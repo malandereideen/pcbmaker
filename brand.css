@@ -1,0 +1,195 @@
+/* ============================================================
+   makr.tools — Brand Design System
+   Graphit · Blau (Struktur) · Orange (Aktion)
+   Drop-in: <link rel="stylesheet" href="/brand.css">
+   Light ist Standard (gut für farbtreue Tool-Inhalte).
+   Dark-Hub:  <html data-theme="dark">
+   ============================================================ */
+
+:root {
+  /* --- Graphit (Light) --- */
+  --bg:            #F4F6F8;
+  --surface:       #FFFFFF;
+  --surface-2:     #EDF0F3;
+  --border:        #DCE1E7;
+  --border-strong: #C3CAD2;
+  --text:          #1B2027;
+  --text-muted:    #5A636E;
+  --text-faint:    #8A939E;
+
+  /* --- Blau: Struktur, Navigation, Links, primäre Aktionen --- */
+  --blue:          #2D6FE0;
+  --blue-deep:     #1B4FB0;
+  --blue-tint:     #E6EFFB;
+  --on-blue-tint:  #1B4FB0;
+  --on-blue:       #FFFFFF;
+
+  /* --- Orange: Highlights, "Neu", sekundäre Call-to-Action --- */
+  --orange:        #F5821F;
+  --orange-deep:   #C25E0C;
+  --orange-tint:   #FDEEDF;
+  --on-orange-tint:#8A4610;
+  --on-orange:     #3A1B02;
+
+  /* --- Neutral-Akzent (z.B. Server-Badge) --- */
+  --neutral-tint:  #E7EAEE;
+  --on-neutral-tint:#4A525C;
+
+  /* --- Typografie --- */
+  --font-display: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+  --font-sans:    'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono:    'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
+
+  /* --- Maße --- */
+  --radius:       8px;
+  --radius-card:  12px;
+  --radius-pill:  999px;
+  --gap:          12px;
+  --pad:          16px;
+  --maxw:         1080px;
+}
+
+html[data-theme="dark"] {
+  --bg:            #16191D;
+  --surface:       #20262D;
+  --surface-2:     #262C33;
+  --border:        #2E3742;
+  --border-strong: #3A4550;
+  --text:          #EAEEF2;
+  --text-muted:    #9AA5B1;
+  --text-faint:    #6E7884;
+
+  --blue-tint:     #16324F;
+  --on-blue-tint:  #8FBEF7;
+
+  --orange-tint:   #3A2410;
+  --on-orange-tint:#F5A65A;
+
+  --neutral-tint:  #2A2F36;
+  --on-neutral-tint:#B4BEC9;
+}
+
+/* ---------- Base ---------- */
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 { font-family: var(--font-display); font-weight: 500; line-height: 1.25; margin: 0 0 .5em; }
+h1 { font-size: 26px; letter-spacing: -.01em; }
+h2 { font-size: 20px; }
+h3 { font-size: 16px; }
+
+a { color: var(--blue); text-decoration: none; }
+a:hover { color: var(--blue-deep); text-decoration: underline; }
+
+code, kbd, .mono { font-family: var(--font-mono); font-size: .9em; }
+
+.container { max-width: var(--maxw); margin: 0 auto; padding: 0 20px; }
+.muted { color: var(--text-muted); }
+.section-label {
+  font-size: 12px; letter-spacing: .04em; color: var(--text-faint);
+  text-transform: none; margin: 0 0 var(--gap);
+}
+
+/* ---------- Header / Nav ---------- */
+.brand-header {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; padding: 14px 20px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.wordmark {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: var(--font-display); font-weight: 500; font-size: 17px;
+  color: var(--text); text-decoration: none; letter-spacing: .01em;
+}
+.wordmark:hover { text-decoration: none; color: var(--text); }
+.wordmark .mark {
+  display: inline-flex; width: 26px; height: 26px; border-radius: 7px;
+  background: var(--blue); color: var(--on-blue);
+  align-items: center; justify-content: center; font-size: 15px;
+}
+.wordmark .dot { color: var(--orange); }
+
+.brand-nav { display: flex; align-items: center; gap: 20px; }
+.brand-nav a { color: var(--text-muted); font-size: 14px; }
+.brand-nav a:hover { color: var(--text); text-decoration: none; }
+.brand-nav a.is-active { color: var(--text); }
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  font: inherit; font-size: 14px; font-weight: 500;
+  padding: 8px 14px; border-radius: var(--radius);
+  border: 1px solid var(--border-strong); background: transparent; color: var(--text);
+  cursor: pointer; transition: background .12s, border-color .12s, transform .06s;
+}
+.btn:hover { background: var(--surface-2); text-decoration: none; }
+.btn:active { transform: scale(.98); }
+.btn--primary { background: var(--blue); border-color: var(--blue); color: var(--on-blue); }
+.btn--primary:hover { background: var(--blue-deep); border-color: var(--blue-deep); }
+.btn--accent { background: var(--orange); border-color: var(--orange); color: var(--on-orange); }
+.btn--accent:hover { background: var(--orange-deep); border-color: var(--orange-deep); color: var(--on-orange); }
+
+/* ---------- Tool grid & cards ---------- */
+.tool-grid {
+  display: grid; gap: var(--gap);
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  margin: 0 0 24px;
+}
+.tool-card {
+  display: block; background: var(--surface);
+  border: 1px solid var(--border); border-radius: var(--radius-card);
+  padding: 16px; color: var(--text); text-decoration: none;
+  transition: border-color .12s, transform .08s;
+}
+.tool-card:hover { border-color: var(--border-strong); text-decoration: none; transform: translateY(-1px); }
+.tool-card__top { display: flex; align-items: flex-start; justify-content: space-between; }
+.tool-card__title { font-family: var(--font-display); font-weight: 500; font-size: 16px; margin: 12px 0 2px; }
+.tool-card__desc { color: var(--text-muted); font-size: 13px; }
+
+.icon-chip {
+  display: inline-flex; width: 34px; height: 34px; border-radius: 9px;
+  align-items: center; justify-content: center; font-size: 19px;
+  background: var(--neutral-tint); color: var(--on-neutral-tint);
+}
+.icon-chip--blue   { background: var(--blue-tint);   color: var(--on-blue-tint); }
+.icon-chip--orange { background: var(--orange-tint); color: var(--on-orange-tint); }
+
+/* ---------- Badges ---------- */
+.badge {
+  font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: var(--radius-pill);
+  background: var(--neutral-tint); color: var(--on-neutral-tint); white-space: nowrap;
+}
+.badge--live   { background: var(--blue-tint);   color: var(--on-blue-tint); }
+.badge--new    { background: var(--orange-tint); color: var(--on-orange-tint); }
+.badge--server { background: var(--neutral-tint); color: var(--on-neutral-tint); }
+
+/* ---------- Card (generisch, für Tool-Inhalte) ---------- */
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-card); padding: var(--pad);
+}
+
+/* ---------- Form controls (Basis) ---------- */
+input, select, textarea {
+  font: inherit; font-size: 14px; color: var(--text);
+  background: var(--surface); border: 1px solid var(--border-strong);
+  border-radius: var(--radius); padding: 8px 10px;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none; border-color: var(--blue);
+  box-shadow: 0 0 0 3px var(--blue-tint);
+}
+
+/* ---------- A11y & Motion ---------- */
+:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }

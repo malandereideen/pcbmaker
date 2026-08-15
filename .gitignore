@@ -1,0 +1,4 @@
+.DS_Store
+# Serverdaten: Schreibschluessel (token.txt) und selbst gebaute Bauteile
+# (eigene.json). Gehoert weder ins Repo noch in den Deploy.
+daten/

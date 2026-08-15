@@ -1,0 +1,2434 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>pcbmaker · makr.tools</title>
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="brand.css">
+<style>
+  html, body { height: 100%; }
+  body { overflow: hidden; display: flex; flex-direction: column; font-size: 14px; }
+
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+
+  #app { flex: 1; display: flex; min-height: 0; }
+
+  /* ---------- Seitenleisten ----------
+     Links wird gebaut, rechts wird ausgegeben. */
+  .seite {
+    width: 320px; flex: none; display: flex; flex-direction: column;
+    background: var(--surface); min-height: 0;
+  }
+  #side { border-right: 1px solid var(--border); }
+  #side2 { border-left: 1px solid var(--border); }
+  .seiteRoll { flex: 1; overflow-y: auto; padding: 16px; }
+
+
+  .group { margin-bottom: 18px; }
+  .group + .group { border-top: 1px solid var(--border); padding-top: 16px; }
+  .group__title {
+    font-family: var(--font-display); font-size: 13px; font-weight: 500;
+    color: var(--text); margin: 0 0 10px;
+  }
+
+  .row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .row > label.key { flex: 0 0 108px; color: var(--text-muted); font-size: 13px; line-height: 1.3; }
+  .row input[type=range] {
+    flex: 1; min-width: 0; height: 18px; padding: 0; border: none; background: transparent;
+    -webkit-appearance: none; appearance: none; cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: var(--border-strong); }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; height: 14px; width: 14px; margin-top: -5px;
+    border-radius: 50%; background: var(--blue); border: 2px solid var(--surface);
+    box-shadow: 0 0 0 1px var(--blue);
+  }
+  input[type=range]:focus { outline: none; box-shadow: none; }
+  .val { flex: 0 0 54px; text-align: right; font-family: var(--font-mono); font-size: 12px; color: var(--text); font-variant-numeric: tabular-nums; }
+  .row select { flex: 1; min-width: 0; }
+  .row input[type=number] { width: 78px; }
+
+  .check { display: inline-flex; align-items: center; gap: 6px; color: var(--text-muted); font-size: 13px; }
+  .check input { width: 15px; height: 15px; padding: 0; accent-color: var(--blue); }
+  .checks { display: flex; flex-wrap: wrap; gap: 10px 14px; margin-bottom: 8px; }
+
+  .btns { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 8px; }
+  .btns.three { grid-template-columns: repeat(3, 1fr); }
+  .btns .btn { justify-content: center; padding: 8px 6px; font-size: 13px; }
+  .full { grid-column: 1 / -1; }
+
+  .hint { color: var(--text-faint); font-size: 12px; line-height: 1.5; margin: 8px 0 0; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 4px; margin: 0 0 10px; }
+  .chip {
+    border: 1px solid var(--border); border-radius: var(--radius-pill, 999px);
+    background: var(--surface); color: var(--text-muted); cursor: pointer;
+    font-family: var(--font-mono); font-size: 11px; line-height: 1; padding: 4px 7px;
+  }
+  .chip:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-tint); }
+
+  .kanten {
+    display: grid; grid-template-columns: auto auto auto auto auto auto;
+    gap: 5px 6px; align-items: center; margin: 10px 0 8px;
+  }
+  .kanten span { font-size: 12.5px; color: var(--text-muted); }
+  .kanten span:nth-child(3n+1) { text-align: right; padding-right: 2px; }
+  .kanten .btn { padding: 3px 0; min-width: 28px; justify-content: center; font-size: 14px; line-height: 1.1; }
+
+  .ebene { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .ebene > .box { flex: 0 0 15px; }
+  .ebene > .box input { width: 15px; height: 15px; padding: 0; margin: 0; accent-color: var(--blue); }
+  .ebene > .name { flex: 1; min-width: 0; font-size: 12.5px; color: var(--text-muted); }
+  .ebene > .name.aus { opacity: .45; text-decoration: line-through; }
+  .ebene input[type=color] {
+    flex: 0 0 40px; width: 40px; height: 24px; padding: 2px;
+    border: 1px solid var(--border); border-radius: 5px; background: var(--surface); cursor: pointer;
+  }
+
+  /* Werkzeugwahl */
+  .tools { display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; margin-bottom: 10px; }
+  .tool {
+    display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer;
+    border: 1px solid var(--border); border-radius: 8px; padding: 7px 2px 5px;
+    background: var(--surface); color: var(--text-muted); font-size: 10.5px; line-height: 1;
+  }
+  .tool svg { width: 18px; height: 18px; }
+  .tool.on { border-color: var(--blue); color: var(--blue); box-shadow: 0 0 0 1px var(--blue); background: var(--blue-tint); }
+
+  /* Lagenwahl */
+  .lagen { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 8px; }
+  .lage {
+    display: flex; align-items: center; justify-content: center; gap: 7px; cursor: pointer;
+    border: 1px solid var(--border); border-radius: 8px; padding: 7px 4px; font-size: 12.5px;
+    color: var(--text-muted); background: var(--surface);
+  }
+  .lage i { width: 11px; height: 11px; border-radius: 3px; display: block; }
+  .lage.on { border-color: var(--text); color: var(--text); box-shadow: 0 0 0 1px var(--text); }
+
+  /* Bühne */
+  #stagewrap { flex: 1; min-width: 0; position: relative; display: flex; }
+  #stage {
+    flex: 1; min-width: 0; overflow: auto; background: var(--bg);
+    background-image: linear-gradient(var(--border) 1px, transparent 1px),
+                      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+  #padder { min-width: 100%; min-height: 100%; display: flex; align-items: center; justify-content: center; padding: 28px; }
+  #paper { position: relative; box-shadow: 0 2px 20px rgba(0,0,0,.24); flex: none; border-radius: 2px; }
+  #paper canvas { display: block; cursor: crosshair; border-radius: 2px; }
+
+  #zoombar {
+    position: absolute; right: 16px; bottom: 16px; z-index: 5;
+    display: flex; align-items: center; gap: 4px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-pill); padding: 4px; box-shadow: 0 2px 10px rgba(0,0,0,.10);
+  }
+  #zoombar .btn { border: none; padding: 5px 9px; border-radius: var(--radius-pill); font-size: 14px; line-height: 1; }
+  #zoomVal { font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); min-width: 46px; text-align: center; }
+
+  #statusbar {
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    padding: 8px 16px; border-top: 1px solid var(--border);
+    background: var(--surface); color: var(--text-muted); font-size: 12px;
+  }
+  #statusbar b { color: var(--text); font-weight: 500; font-family: var(--font-mono); }
+  #stWarn { color: var(--orange-deep, #C25E0C); }
+
+  /* Schmales Fenster: beide Leisten oben nebeneinander, Bühne darunter.
+     Steht bewusst ganz am Ende — eine Media Query erhöht die Spezifität
+     nicht, eine spätere gleichwertige Regel würde sie überschreiben. */
+  @media (max-width: 1150px) {
+    #app { flex-wrap: wrap; align-content: flex-start; }
+    #app .seite { width: 50%; max-height: 44vh; border: none; border-bottom: 1px solid var(--border); }
+    #app #side { border-right: 1px solid var(--border); }
+    #app #stagewrap { order: 3; flex: 1 1 100%; width: 100%; min-height: 260px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="brand-header">
+  <a class="wordmark" href="https://tools.malandereideen.de/">
+    <span class="mark" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 3 8l9 5 9-5-9-5Z"/><path d="m3 16 9 5 9-5"/><path d="m3 12 9 5 9-5"/></svg></span>
+    makr<span class="dot">.</span>tools
+  </a>
+  <nav class="brand-nav">
+    <span class="badge badge--new">pcbmaker</span>
+    <button class="btn" id="mkr-theme" type="button" aria-label="Hell/Dunkel umschalten" title="Hell/Dunkel umschalten" style="padding:6px 10px;line-height:1;">☾</button>
+  </nav>
+</header>
+
+<div id="app">
+  <aside id="side" class="seite">
+    <div class="seiteRoll">
+
+      <div class="group">
+        <h2 class="group__title">Werkzeug</h2>
+        <div class="tools" id="tools">
+          <div class="tool on" data-modus="zeiger" title="Auswählen, verschieben (1)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="m4 3 7 17 2.5-6.5L20 11 4 3Z"/></svg>Zeiger</div>
+          <div class="tool" data-modus="pad" title="Pad setzen (2)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.2"/></svg>Pad</div>
+          <div class="tool" data-modus="bahn" title="Leiterbahn ziehen (3)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18h6l6-6h6"/></svg>Bahn</div>
+          <div class="tool" data-modus="flaeche" title="Kupferfläche aufziehen (4)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="6" width="16" height="12" rx="1"/></svg>Fläche</div>
+          <div class="tool" data-modus="bauteil" title="Bauteil setzen (5)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="7" y="4" width="10" height="16" rx="1"/><path d="M7 8H4M7 12H4M7 16H4M20 8h-3M20 12h-3M20 16h-3"/></svg>Bauteil</div>
+          <div class="tool" data-modus="text" title="Beschriftung setzen (6)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 6V4h14v2M12 4v16M9 20h6"/></svg>Text</div>
+        </div>
+        <div class="lagen" id="lagen">
+          <div class="lage on" data-lage="unten"><i style="background:#E2A32C"></i>Unterseite</div>
+          <div class="lage" data-lage="oben"><i style="background:#D9553F"></i>Oberseite</div>
+        </div>
+        <div class="checks">
+          <label class="check"><input type="checkbox" id="halb"> halbes Raster (1,27)</label>
+          <label class="check"><input type="checkbox" id="diag" checked> nur 45°</label>
+          <label class="check"><input type="checkbox" id="spOben" checked> Oberseite spiegeln</label>
+        </div>
+        <p class="hint" id="spHint"></p>
+        <p class="hint" id="modusHint"></p>
+      </div>
+
+      <div class="group">
+        <h2 class="group__title">Platine</h2>
+        <div class="row"><label class="key" for="cols">Raster quer</label><input type="range" id="cols" min="4" max="60" step="1" value="20"><span class="val" id="colsV"></span></div>
+        <div class="row"><label class="key" for="rows">Raster hoch</label><input type="range" id="rows" min="4" max="60" step="1" value="16"><span class="val" id="rowsV"></span></div>
+        <div class="kanten" id="kanten">
+          <span>Links</span><button class="btn" data-seite="links" data-d="-1">−</button><button class="btn" data-seite="links" data-d="1">+</button>
+          <span>Oben</span><button class="btn" data-seite="oben" data-d="-1">−</button><button class="btn" data-seite="oben" data-d="1">+</button>
+          <span>Rechts</span><button class="btn" data-seite="rechts" data-d="-1">−</button><button class="btn" data-seite="rechts" data-d="1">+</button>
+          <span>Unten</span><button class="btn" data-seite="unten" data-d="-1">−</button><button class="btn" data-seite="unten" data-d="1">+</button>
+        </div>
+        <div class="btns"><button id="zuschneiden" class="btn full">Auf Inhalt zuschneiden</button></div>
+        <p class="hint">Die Regler wachsen nur nach rechts und unten. Über die Kanten-Knöpfe kommt links und
+          oben eine Rasterreihe dazu oder weg — die Zeichnung wandert dabei mit, bleibt also da, wo sie hingehört.</p>
+        <p class="hint" id="masse"></p>
+      </div>
+
+      <div class="group">
+        <h2 class="group__title">Pad und Bahn</h2>
+        <div class="row"><label class="key" for="padD">Pad-Ø</label><input type="range" id="padD" min="0.8" max="4" step="0.1" value="1.8"><span class="val" id="padDV"></span></div>
+        <div class="row"><label class="key" for="bohrD">Bohrung Ø</label><input type="range" id="bohrD" min="0" max="2.5" step="0.1" value="0.9"><span class="val" id="bohrDV"></span></div>
+        <div class="row"><label class="key" for="padForm">Pad-Form</label><select id="padForm">
+          <option value="rund" selected>rund</option>
+          <option value="eckig">quadratisch</option>
+        </select></div>
+        <div class="row"><label class="key" for="bahnB">Bahnbreite</label><input type="range" id="bahnB" min="0.2" max="4" step="0.1" value="0.8"><span class="val" id="bahnBV"></span></div>
+        <div class="row"><label class="key" for="frei">Freistellung</label><input type="range" id="frei" min="0.2" max="2" step="0.05" value="0.5"><span class="val" id="freiV"></span></div>
+        <p class="hint">Die Freistellung gilt nur für Masseflächen: alles andere Kupfer wird um diesen Abstand aus ihr ausgespart.</p>
+      </div>
+
+      <div class="group">
+        <h2 class="group__title">Bauteil</h2>
+        <div class="row"><label class="key" for="bauteil">Typ</label><select id="bauteil"></select></div>
+        <div class="row"><label class="key" for="rot">Drehung</label><select id="rot">
+          <option value="0" selected>0°</option><option value="90">90°</option>
+          <option value="180">180°</option><option value="270">270°</option>
+        </select></div>
+        <p class="hint">Klick setzt das Bauteil, Pin 1 liegt am Klickpunkt. <b>r</b> dreht — auch ein bereits gesetztes, ausgewähltes Bauteil.</p>
+        <p class="hint" id="bibStatus"></p>
+      </div>
+
+      <div class="group">
+        <h2 class="group__title">Eigenes Bauteil</h2>
+        <p class="hint" style="margin-top:0">Pins unten zeichnen, oben beschriften, mit dem Zeiger einen Rahmen
+          darum ziehen — was ganz darin liegt, kommt mit, über beide Seiten hinweg. Dann Namen vergeben
+          und speichern. Ankerpunkt wird das oberste linke Pad.</p>
+        <div class="row"><label class="key">Auswahl</label><span id="auswahlZahl" style="flex:1;font-size:12.5px;color:var(--text-muted)"></span></div>
+        <div class="row"><label class="key" for="bauteilName">Name</label><input type="text" id="bauteilName" maxlength="60" placeholder="ESP32 DevKit"></div>
+        <div class="row"><label class="key" for="bauteilKat">Kategorie</label><select id="bauteilKat"></select></div>
+        <div class="btns">
+          <button id="alsBauteil" class="btn btn--primary" disabled>Speichern</button>
+          <button id="bauteilWeg" class="btn">Gewähltes löschen</button>
+        </div>
+        <div class="btns">
+          <button id="bibExport" class="btn">Eigene sichern</button>
+          <button id="bibImport" class="btn">Einlesen</button>
+        </div>
+        <input type="file" id="bibDatei" accept=".json,application/json" hidden>
+        <div class="row"><label class="key" for="tokenFeld">Schreibschlüssel</label><input type="password" id="tokenFeld" placeholder="nur zum Speichern"></div>
+        <p class="hint" id="bibWarn"></p>
+      </div>
+
+      <div class="group">
+        <h2 class="group__title">Beschriftung</h2>
+        <div class="row"><label class="key" for="textS">Text</label><input type="text" id="textS" value="GND" maxlength="24"></div>
+        <div class="chips" id="chips"></div>
+        <div class="row"><label class="key" for="textH">Höhe</label><input type="range" id="textH" min="1" max="8" step="0.5" value="2.5"><span class="val" id="textHV"></span></div>
+        <div class="row"><label class="key" for="textB">Strichbreite</label><input type="range" id="textB" min="0.2" max="1.5" step="0.05" value="0.5"><span class="val" id="textBV"></span></div>
+        <div class="row"><label class="key" for="textRot">Drehung</label><select id="textRot">
+          <option value="0" selected>0°</option><option value="90">90°</option>
+          <option value="180">180°</option><option value="270">270°</option>
+        </select></div>
+        <div class="checks">
+          <label class="check"><input type="checkbox" id="textRaster"> ans Raster binden</label>
+        </div>
+        <p class="hint">Die Schrift ist Kupfer wie alles andere — die Isolierbahnen umfahren sie von selbst.
+          <b>r</b> dreht ebenfalls, eine ausgewählte Beschriftung genauso wie die nächste zu setzende.</p>
+      </div>
+
+    </div>
+  </aside>
+
+  <div id="stagewrap">
+    <div id="stage">
+      <div id="padder"><div id="paper"><canvas id="cv"></canvas></div></div>
+    </div>
+    <div id="zoombar">
+      <button class="btn" id="zOut" title="kleiner">−</button>
+      <span id="zoomVal"></span>
+      <button class="btn" id="zIn" title="größer">+</button>
+      <button class="btn" id="zFit" title="einpassen">⤢</button>
+    </div>
+  </div>
+
+  <aside id="side2" class="seite">
+    <div class="seiteRoll">
+
+      <div class="group">
+        <div class="btns">
+          <button id="expSvg" class="btn btn--primary" title="Schreibt platine-unten.svg und platine-oben.svg">SVG · 2 Seiten</button>
+          <button id="calc" class="btn btn--accent">Fräsbahnen</button>
+        </div>
+        <div class="btns three">
+          <button id="save" class="btn">Speichern</button>
+          <button id="load" class="btn">Laden</button>
+          <button id="clear" class="btn">Leeren</button>
+        </div>
+        <input type="file" id="file" accept=".json,application/json" hidden>
+      </div>
+
+      <div class="group">
+        <h2 class="group__title">Isolierfräsen</h2>
+        <div class="row"><label class="key" for="fraeser">Fräser-Ø</label><input type="range" id="fraeser" min="0.05" max="2" step="0.05" value="0.2"><span class="val" id="fraeserV"></span></div>
+        <div class="row"><label class="key" for="umlauf">Umläufe</label><input type="range" id="umlauf" min="1" max="6" step="1" value="2"><span class="val" id="umlaufV"></span></div>
+        <div class="row"><label class="key" for="ueber">Bahnabstand</label><input type="range" id="ueber" min="0.05" max="1.5" step="0.05" value="0.15"><span class="val" id="ueberV"></span></div>
+        <div class="row"><label class="key" for="res">Genauigkeit</label><input type="range" id="res" min="6" max="40" step="2" value="16"><span class="val" id="resV"></span></div>
+        <div class="checks">
+          <label class="check"><input type="checkbox" id="zeigFraes" checked> Bahnen anzeigen</label>
+        </div>
+        <p class="hint">Die Bahnen sind Mittellinien des Fräsers. Der erste Umlauf läuft im halben Fräser-Ø ums Kupfer, jeder weitere um den Bahnabstand weiter nach außen.</p>
+      </div>
+
+      <div class="group">
+        <h2 class="group__title">Kontur und Bohren</h2>
+        <div class="row"><label class="key" for="kFraeser">Kontur-Fräser</label><input type="range" id="kFraeser" min="0.5" max="4" step="0.1" value="2"><span class="val" id="kFraeserV"></span></div>
+        <div class="row"><label class="key" for="stege">Haltestege</label><input type="range" id="stege" min="0" max="12" step="1" value="0"><span class="val" id="stegeV"></span></div>
+        <div class="row"><label class="key" for="stegB">Stegbreite</label><input type="range" id="stegB" min="0.5" max="6" step="0.5" value="2"><span class="val" id="stegBV"></span></div>
+        <p class="hint" id="stegHint"></p>
+      </div>
+
+      <div class="group">
+        <h2 class="group__title">Was ins SVG kommt</h2>
+        <div class="row"><label class="key" for="isoArt">Isolierbahnen</label><select id="isoArt">
+          <option value="linie" selected>Linien — Fräsen</option>
+          <option value="flaeche">Fläche — Gravieren</option>
+        </select></div>
+        <p class="hint" id="isoHint"></p>
+        <div class="row"><label class="key" for="bohrArt">Bohrungen als</label><select id="bohrArt">
+          <option value="linie" selected>Kreis-Umriss</option>
+          <option value="flaeche">gefüllter Punkt</option>
+        </select></div>
+      </div>
+
+      <div class="group">
+        <h2 class="group__title">Ebenen und Farben</h2>
+        <div id="ebenen"></div>
+        <div class="btns">
+          <button id="farbStd" class="btn">Farben zurücksetzen</button>
+          <button id="kopieSvg" class="btn">aktive Seite kopieren</button>
+        </div>
+        <p class="hint">Der Export schreibt <b>zwei Dateien</b>, <code>platine-unten.svg</code> und
+          <code>platine-oben.svg</code>, beide ungespiegelt und beide mit genau diesen Ebenen in
+          genau dieser Reihenfolge. xTool Studio sortiert beim Import nach Farbe:
+          <b>eine Farbe = eine Ebene</b>; die Farbe steht an jedem einzelnen Element, nicht nur an
+          der Gruppe. Die Paare (1) und (2) sind dieselbe Geometrie zweimal — für zwei Durchgänge
+          mit eigenen Einstellungen. Die untersten drei sind Zugaben, normalerweise aus.</p>
+        <p class="hint"><b>Restfläche</b> ist das Kupfer, das nach dem Isolieren neben den Bahnen
+          stehen bleibt. Auf der Rohplatine ist alles Kupfer — trägt man das Feld nicht ab, brückt
+          das Lötzinn beim Löten über den schmalen Graben dorthin. Diese Ebene komplett abtragen
+          lassen, dann bleibt nur noch, was leiten soll. Sie reicht <b>1 mm über die Außenkontur
+          hinaus</b> — sonst bliebe zwischen Platinenrand und Schnittbahn ein Kupferstreifen stehen.</p>
+        <p class="hint" id="farbWarn" style="color:var(--orange-deep)"></p>
+        <div class="row"><label class="key" for="strich">Linienstärke</label><input type="range" id="strich" min="0.01" max="0.5" step="0.01" value="0.05"><span class="val" id="strichV"></span></div>
+      </div>
+
+    </div>
+  </aside>
+</div>
+
+<div id="statusbar">
+  <span>Platine <b id="stMass">—</b></span>
+  <span>Raster <b>2,54 mm</b></span>
+  <span>Pads <b id="stPads">0</b></span>
+  <span>Bahnen <b id="stBahnen">0</b></span>
+  <span>Bohrungen <b id="stBohr">0</b></span>
+  <span>Fräsweg <b id="stWeg">—</b></span>
+  <span id="stWarn"></span>
+</div>
+
+<script>
+(function () {
+  var root = document.documentElement, KEY = 'mkr-theme';
+  var q = new URLSearchParams(location.search).get('theme');
+  var saved = q || localStorage.getItem(KEY);
+  if (saved) root.dataset.theme = saved;
+  var btn = document.getElementById('mkr-theme');
+  function sync() { btn.textContent = root.dataset.theme === 'dark' ? '☾' : '☀'; }
+  sync();
+  btn.addEventListener('click', function () {
+    root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
+    localStorage.setItem(KEY, root.dataset.theme);
+    sync();
+  });
+})();
+</script>
+
+<script>
+'use strict';
+
+/* ============================================================
+   pcbmaker — Platinen im 2,54er Raster zeichnen und daraus
+   die Fräsgrafik fürs Isolierfräsen rechnen.
+
+   Alles rechnet in Millimetern. Die Isolierbahnen entstehen
+   nicht durch Polygon-Offset, sondern über ein Rasterbild des
+   Kupfers: davon wird die exakte Distanztransformation
+   gebildet, und die Bahnen sind die Höhenlinien dieses
+   Distanzfeldes (Marching Squares). Das kommt mit beliebigen
+   Formen und Verschmelzungen klaglos zurecht.
+   ============================================================ */
+
+var G = 2.54;                 /* Rastermaß in mm */
+var el = function (id) { return document.getElementById(id); };
+
+/* ---------- Bauteil-Bibliothek ----------
+   Wird beim Start von bibliothek.php geholt (oder ersatzweise direkt aus
+   bauteile.json, falls kein PHP laeuft). Ein Bauteil ist eine Liste von
+   Teilen in mm, gemessen vom Ankerpunkt aus — Pin 1. Jedes Teil traegt
+   seine eigene Lage, deshalb kann ein Bauteil unten Pins und oben
+   Beschriftung haben.
+
+   { id, name, kategorie, korpus:[x0,y0,x1,y1]|null,
+     teile: [ {t:'pad'|'text'|'bahn'|'flaeche', ...} ] }              */
+
+var BIB = { standard: [], eigene: [], kategorien: [], schreiben: false, quelle: 'nichts' };
+
+function bauteilDef(id) {
+  var i;
+  for (i = 0; i < BIB.eigene.length; i++) if (BIB.eigene[i].id === id) return BIB.eigene[i];
+  for (i = 0; i < BIB.standard.length; i++) if (BIB.standard[i].id === id) return BIB.standard[i];
+  return null;
+}
+function alleBauteile() { return BIB.standard.concat(BIB.eigene); }
+
+/* ---------- Strichschrift ----------
+   Eine eingebaute Einlinien-Schrift statt einer Systemschrift: nur so
+   zeichnen Anzeige, Rasterbild und SVG garantiert dieselben Buchstaben.
+   Alle Punkte im Kasten 0…4 quer, 0…6 hoch, y zeigt nach unten.
+   Jeder Buchstabe ist eine Liste von Linienzügen. */
+var SCHRIFT_H = 6, SCHRIFT_B = 4, SCHRIFT_LUFT = 1.4;
+var SCHRIFT = {
+  'A': [[[0,6],[2,0],[4,6]], [[0.7,4],[3.3,4]]],
+  'B': [[[0,0],[0,6]], [[0,0],[3,0],[4,1],[4,2],[3,3],[0,3]], [[0,3],[3,3],[4,4],[4,5],[3,6],[0,6]]],
+  'C': [[[4,1],[3,0],[1,0],[0,1],[0,5],[1,6],[3,6],[4,5]]],
+  'D': [[[0,0],[0,6]], [[0,0],[3,0],[4,1],[4,5],[3,6],[0,6]]],
+  'E': [[[4,0],[0,0],[0,6],[4,6]], [[0,3],[3,3]]],
+  'F': [[[4,0],[0,0],[0,6]], [[0,3],[3,3]]],
+  'G': [[[4,1],[3,0],[1,0],[0,1],[0,5],[1,6],[3,6],[4,5],[4,3],[2,3]]],
+  'H': [[[0,0],[0,6]], [[4,0],[4,6]], [[0,3],[4,3]]],
+  'I': [[[2,0],[2,6]], [[1,0],[3,0]], [[1,6],[3,6]]],
+  'J': [[[3,0],[3,5],[2,6],[1,6],[0,5]]],
+  'K': [[[0,0],[0,6]], [[4,0],[0.2,3.2]], [[1.4,2.2],[4,6]]],
+  'L': [[[0,0],[0,6],[4,6]]],
+  'M': [[[0,6],[0,0],[2,2.6],[4,0],[4,6]]],
+  'N': [[[0,6],[0,0],[4,6],[4,0]]],
+  'O': [[[1,0],[3,0],[4,1],[4,5],[3,6],[1,6],[0,5],[0,1],[1,0]]],
+  'P': [[[0,6],[0,0],[3,0],[4,1],[4,2],[3,3],[0,3]]],
+  'Q': [[[1,0],[3,0],[4,1],[4,5],[3,6],[1,6],[0,5],[0,1],[1,0]], [[2.4,4.4],[4,6]]],
+  'R': [[[0,6],[0,0],[3,0],[4,1],[4,2],[3,3],[0,3]], [[2,3],[4,6]]],
+  'S': [[[4,1],[3,0],[1,0],[0,1],[0,2],[1,3],[3,3],[4,4],[4,5],[3,6],[1,6],[0,5]]],
+  'T': [[[0,0],[4,0]], [[2,0],[2,6]]],
+  'U': [[[0,0],[0,5],[1,6],[3,6],[4,5],[4,0]]],
+  'V': [[[0,0],[2,6],[4,0]]],
+  'W': [[[0,0],[1,6],[2,2.6],[3,6],[4,0]]],
+  'X': [[[0,0],[4,6]], [[4,0],[0,6]]],
+  'Y': [[[0,0],[2,3],[4,0]], [[2,3],[2,6]]],
+  'Z': [[[0,0],[4,0],[0,6],[4,6]]],
+  '0': [[[1,0],[3,0],[4,1],[4,5],[3,6],[1,6],[0,5],[0,1],[1,0]], [[0.8,4.6],[3.2,1.4]]],
+  '1': [[[0.8,1.2],[2,0],[2,6]], [[1,6],[3,6]]],
+  '2': [[[0,1],[1,0],[3,0],[4,1],[4,2],[0,6],[4,6]]],
+  '3': [[[0,0],[4,0],[2,2.6]], [[2,2.6],[3,2.6],[4,3.6],[4,5],[3,6],[1,6],[0,5]]],
+  '4': [[[3,6],[3,0],[0,4],[4,4]]],
+  '5': [[[4,0],[0,0],[0,2.6],[3,2.6],[4,3.6],[4,5],[3,6],[1,6],[0,5]]],
+  '6': [[[4,1],[3,0],[1,0],[0,1],[0,5],[1,6],[3,6],[4,5],[4,4],[3,3],[1,3],[0,4]]],
+  '7': [[[0,0],[4,0],[1.4,6]]],
+  '8': [[[1,3],[0,2],[0,1],[1,0],[3,0],[4,1],[4,2],[3,3],[1,3],[0,4],[0,5],[1,6],[3,6],[4,5],[4,4],[3,3],[1,3]]],
+  '9': [[[0,5],[1,6],[3,6],[4,5],[4,1],[3,0],[1,0],[0,1],[0,2],[1,3],[3,3],[4,2]]],
+  '+': [[[0.4,3],[3.6,3]], [[2,1.4],[2,4.6]]],
+  '-': [[[0.4,3],[3.6,3]]],
+  '=': [[[0.4,2],[3.6,2]], [[0.4,4],[3.6,4]]],
+  '/': [[[0,6],[4,0]]],
+  '\\':[[[0,0],[4,6]]],
+  '_': [[[0,6],[4,6]]],
+  '.': [[[1.8,5.8],[2.2,5.8]]],
+  ',': [[[2.2,5.4],[1.6,6.6]]],
+  ':': [[[1.8,2],[2.2,2]], [[1.8,5],[2.2,5]]],
+  '(': [[[3,0],[1.4,1.8],[1.4,4.2],[3,6]]],
+  ')': [[[1,0],[2.6,1.8],[2.6,4.2],[1,6]]],
+  '<': [[[3.4,1],[0.8,3],[3.4,5]]],
+  '>': [[[0.6,1],[3.2,3],[0.6,5]]],
+  '*': [[[2,1],[2,5]], [[0.4,1.8],[3.6,4.2]], [[3.6,1.8],[0.4,4.2]]],
+  '#': [[[1.2,0.6],[0.6,5.4]], [[3,0.6],[2.4,5.4]], [[0.2,2],[3.8,2]], [[0.2,4],[3.8,4]]],
+  '!': [[[2,0],[2,4]], [[1.8,5.8],[2.2,5.8]]],
+  '?': [[[0.2,1],[1.2,0],[2.8,0],[3.8,1],[3.8,2],[2,3.4],[2,4.2]], [[1.8,5.8],[2.2,5.8]]],
+  '~': [[[0.2,3.4],[1.4,2.4],[2.6,3.6],[3.8,2.6]]],
+  '°': [[[1,0.3],[3,0.3],[3,2.3],[1,2.3],[1,0.3]]],
+  'Ω': [[[0.2,6],[1.6,6],[1.6,5],[0.4,3.6],[0.4,1.4],[1.4,0],[2.6,0],[3.6,1.4],[3.6,3.6],[2.4,5],[2.4,6],[3.8,6]]],
+  ' ': []
+};
+
+/* Linienzüge eines Textes, in mm, schon gedreht und gesetzt.
+   Aufhängepunkt ist links auf halber Höhe — so sitzt die Zeile auf
+   derselben Linie wie die Pads daneben. */
+function textPfade(it) {
+  var s = (it.s || '').toUpperCase();
+  var sk = it.h / SCHRIFT_H, out = [], x = 0, i, j, k;
+  var hoch = it.h / 2;
+  var co = Math.cos(it.rot * Math.PI / 180), si = Math.sin(it.rot * Math.PI / 180);
+  /* Beschriftung, die in der gespiegelten Ansicht gesetzt wurde, liegt
+     im Speicher seitenverkehrt. Nur so liest sie sich sowohl auf dem
+     Bildschirm als auch im ebenfalls gespiegelten SVG richtig herum. */
+  var sp = it.sp ? -1 : 1;
+  for (i = 0; i < s.length; i++) {
+    var g = SCHRIFT[s[i]];
+    if (g === undefined) g = SCHRIFT['?'];
+    for (j = 0; j < g.length; j++) {
+      var zug = [];
+      for (k = 0; k < g[j].length; k++) {
+        var px = (x + g[j][k][0]) * sk * sp, py = g[j][k][1] * sk - hoch;
+        zug.push([it.x + px * co - py * si, it.y + px * si + py * co]);
+      }
+      out.push(zug);
+    }
+    x += SCHRIFT_B + SCHRIFT_LUFT;
+  }
+  return out;
+}
+function textBreite(it) {
+  var n = (it.s || '').length;
+  return n ? (n * (SCHRIFT_B + SCHRIFT_LUFT) - SCHRIFT_LUFT) * it.h / SCHRIFT_H : 0;
+}
+
+/* ---------- Zustand ---------- */
+var S = {
+  cols: 20, rows: 16,
+  items: [],
+  lage: 'unten',
+  modus: 'zeiger',
+  halb: false, diag: true,
+  padD: 1.8, bohrD: 0.9, padForm: 'rund', bahnB: 0.8, frei: 0.5,
+  bauteil: 'dip14', rot: 0,
+  text: 'GND', textH: 2.5, textB: 0.5, textRot: 0, textRaster: false,
+  spOben: true,
+  fraeser: 0.2, umlauf: 2, ueber: 0.15, res: 16,
+  kFraeser: 2, stege: 4, stegB: 2,
+  strich: 0.05,
+  farben: null,
+  zoom: 5,
+  sel: null, mehr: [], entwurf: null, ziehen: null, maus: null,
+  fraes: null, veraltet: true,
+  undo: []
+};
+
+var FARBE = {
+  platine:  '#0E5A38',
+  platine2: '#0B4A2E',
+  raster:   'rgba(255,255,255,.20)',
+  unten:    '#E2A32C',
+  oben:     '#D9553F',
+  bohrung:  '#08321F',
+  korpus:   'rgba(255,255,255,.55)',
+  fraes:    '#57D8FF',
+  kontur:   '#FF7BD5',
+  wahl:     '#FFFFFF'
+};
+
+function W() { return S.cols * G; }
+function H() { return S.rows * G; }
+
+/* Die Zeichnung ist der Blick auf die Unterseite. Steht die Oberseite
+   auf aktiv, kippt die Ansicht — man schaut dann von oben auf die
+   Platine, so wie sie liegt, wenn man sie zum Bearbeiten umdreht.
+   Dieselbe Kippung wandert in platine-oben.svg, sonst passen die
+   beiden Seiten nach dem Umdrehen nicht mehr übereinander. */
+function gespiegelt(lage) { return S.spOben && (lage || S.lage) === 'oben'; }
+
+/* ---------- Kleinkram ---------- */
+function nr(v, n) { return (Math.round(v * Math.pow(10, n)) / Math.pow(10, n)).toString(); }
+function de(v, n) { return nr(v, n).replace('.', ','); }
+function schritt() { return S.halb ? G / 2 : G; }
+function snap(v) {
+  var st = schritt(), off = G / 2;
+  return Math.round((v - off) / st) * st + off;
+}
+/* Beschriftung sitzt zwischen den Bauteilen, nicht auf ihren Pins —
+   deshalb hängt sie standardmäßig nicht am Raster. */
+function freiesElement(it) { return it && it.t === 'text' && !S.textRaster; }
+function kopie(o) { return JSON.parse(JSON.stringify(o)); }
+
+function merken() {
+  S.undo.push(JSON.stringify({ items: S.items, cols: S.cols, rows: S.rows }));
+  if (S.undo.length > 60) S.undo.shift();
+}
+function zurueck() {
+  if (!S.undo.length) return;
+  var z = JSON.parse(S.undo.pop());
+  S.items = z.items; S.cols = z.cols; S.rows = z.rows;
+  rasterRegler();
+  S.sel = null; S.entwurf = null;
+  veraendert();
+}
+
+/* ---------- Bauteil auflösen ----------
+   Ein platziertes Bauteil ist nur ein Verweis auf die Bibliothek plus
+   Ort und Drehung. `entfalten` macht daraus die einzelnen Kupferstuecke
+   mit absoluten Koordinaten. Alles andere im Programm rechnet nur noch
+   mit diesen Stuecken — dadurch braucht kein einziger Ort im Code zu
+   wissen, dass es Bauteile ueberhaupt gibt.                           */
+function dreh(x, y, rot) {
+  if (rot === 90) return [-y, x];
+  if (rot === 180) return [-x, -y];
+  if (rot === 270) return [y, -x];
+  return [x, y];
+}
+
+function entfalten(it) {
+  if (it.t !== 'bauteil') return [it];
+  var def = bauteilDef(it.bid || it.typ);
+  if (!def) return [];
+  var rot = it.rot || 0, out = [];
+  (def.teile || []).forEach(function (t) {
+    var k = kopie(t);
+    k.lage = t.lage || it.lage || 'unten';
+    if (k.t === 'bahn') {
+      k.pts = (t.pts || []).map(function (p) {
+        var r = dreh(p[0], p[1], rot);
+        return [it.x + r[0], it.y + r[1]];
+      });
+    } else if (k.t === 'flaeche') {
+      /* Beide Ecken drehen und neu ordnen — sonst haette das Rechteck
+         nach einer 90°-Drehung eine negative Breite. */
+      var a = dreh(t.x, t.y, rot), b = dreh(t.x + t.w, t.y + t.h, rot);
+      k.x = it.x + Math.min(a[0], b[0]);
+      k.y = it.y + Math.min(a[1], b[1]);
+      k.w = Math.abs(b[0] - a[0]);
+      k.h = Math.abs(b[1] - a[1]);
+    } else {
+      var r = dreh(t.x, t.y, rot);
+      k.x = it.x + r[0];
+      k.y = it.y + r[1];
+      if (k.t === 'text') k.rot = ((t.rot || 0) + rot) % 360;
+    }
+    out.push(k);
+  });
+  return out;
+}
+
+/* Alle Kupferstuecke der Platine, Bauteile schon aufgeloest. */
+function alleStuecke(lage) {
+  var out = [], i, j;
+  for (i = 0; i < S.items.length; i++) {
+    var teile = entfalten(S.items[i]);
+    for (j = 0; j < teile.length; j++) {
+      if (!lage || teile[j].lage === lage) out.push(teile[j]);
+    }
+  }
+  return out;
+}
+
+function bauteilKorpus(it) {
+  var def = bauteilDef(it.bid || it.typ);
+  if (!def || !def.korpus) return null;
+  var k = def.korpus, ecken = [[k[0], k[1]], [k[2], k[1]], [k[2], k[3]], [k[0], k[3]]], out = [], i;
+  for (i = 0; i < 4; i++) {
+    var r = dreh(ecken[i][0], ecken[i][1], it.rot || 0);
+    out.push([it.x + r[0], it.y + r[1]]);
+  }
+  return out;
+}
+
+/* Welche Seite ein Element belegt. Ein Bauteil kann beide belegen —
+   dann zaehlt die Seite seines ersten Teils, also die der Pins. */
+function itemLage(it) {
+  if (it.t !== 'bauteil') return it.lage;
+  var teile = entfalten(it);
+  return teile.length ? teile[0].lage : 'unten';
+}
+
+/* Alle Pads einer Lage — echte Pads plus die aus Bauteilen. */
+function allePads(lage) {
+  return alleStuecke(lage).filter(function (s) { return s.t === 'pad'; });
+}
+
+/* ============================================================
+   Kupfer zeichnen — für die Anzeige und fürs Rasterbild
+   dieselbe Routine, damit beides garantiert übereinstimmt.
+   ctx ist bereits auf mm skaliert und enthält nur diese Lage.
+   ============================================================ */
+function malKupfer(ctx, lage, farbe, opts) {
+  opts = opts || {};
+  var nur = opts.nur;                 /* 'leiter' | 'text' | nichts */
+  var i, it, pads, p;
+  var masse = [], normal = [], stuecke = alleStuecke(lage);
+  for (i = 0; i < stuecke.length; i++) {
+    it = stuecke[i];
+    if (it.t === 'flaeche' && it.masse) masse.push(it); else normal.push(it);
+  }
+  /* Was tatsächlich gemalt wird. Ausgestanzt wird trotzdem immer mit
+     allem — sonst klebte die Beschriftung an der Massefläche. */
+  var malen = nur === 'text' ? normal.filter(istText)
+            : nur === 'leiter' ? normal.filter(function (x) { return !istText(x); })
+            : normal;
+  if (nur === 'text') masse = [];
+
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  ctx.fillStyle = farbe; ctx.strokeStyle = farbe;
+
+  /* 1. Masseflächen voll */
+  for (i = 0; i < masse.length; i++) ctx.fillRect(masse[i].x, masse[i].y, masse[i].w, masse[i].h);
+
+  /* 2. Freistellung ausstanzen: alles andere Kupfer, aufgedickt */
+  if (masse.length) {
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.fillStyle = '#000'; ctx.strokeStyle = '#000';
+    for (i = 0; i < normal.length; i++) malStueck(ctx, normal[i], S.frei);
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.fillStyle = farbe; ctx.strokeStyle = farbe;
+  }
+
+  /* 3. Bahnen, Flächen, Pads, Beschriftung */
+  for (i = 0; i < malen.length; i++) malStueck(ctx, malen[i], 0);
+
+  /* 4. Bohrlöcher nur in der Anzeige */
+  if (opts.loecher) {
+    ctx.fillStyle = opts.lochFarbe || FARBE.bohrung;
+    pads = allePads(lage);
+    for (i = 0; i < pads.length; i++) {
+      p = pads[i];
+      if (!(p.bohr > 0)) continue;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.bohr / 2, 0, 6.2832); ctx.fill();
+    }
+  }
+}
+
+function istText(it) { return it.t === 'text'; }
+
+/* Ein einzelnes Kupferstück, wahlweise um `auf` mm aufgedickt. */
+function malStueck(ctx, it, auf) {
+  var i, p, pads;
+  if (it.t === 'pad') {
+    kreisOderEck(ctx, it.x, it.y, it.d + 2 * auf, it.form);
+  } else if (it.t === 'flaeche') {
+    ctx.fillRect(it.x - auf, it.y - auf, it.w + 2 * auf, it.h + 2 * auf);
+  } else if (it.t === 'text') {
+    var zuege = textPfade(it);
+    ctx.lineWidth = it.b + 2 * auf;
+    for (i = 0; i < zuege.length; i++) {
+      var z = zuege[i];
+      ctx.beginPath();
+      ctx.moveTo(z[0][0], z[0][1]);
+      for (var m = 1; m < z.length; m++) ctx.lineTo(z[m][0], z[m][1]);
+      if (z.length === 1) ctx.lineTo(z[0][0], z[0][1]);
+      ctx.stroke();
+    }
+  } else if (it.t === 'bahn') {
+    if (it.pts.length < 2) {
+      if (it.pts.length === 1) kreisOderEck(ctx, it.pts[0][0], it.pts[0][1], it.b + 2 * auf, 'rund');
+      return;
+    }
+    ctx.lineWidth = it.b + 2 * auf;
+    ctx.beginPath();
+    ctx.moveTo(it.pts[0][0], it.pts[0][1]);
+    for (i = 1; i < it.pts.length; i++) ctx.lineTo(it.pts[i][0], it.pts[i][1]);
+    ctx.stroke();
+  }
+}
+function kreisOderEck(ctx, x, y, d, form) {
+  if (form === 'eckig') ctx.fillRect(x - d / 2, y - d / 2, d, d);
+  else { ctx.beginPath(); ctx.arc(x, y, d / 2, 0, 6.2832); ctx.fill(); }
+}
+
+/* ============================================================
+   Anzeige
+   ============================================================ */
+var cv = el('cv'), ctx = cv.getContext('2d');
+var lagenCv = { unten: document.createElement('canvas'), oben: document.createElement('canvas') };
+
+function zeichne() {
+  var dpr = Math.min(window.devicePixelRatio || 1, 2);
+  var w = W() * S.zoom, h = H() * S.zoom;
+  cv.style.width = w + 'px'; cv.style.height = h + 'px';
+  cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+
+  var sp = gespiegelt();
+  var m11 = (sp ? -1 : 1) * dpr * S.zoom;
+  ctx.setTransform(m11, 0, 0, dpr * S.zoom, sp ? dpr * S.zoom * W() : 0, 0);
+  ctx.clearRect(0, 0, W(), H());
+
+  /* Platinengrund */
+  ctx.fillStyle = FARBE.platine;
+  ctx.fillRect(0, 0, W(), H());
+
+  /* Rasterpunkte */
+  ctx.fillStyle = FARBE.raster;
+  var st = schritt(), x, y;
+  if (st * S.zoom > 4) {
+    for (x = G / 2; x < W(); x += st) {
+      for (y = G / 2; y < H(); y += st) {
+        ctx.beginPath(); ctx.arc(x, y, Math.min(0.22, 1.4 / S.zoom), 0, 6.2832); ctx.fill();
+      }
+    }
+  }
+
+  /* Kupfer je Lage über eine eigene Leinwand — sonst frisst
+     das Ausstanzen der Freistellung die Platine mit weg. */
+  var reihe = S.lage === 'unten' ? ['oben', 'unten'] : ['unten', 'oben'];
+  for (var k = 0; k < 2; k++) {
+    var lage = reihe[k];
+    var lc = lagenCv[lage];
+    lc.width = cv.width; lc.height = cv.height;
+    var lx = lc.getContext('2d');
+    lx.setTransform(dpr * S.zoom, 0, 0, dpr * S.zoom, 0, 0);
+    malKupfer(lx, lage, FARBE[lage], { loecher: true, lochFarbe: FARBE.bohrung });
+    ctx.save();
+    /* Die Lagen-Leinwand liegt in Bildpunkten vor, deshalb hier die
+       Spiegelung von Hand statt über die mm-Transformation. */
+    ctx.setTransform(sp ? -1 : 1, 0, 0, 1, sp ? cv.width : 0, 0);
+    ctx.globalAlpha = lage === S.lage ? 1 : 0.32;
+    ctx.drawImage(lc, 0, 0);
+    ctx.restore();
+  }
+
+  /* Bauteilkörper */
+  ctx.strokeStyle = FARBE.korpus;
+  ctx.lineWidth = Math.max(0.12, 1 / S.zoom);
+  for (var i = 0; i < S.items.length; i++) {
+    var it = S.items[i];
+    if (it.t !== 'bauteil') continue;
+    var kp = bauteilKorpus(it);
+    if (!kp) continue;
+    ctx.globalAlpha = it.lage === S.lage ? 0.85 : 0.3;
+    ctx.beginPath();
+    ctx.moveTo(kp[0][0], kp[0][1]);
+    for (var j = 1; j < 4; j++) ctx.lineTo(kp[j][0], kp[j][1]);
+    ctx.closePath(); ctx.stroke();
+    /* Pin-1-Kerbe */
+    ctx.beginPath();
+    ctx.arc(it.x, it.y, Math.max(0.2, 2 / S.zoom), 0, 6.2832);
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+
+  /* Fräsbahnen */
+  if (el('zeigFraes').checked && S.fraes) {
+    ctx.lineWidth = Math.max(0.06, 1 / S.zoom);
+    ctx.strokeStyle = FARBE.fraes;
+    malPfade(ctx, alleBahnen(S.fraes.unten));
+    malPfade(ctx, alleBahnen(S.fraes.oben));
+    ctx.strokeStyle = FARBE.kontur;
+    malPfade(ctx, S.fraes.kontur);
+  }
+
+  /* Auswahl */
+  var gewaehlt = S.mehr.length ? S.mehr : (S.sel ? [S.sel] : []);
+  if (gewaehlt.length) {
+    ctx.strokeStyle = FARBE.wahl;
+    ctx.lineWidth = Math.max(0.1, 1.5 / S.zoom);
+    ctx.setLineDash([0.8, 0.6]);
+    gewaehlt.forEach(function (it) {
+      var b = huelle(it);
+      if (b) ctx.strokeRect(b[0] - 0.3, b[1] - 0.3, b[2] - b[0] + 0.6, b[3] - b[1] + 0.6);
+    });
+    ctx.setLineDash([]);
+  }
+  if (S.ziehen && S.ziehen.art === 'rahmen') {
+    var r = S.ziehen;
+    ctx.strokeStyle = FARBE.wahl;
+    ctx.lineWidth = Math.max(0.08, 1 / S.zoom);
+    ctx.setLineDash([0.5, 0.4]);
+    ctx.strokeRect(Math.min(r.x0, r.x1), Math.min(r.y0, r.y1), Math.abs(r.x1 - r.x0), Math.abs(r.y1 - r.y0));
+    ctx.setLineDash([]);
+  }
+
+  /* Entwurf: laufende Bahn oder aufgezogene Fläche */
+  if (S.entwurf && S.entwurf.t === 'bahn') {
+    var e = S.entwurf;
+    ctx.strokeStyle = FARBE[S.lage]; ctx.globalAlpha = 0.75;
+    ctx.lineWidth = e.b; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.beginPath();
+    ctx.moveTo(e.pts[0][0], e.pts[0][1]);
+    for (var m = 1; m < e.pts.length; m++) ctx.lineTo(e.pts[m][0], e.pts[m][1]);
+    if (S.maus) { var z = ziel(e.pts[e.pts.length - 1], S.maus); ctx.lineTo(z[0], z[1]); }
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
+  if (S.entwurf && S.entwurf.t === 'flaeche') {
+    var f = S.entwurf;
+    ctx.fillStyle = FARBE[S.lage]; ctx.globalAlpha = 0.55;
+    ctx.fillRect(f.x, f.y, f.w, f.h);
+    ctx.globalAlpha = 1;
+  }
+  if (S.modus === 'bauteil' && S.maus) {
+    var vor = { t: 'bauteil', bid: S.bauteil, x: snap(S.maus[0]), y: snap(S.maus[1]), rot: S.rot };
+    var vp = entfalten(vor);
+    ctx.globalAlpha = 0.5;
+    for (var q = 0; q < vp.length; q++) {
+      ctx.fillStyle = FARBE[vp[q].lage] || FARBE.unten;
+      ctx.strokeStyle = ctx.fillStyle;
+      malStueck(ctx, vp[q], 0);
+    }
+    ctx.globalAlpha = 1;
+  }
+  if (S.modus === 'text' && S.maus && S.text) {
+    ctx.globalAlpha = 0.55;
+    ctx.strokeStyle = FARBE[S.lage]; ctx.fillStyle = FARBE[S.lage];
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    malStueck(ctx, {
+      t: 'text', s: S.text,
+      x: S.textRaster ? snap(S.maus[0]) : S.maus[0],
+      y: S.textRaster ? snap(S.maus[1]) : S.maus[1],
+      h: S.textH, b: S.textB, rot: S.textRot, sp: gespiegelt()
+    }, 0);
+    ctx.globalAlpha = 1;
+  }
+
+  el('zoomVal').textContent = Math.round(S.zoom / 3.7795 * 100) + '%';
+}
+
+function malPfade(c, liste) {
+  if (!liste) return;
+  for (var i = 0; i < liste.length; i++) {
+    var p = liste[i];
+    if (p.length < 2) continue;
+    c.beginPath();
+    c.moveTo(p[0][0], p[0][1]);
+    for (var j = 1; j < p.length; j++) c.lineTo(p[j][0], p[j][1]);
+    c.stroke();
+  }
+}
+
+/* ---------- Hüllen und Treffer ---------- */
+function huelle(it) {
+  var i, x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+  function add(x, y, r) { x0 = Math.min(x0, x - r); y0 = Math.min(y0, y - r); x1 = Math.max(x1, x + r); y1 = Math.max(y1, y + r); }
+  if (it.t === 'pad') add(it.x, it.y, it.d / 2);
+  else if (it.t === 'flaeche') { add(it.x, it.y, 0); add(it.x + it.w, it.y + it.h, 0); }
+  else if (it.t === 'bahn') { for (i = 0; i < it.pts.length; i++) add(it.pts[i][0], it.pts[i][1], it.b / 2); }
+  else if (it.t === 'text') {
+    var z = textPfade(it);
+    for (i = 0; i < z.length; i++) for (var j = 0; j < z[i].length; j++) add(z[i][j][0], z[i][j][1], it.b / 2);
+    if (!z.length) add(it.x, it.y, it.h / 2);
+  }
+  else if (it.t === 'bauteil') {
+    var teile = entfalten(it);
+    for (i = 0; i < teile.length; i++) {
+      var b3 = huelle(teile[i]);
+      if (b3) { add(b3[0], b3[1], 0); add(b3[2], b3[3], 0); }
+    }
+    var kp = bauteilKorpus(it);
+    if (kp) for (i = 0; i < 4; i++) add(kp[i][0], kp[i][1], 0);
+  }
+  return x1 < x0 ? null : [x0, y0, x1, y1];
+}
+function abstandSeg(p, a, b) {
+  var vx = b[0] - a[0], vy = b[1] - a[1];
+  var l = vx * vx + vy * vy;
+  var t = l ? Math.max(0, Math.min(1, ((p[0] - a[0]) * vx + (p[1] - a[1]) * vy) / l)) : 0;
+  var dx = p[0] - (a[0] + t * vx), dy = p[1] - (a[1] + t * vy);
+  return Math.sqrt(dx * dx + dy * dy);
+}
+function trifft(it, mx, my) {
+  var i;
+  if (it.t === 'pad') return Math.hypot(mx - it.x, my - it.y) <= it.d / 2 + 0.2;
+  if (it.t === 'flaeche') return mx >= it.x && mx <= it.x + it.w && my >= it.y && my <= it.y + it.h;
+  if (it.t === 'bahn') {
+    for (i = 1; i < it.pts.length; i++) if (abstandSeg([mx, my], it.pts[i - 1], it.pts[i]) <= it.b / 2 + 0.3) return true;
+    return it.pts.length === 1 && Math.hypot(mx - it.pts[0][0], my - it.pts[0][1]) <= it.b;
+  }
+  if (it.t === 'text') {
+    var b2 = huelle(it);
+    return b2 && mx >= b2[0] - 0.3 && mx <= b2[2] + 0.3 && my >= b2[1] - 0.3 && my <= b2[3] + 0.3;
+  }
+  if (it.t === 'bauteil') {
+    var teile = entfalten(it);
+    for (i = 0; i < teile.length; i++) if (trifft(teile[i], mx, my)) return true;
+    var b = huelle(it);
+    return b && mx >= b[0] && mx <= b[2] && my >= b[1] && my <= b[3];
+  }
+  return false;
+}
+function suche(mx, my) {
+  var i;
+  for (i = S.items.length - 1; i >= 0; i--) if (itemLage(S.items[i]) === S.lage && trifft(S.items[i], mx, my)) return S.items[i];
+  for (i = S.items.length - 1; i >= 0; i--) if (trifft(S.items[i], mx, my)) return S.items[i];
+  return null;
+}
+function verschiebe(it, dx, dy) {
+  if (it.t === 'bahn') { for (var i = 0; i < it.pts.length; i++) { it.pts[i][0] += dx; it.pts[i][1] += dy; } }
+  else { it.x += dx; it.y += dy; }
+}
+
+/* 45°-Zwang gegen den letzten Punkt */
+function ziel(von, maus) {
+  var x = snap(maus[0]), y = snap(maus[1]);
+  if (!S.diag || !von) return [x, y];
+  var dx = x - von[0], dy = y - von[1];
+  var ax = Math.abs(dx), ay = Math.abs(dy);
+  if (ax > ay * 2) return [x, von[1]];
+  if (ay > ax * 2) return [von[0], y];
+  var m = Math.min(ax, ay);
+  return [von[0] + Math.sign(dx) * m, von[1] + Math.sign(dy) * m];
+}
+
+/* ============================================================
+   Maus
+   ============================================================ */
+/* Beginn eines Verschiebe-Zugs. Wandert die Auswahl frei oder im
+   Raster? Frei nur, wenn ausschließlich Beschriftung gewählt ist. */
+function zugStart(gruppe, m) {
+  var frei = gruppe.length > 0 && gruppe.every(freiesElement);
+  return {
+    art: 'move', gruppe: gruppe, frei: frei,
+    lx: frei ? m[0] : snap(m[0]),
+    ly: frei ? m[1] : snap(m[1])
+  };
+}
+
+function mausMM(e) {
+  var r = cv.getBoundingClientRect();
+  var x = (e.clientX - r.left) / S.zoom, y = (e.clientY - r.top) / S.zoom;
+  /* In gespiegelter Ansicht zeigt der Zeiger auf den gespiegelten Ort —
+     gespeichert wird aber immer im ungespiegelten System, damit ein
+     Loch auf beiden Seiten derselbe Punkt bleibt. */
+  return [gespiegelt() ? W() - x : x, y];
+}
+
+cv.addEventListener('mousemove', function (e) {
+  S.maus = mausMM(e);
+  if (S.ziehen) {
+    var sx = snap(S.maus[0]), sy = snap(S.maus[1]);
+    if (S.ziehen.art === 'move') {
+      /* Eine reine Beschriftungs-Auswahl wandert frei, alles andere
+         rastet ein — sonst zöge ein einzelner Text seine Pads mit vom
+         Rasterpunkt herunter. */
+      var zx = S.ziehen.frei ? S.maus[0] : sx, zy = S.ziehen.frei ? S.maus[1] : sy;
+      var dx = zx - S.ziehen.lx, dy = zy - S.ziehen.ly;
+      if (dx || dy) {
+        S.ziehen.gruppe.forEach(function (it) { verschiebe(it, dx, dy); });
+        S.ziehen.lx = zx; S.ziehen.ly = zy; S.veraltet = true;
+      }
+    } else if (S.ziehen.art === 'rahmen') {
+      S.ziehen.x1 = S.maus[0]; S.ziehen.y1 = S.maus[1];
+    } else if (S.ziehen.art === 'flaeche') {
+      var f = S.entwurf;
+      f.x = Math.min(S.ziehen.x0, sx); f.y = Math.min(S.ziehen.y0, sy);
+      f.w = Math.abs(sx - S.ziehen.x0); f.h = Math.abs(sy - S.ziehen.y0);
+    }
+  }
+  zeichne();
+});
+cv.addEventListener('mouseleave', function () { S.maus = null; zeichne(); });
+
+cv.addEventListener('mousedown', function (e) {
+  if (e.button !== 0) return;
+  var m = mausMM(e), sx = snap(m[0]), sy = snap(m[1]);
+
+  if (S.modus === 'zeiger') {
+    var hit = suche(m[0], m[1]);
+    if (hit && S.mehr.indexOf(hit) >= 0) {
+      /* Schon in der Mehrfachauswahl: die ganze Gruppe wandert. */
+      merken();
+      S.ziehen = zugStart(S.mehr.slice(), m);
+      zeichne(); return;
+    }
+    S.mehr = [];
+    S.sel = hit;
+    if (hit) { merken(); S.ziehen = zugStart([hit], m); }
+    else S.ziehen = { art: 'rahmen', x0: m[0], y0: m[1], x1: m[0], y1: m[1] };
+    zeichne(); return;
+  }
+
+  if (S.modus === 'pad') {
+    merken();
+    S.items.push({ t: 'pad', x: sx, y: sy, d: S.padD, bohr: S.bohrD, form: S.padForm, lage: S.lage });
+    veraendert(); return;
+  }
+
+  if (S.modus === 'bauteil') {
+    merken();
+    S.items.push({ t: 'bauteil', bid: S.bauteil, x: sx, y: sy, rot: S.rot });
+    veraendert(); return;
+  }
+
+  if (S.modus === 'text') {
+    if (!S.text) return;
+    merken();
+    var tx = S.textRaster ? sx : m[0], ty = S.textRaster ? sy : m[1];
+    S.items.push({ t: 'text', s: S.text, x: tx, y: ty, h: S.textH, b: S.textB, rot: S.textRot, lage: S.lage, sp: gespiegelt() });
+    veraendert(); return;
+  }
+
+  if (S.modus === 'flaeche') {
+    S.entwurf = { t: 'flaeche', x: sx, y: sy, w: 0, h: 0, lage: S.lage, masse: false };
+    S.ziehen = { art: 'flaeche', x0: sx, y0: sy };
+    return;
+  }
+
+  if (S.modus === 'bahn') {
+    if (!S.entwurf || S.entwurf.t !== 'bahn') {
+      S.entwurf = { t: 'bahn', pts: [[sx, sy]], b: S.bahnB, lage: S.lage };
+    } else {
+      var z = ziel(S.entwurf.pts[S.entwurf.pts.length - 1], m);
+      S.entwurf.pts.push(z);
+    }
+    zeichne(); return;
+  }
+});
+
+cv.addEventListener('mouseup', function () {
+  if (S.ziehen && S.ziehen.art === 'flaeche') {
+    var f = S.entwurf;
+    if (f && f.w >= G / 2 && f.h >= G / 2) {
+      merken();
+      f.masse = !!el('masseNeu') && el('masseNeu').checked;
+      S.items.push(f);
+    }
+    S.entwurf = null; S.ziehen = null; veraendert(); return;
+  }
+  if (S.ziehen && S.ziehen.art === 'move') { S.ziehen = null; veraendert(); return; }
+  if (S.ziehen && S.ziehen.art === 'rahmen') {
+    var r = S.ziehen;
+    var x0 = Math.min(r.x0, r.x1), x1 = Math.max(r.x0, r.x1);
+    var y0 = Math.min(r.y0, r.y1), y1 = Math.max(r.y0, r.y1);
+    S.ziehen = null;
+    /* Ein Klick ohne Ziehen ist kein Rahmen, sondern das Abwählen. */
+    if (x1 - x0 < 0.5 && y1 - y0 < 0.5) { S.mehr = []; S.sel = null; zeichne(); return; }
+    /* Ganz enthalten, nicht nur berührt — sonst reißt man beim Aufziehen
+       ständig halbe Leiterbahnen mit hinein. Über beide Seiten hinweg,
+       damit Pins unten und Beschriftung oben zusammen erwischt werden. */
+    S.mehr = S.items.filter(function (it) {
+      var b = huelle(it);
+      return b && b[0] >= x0 && b[2] <= x1 && b[1] >= y0 && b[3] <= y1;
+    });
+    S.sel = S.mehr.length === 1 ? S.mehr[0] : null;
+    auswahlStatus();
+    zeichne(); return;
+  }
+  S.ziehen = null;
+});
+
+cv.addEventListener('dblclick', function () { bahnAbschluss(); });
+cv.addEventListener('contextmenu', function (e) {
+  if (S.entwurf && S.entwurf.t === 'bahn') { e.preventDefault(); bahnAbschluss(); }
+});
+
+function bahnAbschluss() {
+  if (!S.entwurf || S.entwurf.t !== 'bahn') return;
+  /* Beim Doppelklick zaehlt der erste Klick noch als Stuetzpunkt — der
+     liegt dann doppelt auf dem letzten und muss wieder raus. */
+  var p = S.entwurf.pts;
+  for (var i = p.length - 1; i > 0; i--) {
+    if (Math.abs(p[i][0] - p[i - 1][0]) < 1e-6 && Math.abs(p[i][1] - p[i - 1][1]) < 1e-6) p.splice(i, 1);
+  }
+  if (p.length >= 2) { merken(); S.items.push(S.entwurf); }
+  S.entwurf = null;
+  veraendert();
+}
+
+/* ============================================================
+   Tastatur
+   ============================================================ */
+window.addEventListener('keydown', function (e) {
+  if (/input|select|textarea/i.test(e.target.tagName)) return;
+  var k = e.key;
+  if ((e.metaKey || e.ctrlKey) && k.toLowerCase() === 'z') { e.preventDefault(); zurueck(); return; }
+  if (k === 'Escape') { S.entwurf = null; S.sel = null; S.mehr = []; auswahlStatus(); zeichne(); return; }
+  if (k === 'Enter') { bahnAbschluss(); return; }
+  if (k === 'a' && (e.metaKey || e.ctrlKey)) {
+    e.preventDefault();
+    S.mehr = S.items.slice(); S.sel = null; auswahlStatus(); zeichne(); return;
+  }
+  if (k === 'Delete' || k === 'Backspace') {
+    var weg = S.mehr.length ? S.mehr : (S.sel ? [S.sel] : []);
+    if (weg.length) {
+      merken();
+      S.items = S.items.filter(function (it) { return weg.indexOf(it) < 0; });
+      S.sel = null; S.mehr = []; auswahlStatus(); veraendert();
+    }
+    return;
+  }
+  if (k === 'r' || k === 'R') {
+    if (S.sel && (S.sel.t === 'bauteil' || S.sel.t === 'text')) { merken(); S.sel.rot = (S.sel.rot + 90) % 360; veraendert(); }
+    else if (S.modus === 'text') { S.textRot = (S.textRot + 90) % 360; el('textRot').value = S.textRot; zeichne(); }
+    else { S.rot = (S.rot + 90) % 360; el('rot').value = S.rot; zeichne(); }
+    return;
+  }
+  if (k === 'l' || k === 'L') { setLage(S.lage === 'unten' ? 'oben' : 'unten'); return; }
+  if (k >= '1' && k <= '6') { setModus(['zeiger', 'pad', 'bahn', 'flaeche', 'bauteil', 'text'][+k - 1]); return; }
+  if (k === '+') setZoom(S.zoom * 1.25);
+  if (k === '-') setZoom(S.zoom / 1.25);
+  if (k === '0') fit();
+});
+
+/* ============================================================
+   Distanzfeld und Höhenlinien
+   ============================================================ */
+
+/* Exakte quadrierte Distanztransformation, 1D (Felzenszwalb).
+   Statt Unendlich ein großer endlicher Wert — sonst wird die
+   Parabelschnitt-Rechnung zu NaN. */
+var BIG = 1e9;
+function edt1d(f, n, d, v, z) {
+  var k = 0, q, s;
+  v[0] = 0; z[0] = -1e20; z[1] = 1e20;
+  for (q = 1; q < n; q++) {
+    s = ((f[q] + q * q) - (f[v[k]] + v[k] * v[k])) / (2 * q - 2 * v[k]);
+    while (s <= z[k]) {
+      k--;
+      s = ((f[q] + q * q) - (f[v[k]] + v[k] * v[k])) / (2 * q - 2 * v[k]);
+    }
+    k++; v[k] = q; z[k] = s; z[k + 1] = 1e20;
+  }
+  k = 0;
+  for (q = 0; q < n; q++) {
+    while (z[k + 1] < q) k++;
+    d[q] = (q - v[k]) * (q - v[k]) + f[v[k]];
+  }
+}
+function distanzfeld(m, w, h) {
+  var g = new Float64Array(w * h), i, x, y;
+  for (i = 0; i < w * h; i++) g[i] = m[i] ? 0 : BIG;
+  var n = Math.max(w, h);
+  var f = new Float64Array(n), d = new Float64Array(n), v = new Int32Array(n), z = new Float64Array(n + 1);
+  for (x = 0; x < w; x++) {
+    for (y = 0; y < h; y++) f[y] = g[y * w + x];
+    edt1d(f, h, d, v, z);
+    for (y = 0; y < h; y++) g[y * w + x] = d[y];
+  }
+  for (y = 0; y < h; y++) {
+    for (x = 0; x < w; x++) f[x] = g[y * w + x];
+    edt1d(f, w, d, v, z);
+    for (x = 0; x < w; x++) g[y * w + x] = Math.sqrt(d[x]);
+  }
+  return g;
+}
+
+/* Marching Squares auf dem Distanzfeld. Liefert lose Segmente. */
+function hoehenlinie(feld, w, h, L) {
+  var segs = [], x, y;
+  function ip(ax, ay, bx, by, va, vb) {
+    var t = (L - va) / (vb - va);
+    if (!isFinite(t)) t = 0.5;
+    return [ax + (bx - ax) * t, ay + (by - ay) * t];
+  }
+  for (y = 0; y < h - 1; y++) {
+    for (x = 0; x < w - 1; x++) {
+      var v0 = feld[y * w + x], v1 = feld[y * w + x + 1], v2 = feld[(y + 1) * w + x + 1], v3 = feld[(y + 1) * w + x];
+      var c = (v0 < L ? 1 : 0) | (v1 < L ? 2 : 0) | (v2 < L ? 4 : 0) | (v3 < L ? 8 : 0);
+      if (c === 0 || c === 15) continue;
+      var oben = null, rechts = null, unten = null, links = null;
+      if ((c & 1) !== (c & 2) >> 1) oben = ip(x, y, x + 1, y, v0, v1);
+      if ((c & 2) >> 1 !== (c & 4) >> 2) rechts = ip(x + 1, y, x + 1, y + 1, v1, v2);
+      if ((c & 8) >> 3 !== (c & 4) >> 2) unten = ip(x, y + 1, x + 1, y + 1, v3, v2);
+      if ((c & 1) !== (c & 8) >> 3) links = ip(x, y, x, y + 1, v0, v3);
+      if (c === 5 || c === 10) {
+        var mit = (v0 + v1 + v2 + v3) / 4;
+        if ((c === 5) === (mit < L)) { segs.push([links, unten]); segs.push([oben, rechts]); }
+        else { segs.push([links, oben]); segs.push([unten, rechts]); }
+        continue;
+      }
+      var a = [], b;
+      if (oben) a.push(oben);
+      if (rechts) a.push(rechts);
+      if (unten) a.push(unten);
+      if (links) a.push(links);
+      if (a.length === 2) segs.push([a[0], a[1]]);
+    }
+  }
+  return segs;
+}
+
+/* Lose Segmente zu durchgehenden Bahnen zusammenhängen. */
+function naehe(segs) {
+  var map = new Map(), i, j;
+  function key(p) { return Math.round(p[0] * 2048) + ',' + Math.round(p[1] * 2048); }
+  for (i = 0; i < segs.length; i++) {
+    for (j = 0; j < 2; j++) {
+      var k = key(segs[i][j]);
+      if (!map.has(k)) map.set(k, []);
+      map.get(k).push(i);
+    }
+  }
+  var benutzt = new Uint8Array(segs.length), bahnen = [];
+  for (i = 0; i < segs.length; i++) {
+    if (benutzt[i]) continue;
+    benutzt[i] = 1;
+    var pts = [segs[i][0], segs[i][1]];
+    for (var richtung = 0; richtung < 2; richtung++) {
+      for (;;) {
+        var ende = pts[pts.length - 1], k2 = key(ende), liste = map.get(k2) || [], nx = -1;
+        for (j = 0; j < liste.length; j++) if (!benutzt[liste[j]]) { nx = liste[j]; break; }
+        if (nx < 0) break;
+        benutzt[nx] = 1;
+        var s = segs[nx];
+        pts.push(key(s[0]) === k2 ? s[1] : s[0]);
+      }
+      pts.reverse();
+    }
+    if (pts.length > 2) bahnen.push(pts);
+  }
+  return bahnen;
+}
+
+/* Douglas-Peucker, ohne Rekursion. */
+function glaette(pts, eps) {
+  if (pts.length < 3) return pts.slice();
+  var behalten = new Uint8Array(pts.length);
+  behalten[0] = 1; behalten[pts.length - 1] = 1;
+  var stapel = [[0, pts.length - 1]];
+  while (stapel.length) {
+    var s = stapel.pop(), a = s[0], b = s[1];
+    if (b <= a + 1) continue;
+    var max = -1, idx = -1;
+    for (var i = a + 1; i < b; i++) {
+      var d = abstandSeg(pts[i], pts[a], pts[b]);
+      if (d > max) { max = d; idx = i; }
+    }
+    if (max > eps) { behalten[idx] = 1; stapel.push([a, idx]); stapel.push([idx, b]); }
+  }
+  var out = [];
+  for (var j = 0; j < pts.length; j++) if (behalten[j]) out.push(pts[j]);
+  return out;
+}
+
+/* Kupfer einer Lage als Schwarzweiß-Raster. */
+/* Obergrenze fuer das Rasterbild. Darueber wird das Distanzfeld
+   (8 Byte je Pixel) zum Speicherfresser und der Rechner steht. */
+/* Zwei Distanzfelder (Leiter und Text) liegen gleichzeitig im Speicher,
+   je 8 Byte pro Pixel — deshalb die Grenze nicht höher setzen. */
+var MAXPIX = 4e6;
+
+/* Rand um die Platine herum, in mm. Ohne diesen Rand laufen die
+   Höhenlinien von Kupfer nahe der Kante gegen den Bildrand und werden
+   dort abgeschnitten — offene Konturen also. Beim Fräsen faellt das
+   kaum auf, beim Gravieren zieht der Fuellalgorithmus die offenen
+   Enden mit einer Sehne quer ueber die Platine zu, und heraus kommen
+   grosse schwarze Klumpen. Mit Rand ist jede Kontur geschlossen. */
+function rasterRand() { return S.fraeser / 2 + (S.umlauf - 1) * S.ueber + 1; }
+
+function kupferRaster(lage, nur) {
+  var rand = rasterRand();
+  var bw = W() + 2 * rand, bh = H() + 2 * rand;
+  var res = S.res;
+  if (bw * bh * res * res > MAXPIX) {
+    res = Math.max(4, Math.floor(Math.sqrt(MAXPIX / (bw * bh))));
+    grobHinweis = res;
+  }
+  var w = Math.max(4, Math.round(bw * res)), h = Math.max(4, Math.round(bh * res));
+  var c = document.createElement('canvas');
+  c.width = w; c.height = h;
+  var x = c.getContext('2d', { willReadFrequently: true });
+  x.fillStyle = '#000'; x.fillRect(0, 0, w, h);
+  x.setTransform(res, 0, 0, res, rand * res, rand * res);
+  malKupfer(x, lage, '#fff', { nur: nur });
+  var d = x.getImageData(0, 0, w, h).data;
+  var m = new Uint8Array(w * h), leer = true;
+  for (var i = 0; i < w * h; i++) { m[i] = d[i * 4] > 127 ? 1 : 0; if (m[i]) leer = false; }
+  return { m: m, w: w, h: h, res: res, rand: rand, leer: leer };
+}
+
+/* Isolierbahnen einer Lage, nach Umlauf getrennt:
+   [[Bahnen des 1. Umlaufs], [Bahnen des 2.], …]. Nach Umlauf getrennt,
+   weil der Flächen-Export nur den innersten und den äußersten braucht —
+   die beiden ergeben zusammen den Graben.
+
+   Getrennt nach Leiterbahnen und Beschriftung, aber aus EINEM
+   gemeinsamen Distanzfeld: würde man beide für sich rechnen, liefe die
+   Bahn um eine Leiterbahn mitten durch einen daneben stehenden
+   Buchstaben und würde ihn wegfräsen. Deshalb wird das Feld aus dem
+   Minimum beider Abstände gebildet, und jede fertige Kontur bekommt
+   hinterher das Etikett des Kupfers, an dem sie tatsächlich entlangläuft.
+
+   Ergebnis: { leiter: [[Umlauf 1], [Umlauf 2], …], text: […] } */
+function isolierBahnen(lage) {
+  var rL = kupferRaster(lage, 'leiter'), rT = kupferRaster(lage, 'text');
+  if (rL.leer && rT.leer) return { leiter: [], text: [] };
+
+  var w = rL.w, h = rL.h, n = w * h, i;
+  var dL = distanzfeld(rL.m, w, h), dT = distanzfeld(rT.m, w, h);
+  /* dL wird zum Gesamtfeld umgebaut, damit nicht drei große Felder
+     gleichzeitig im Speicher liegen. */
+  var klasse = new Uint8Array(n);
+  for (i = 0; i < n; i++) {
+    if (dT[i] < dL[i]) { klasse[i] = 1; dL[i] = dT[i]; }
+  }
+  dT = null;
+
+  var raus = { leiter: [], text: [] }, k;
+  for (k = 0; k < S.umlauf; k++) {
+    var mm = S.fraeser / 2 + k * S.ueber;
+    var bahnen = naehe(hoehenlinie(dL, w, h, mm * rL.res));
+    var stufeL = [], stufeT = [];
+    for (i = 0; i < bahnen.length; i++) {
+      var p = bahnen[i], q = [], textStimmen = 0;
+      for (var j = 0; j < p.length; j++) {
+        var px = Math.max(0, Math.min(w - 1, Math.round(p[j][0])));
+        var py = Math.max(0, Math.min(h - 1, Math.round(p[j][1])));
+        if (klasse[py * w + px]) textStimmen++;
+        q.push([(p[j][0] + 0.5) / rL.res - rL.rand, (p[j][1] + 0.5) / rL.res - rL.rand]);
+      }
+      q = glaette(q, 0.015);
+      if (q.length > 2) (textStimmen * 2 > p.length ? stufeT : stufeL).push(q);
+    }
+    raus.leiter.push(stufeL);
+    raus.text.push(stufeT);
+  }
+  return raus;
+}
+function flach(stufen) {
+  var out = [];
+  for (var i = 0; i < (stufen || []).length; i++) out = out.concat(stufen[i]);
+  return out;
+}
+/* Alle Bahnen einer Lage, egal welcher Sorte. */
+function alleBahnen(f) {
+  if (!f) return [];
+  return flach(f.leiter).concat(flach(f.text));
+}
+
+/* Außenkontur mit Haltestegen. */
+function konturBahn() {
+  var r = S.kFraeser / 2;
+  var x0 = -r, y0 = -r, x1 = W() + r, y1 = H() + r;
+  var ecken = [[x0, y0], [x1, y0], [x1, y1], [x0, y1], [x0, y0]];
+  /* Umfang parametrisieren */
+  var lang = [], gesamt = 0, i;
+  for (i = 1; i < ecken.length; i++) {
+    var d = Math.hypot(ecken[i][0] - ecken[i - 1][0], ecken[i][1] - ecken[i - 1][1]);
+    lang.push(d); gesamt += d;
+  }
+  function punkt(t) {
+    var rest = t % gesamt; if (rest < 0) rest += gesamt;
+    for (var j = 0; j < lang.length; j++) {
+      if (rest <= lang[j]) {
+        var f = lang[j] ? rest / lang[j] : 0;
+        return [ecken[j][0] + (ecken[j + 1][0] - ecken[j][0]) * f, ecken[j][1] + (ecken[j + 1][1] - ecken[j][1]) * f];
+      }
+      rest -= lang[j];
+    }
+    return ecken[0].slice();
+  }
+  /* Ohne Haltestege ist die Kontur ein geschlossener Ring — genau das,
+     was ein Schneidprogramm sehen will. */
+  if (!S.stege) return [ecken.slice()];
+
+  var luecken = [], n = S.stege, b = S.stegB + S.kFraeser;
+  for (i = 0; i < n; i++) {
+    var mitte = (i + 0.5) / n * gesamt;
+    luecken.push([mitte - b / 2, mitte + b / 2]);
+  }
+  /* Die Ecken liegen bei festen Weglängen. Sie müssen als echte Punkte
+     in die Bahn, sonst schneidet ein Stück zwischen zwei Abtastpunkten
+     die Ecke einfach schräg ab. Deshalb wird hier nicht abgetastet,
+     sondern nur an den Ecken und an den Steg-Rändern geteilt. */
+  var eckT = [0];
+  for (i = 0; i < lang.length; i++) eckT.push(eckT[i] + lang[i]);
+
+  var bahnen = [];
+  for (i = 0; i < n; i++) {
+    var von = luecken[i][1], bis = luecken[(i + 1) % n][0];
+    if (bis < von) bis += gesamt;
+    var pts = [punkt(von)];
+    /* alle Ecken, die zwischen von und bis liegen — auch die aus der
+       nächsten Runde, wenn das Stück über den Nullpunkt läuft */
+    for (var r = 0; r <= 1; r++) {
+      for (var e = 0; e < eckT.length; e++) {
+        var t = eckT[e] + r * gesamt;
+        if (t > von + 1e-9 && t < bis - 1e-9) pts.push(punkt(t));
+      }
+    }
+    pts.push(punkt(bis));
+    if (pts.length > 1) bahnen.push(pts);
+  }
+  return bahnen;
+}
+
+var grobHinweis = 0;
+function rechne() {
+  var t0 = performance.now();
+  grobHinweis = 0;
+  el('stWarn').textContent = 'rechnet …';
+  S.fraes = {
+    unten: isolierBahnen('unten'),
+    oben: isolierBahnen('oben'),
+    kontur: konturBahn()
+  };
+  S.veraltet = false;
+  var ms = Math.round(performance.now() - t0);
+  el('stWarn').textContent =
+    grobHinweis ? 'Platine zu groß für diese Genauigkeit — gerechnet mit ' + grobHinweis + ' Punkten/mm' :
+    ms > 400 ? ms + ' ms — Genauigkeit senken beschleunigt das' : '';
+  status();
+  zeichne();
+}
+
+/* ============================================================
+   SVG
+   ============================================================ */
+/* Breite des Grabens: der radiale Abstand zwischen innerstem und
+   äußerstem Umlauf. Mit nur einem Umlauf gibt es keinen Graben. */
+function grabenBreite() { return (S.umlauf - 1) * S.ueber; }
+
+function geschlossen(pts) {
+  return Math.hypot(pts[0][0] - pts[pts.length - 1][0], pts[0][1] - pts[pts.length - 1][1]) < 0.02;
+}
+/* Für den Compound-Pfad: immer geschlossen, sonst füllt niemand richtig. */
+function zuD(pts) {
+  var s = pfadD(pts);
+  return s.slice(-2) === ' Z' ? s : s + ' Z';
+}
+
+function pfadD(pts) {
+  var s = 'M' + nr(pts[0][0], 3) + ' ' + nr(pts[0][1], 3);
+  for (var i = 1; i < pts.length; i++) s += ' L' + nr(pts[i][0], 3) + ' ' + nr(pts[i][1], 3);
+  var zu = Math.hypot(pts[0][0] - pts[pts.length - 1][0], pts[0][1] - pts[pts.length - 1][1]) < 0.002;
+  return s + (zu ? ' Z' : '');
+}
+
+/* Importer wie xTool Studio sortieren die Objekte eines SVG nach ihrer
+   Farbe auf getrennte Ebenen. Damit das trägt, muss die Farbe an jedem
+   einzelnen Element stehen — auf Vererbung von der <g> verlassen sich
+   diese Programme nicht. Deshalb hängt `farbig()` sie überall dran. */
+/* stil('#RRGGBB', 'linie'|'flaeche', extra) → fertige Attribute */
+function stil(f, art, extra) {
+  var s = art === 'flaeche'
+    ? 'fill="' + f + '" stroke="none"'
+    : 'fill="none" stroke="' + f + '" stroke-width="' + nr(S.strich, 3) + '"';
+  return s + (extra ? ' ' + extra : '');
+}
+/* Attribute in jedes Element hineinschreiben, das noch keine hat. */
+function farbig(inhalt, attr) {
+  return inhalt.replace(/<(path|circle|rect|polyline)\b/g, '<$1 ' + attr);
+}
+
+var offenVerworfen = 0;
+
+/* Eine Sorte Isolierbahnen als fertige Gruppe.
+   `stufen` ist die Liste je Umlauf. */
+function isoGruppe(id, stufen, f) {
+  if (!stufen || !stufen.length) return '';
+  var alsFlaeche = el('isoArt').value === 'flaeche', d;
+  if (alsFlaeche) {
+    /* Nur geschlossene Konturen dürfen in den Füllpfad — eine offene
+       würde vom Füllalgorithmus mit einer Sehne zugezogen. */
+    var roh = stufen[0].concat(stufen.length > 1 ? stufen[stufen.length - 1] : []);
+    var ring = roh.filter(geschlossen);
+    offenVerworfen += roh.length - ring.length;
+    if (!ring.length) return '';
+    d = farbig('<path d="' + ring.map(zuD).join(' ') + '"/>', stil(f, 'flaeche', 'fill-rule="evenodd"'));
+    return '<g id="' + id + '" data-graben="' + nr(grabenBreite(), 3) + '">' + d + '</g>';
+  }
+  var alle = flach(stufen);
+  if (!alle.length) return '';
+  d = farbig(alle.map(function (p) { return '<path d="' + pfadD(p) + '"/>'; }).join(''),
+             stil(f, 'linie', 'stroke-linecap="round" stroke-linejoin="round"'));
+  return '<g id="' + id + '" data-fraeser="' + nr(S.fraeser, 2) + '">' + d + '</g>';
+}
+
+/* Das Kupfer, das nach dem Isolieren übrig bleibt.
+   Auf der Rohplatine ist ALLES Kupfer. Die Isolierbahn trennt zwar
+   sauber, lässt aber neben den Leiterbahnen ein großes freischwebendes
+   Kupferfeld stehen — und beim Löten brückt das Zinn über den schmalen
+   Graben genau dorthin. Diese Ebene ist dieses Feld als Fläche.
+
+   Gebaut aus dem Platinenrechteck plus allen äußersten Isolierkonturen
+   in EINEM Pfad mit evenodd. Die Paritätsprobe:
+     Restfeld            → im Rechteck (1)                    → gefüllt
+     Kupfer samt Graben  → im Rechteck (1) + in der Kontur (2) → frei
+     Loch im Buchstaben  → (1) + außen (2) + innen (3)         → gefüllt
+   Also genau das, was weg soll.
+
+   Das Rechteck ist NICHT der Platinenrand, sondern reicht `REST_UEBER`
+   über die Außenkontur hinaus. Endete es am Platinenrand, bliebe zwischen
+   Rand und Schnittbahn (die liegt um den halben Konturfräser weiter
+   draußen) ein schmaler Kupferstreifen stehen — Marios Befund an der
+   zweiten echten Platine. Der Überstand wird beim Ausschneiden ohnehin
+   weggefräst, kostet also nichts. */
+var REST_UEBER = 1;      /* mm über die Außenkontur hinaus */
+function restRand() { return S.kFraeser / 2 + REST_UEBER; }
+
+function restGruppe(lage, f) {
+  var st = S.fraes[lage];
+  if (!st) return '';
+  var aussen = [];
+  ['leiter', 'text'].forEach(function (sorte) {
+    var s = st[sorte];
+    if (s && s.length) aussen = aussen.concat(s[s.length - 1]);
+  });
+  aussen = aussen.filter(geschlossen);
+  if (!aussen.length) return '';
+  var r = restRand(), x0 = nr(-r, 3), y0 = nr(-r, 3), x1 = nr(W() + r, 3), y1 = nr(H() + r, 3);
+  var d = 'M' + x0 + ' ' + y0 + ' L' + x1 + ' ' + y0 + ' L' + x1 + ' ' + y1 + ' L' + x0 + ' ' + y1 + ' Z ' +
+          aussen.map(zuD).join(' ');
+  return '<g id="restflaeche" data-hinweis="uebriges Kupfer, komplett abtragen">' +
+         farbig('<path d="' + d + '"/>', stil(f, 'flaeche', 'fill-rule="evenodd"')) + '</g>';
+}
+
+/* Die Buchstaben selbst — nicht die Bahn drumherum.
+   Als Striche mit der eingestellten Strichbreite, also genau die Form,
+   die auf dem Kupfer steht. */
+function schriftGruppe(lage, f) {
+  var s = '';
+  alleStuecke(lage).forEach(function (it) {
+    if (it.t !== 'text') return;
+    textPfade(it).forEach(function (z) {
+      if (z.length < 2) return;
+      s += '<path d="' + pfadD(z) + '" stroke-width="' + nr(it.b, 3) + '"/>';
+    });
+  });
+  if (!s) return '';
+  /* Die Strichbreite steht schon an jedem Pfad — hier darf `stil` sie
+     nicht noch einmal setzen, sonst gewinnt der falsche Wert. */
+  s = farbig(s, 'fill="none" stroke="' + f + '" stroke-linecap="round" stroke-linejoin="round"');
+  return '<g id="schrift">' + s + '</g>';
+}
+
+function bohrGruppe(lage, f) {
+  var nach = {};
+  allePads(lage).forEach(function (p) {
+    if (!(p.bohr > 0)) return;
+    var k = nr(p.bohr, 2);
+    (nach[k] = nach[k] || []).push(p);
+  });
+  var keys = Object.keys(nach).sort(function (a, b) { return +a - +b; });
+  if (!keys.length) return '';
+  var bArt = el('bohrArt').value, s = '';
+  keys.forEach(function (k) {
+    var kreise = nach[k].map(function (p) {
+      return '<circle cx="' + nr(p.x, 3) + '" cy="' + nr(p.y, 3) + '" r="' + nr(+k / 2, 3) + '"/>';
+    }).join('');
+    s += '<g id="bohren-' + k.replace('.', 'p') + 'mm" data-durchmesser="' + k + '">' +
+         farbig(kreise, stil(f, bArt)) + '</g>';
+  });
+  return '<g id="bohrloecher">' + s + '</g>';
+}
+
+function konturGruppe(id, f) {
+  var kb = S.fraes.kontur.map(function (p) { return '<path d="' + pfadD(p) + '"/>'; }).join('');
+  if (!kb) return '';
+  return '<g id="' + id + '" data-fraeser="' + nr(S.kFraeser, 2) + '" data-stege="' + S.stege + '">' +
+         farbig(kb, stil(f, 'linie', 'stroke-linecap="round" stroke-linejoin="round"')) + '</g>';
+}
+
+function bestGruppe(lage, f) {
+  var bs = '';
+  S.items.forEach(function (it) {
+    if (it.t !== 'bauteil' || itemLage(it) !== lage) return;
+    var kp = bauteilKorpus(it);
+    if (!kp) return;
+    bs += '<path d="' + pfadD(kp.concat([kp[0]])) + '"/>';
+    bs += '<circle cx="' + nr(it.x, 3) + '" cy="' + nr(it.y, 3) + '" r="0.5"/>';
+  });
+  return bs ? '<g id="bestueckung">' + farbig(bs, stil(f, 'linie')) + '</g>' : '';
+}
+
+/* Ein SVG für EINE Seite. Reihenfolge der Gruppen = Reihenfolge, in
+   der xTool Studio sie später abarbeitet — deshalb steht sie fest in
+   EBENEN und wird hier stur durchlaufen. */
+function svgSeite(lage) {
+  if (S.veraltet || !S.fraes) rechne();
+  var w = W(), h = H(), o = [];
+  var st = S.fraes[lage] || { leiter: [], text: [] };
+
+  var alsFlaeche = el('isoArt').value === 'flaeche';
+  if (alsFlaeche && S.umlauf < 2) {
+    el('stWarn').textContent = 'Fläche mit nur einem Umlauf: der Graben hat keine Breite, das SVG wird zum Klotz.';
+  }
+
+  /* Außenkontur und randnahe Isolierbahnen ragen über die Platine
+     hinaus — ohne diesen Rand im viewBox schneidet das SVG sie ab. */
+  var rand = 0;
+  if (an('kontur1') || an('kontur2')) rand = S.kFraeser / 2 + 0.1;
+  if (an('isoLeit1') || an('isoText1') || an('rest')) rand = Math.max(rand, S.fraeser / 2 + (S.umlauf - 1) * S.ueber + 0.1);
+  /* Die Restfläche ragt am weitesten hinaus — sie geht bewusst über die
+     Außenkontur, damit am Rand kein Kupferstreifen stehen bleibt. */
+  if (an('rest')) rand = Math.max(rand, restRand() + 0.1);
+  var vb = [-rand, -rand, w + 2 * rand, h + 2 * rand];
+
+  o.push('<?xml version="1.0" encoding="UTF-8"?>');
+  o.push('<!-- pcbmaker · makr.tools — ' + (lage === 'unten' ? 'Unterseite' : 'Oberseite') + ', Maßstab 1:1, Einheit mm.');
+  o.push('     Raster 2,54 mm · Platine ' + de(w, 2) + ' × ' + de(h, 2) + ' mm');
+  o.push('     Isolierfräser ' + de(S.fraeser, 2) + ' mm, ' + S.umlauf + ' Umlauf/Umläufe, Bahnabstand ' + de(S.ueber, 2) + ' mm');
+  o.push('     ' + (gespiegelt(lage) ? 'Gespiegelt — die Platine liegt umgedreht.' : 'Ungespiegelt.') +
+         ' Eine Farbe je Ebene, siehe die id der Gruppen. -->');
+  o.push('<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="' + nr(vb[2], 3) + 'mm" height="' + nr(vb[3], 3) +
+         'mm" viewBox="' + nr(vb[0], 3) + ' ' + nr(vb[1], 3) + ' ' + nr(vb[2], 3) + ' ' + nr(vb[3], 3) + '">');
+
+  var bauer = {
+    isoLeit1: function (f) { return isoGruppe('isolation-leiter-1', st.leiter, f); },
+    isoLeit2: function (f) { return isoGruppe('isolation-leiter-2', st.leiter, f); },
+    isoText1: function (f) { return isoGruppe('isolation-text-1', st.text, f); },
+    isoText2: function (f) { return isoGruppe('isolation-text-2', st.text, f); },
+    bohr:     function (f) { return bohrGruppe(lage, f); },
+    schrift:  function (f) { return schriftGruppe(lage, f); },
+    rest:     function (f) { return restGruppe(lage, f); },
+    kontur1:  function (f) { return konturGruppe('aussenkontur-1', f); },
+    kontur2:  function (f) { return konturGruppe('aussenkontur-2', f); },
+    kupfer:   function (f) { var t = kupferSvg(lage, f); return t ? '<g id="kupfer">' + t + '</g>' : ''; },
+    platine:  function (f) { return '<g id="platinenrand">' + farbig('<rect x="0" y="0" width="' + nr(w, 3) + '" height="' + nr(h, 3) + '"/>', stil(f, 'linie')) + '</g>'; },
+    best:     function (f) { return bestGruppe(lage, f); }
+  };
+
+  /* Dieselbe Kippung wie in der Ansicht, an jede Gruppe geschrieben —
+     so bleiben die Gruppen oberste Ebene und der Importer findet sie. */
+  var kipp = gespiegelt(lage) ? ' transform="translate(' + nr(w, 3) + ' 0) scale(-1 1)"' : '';
+  EBENEN.forEach(function (e) {
+    if (!an(e.id)) return;
+    var g = bauer[e.id] ? bauer[e.id](S.farben[e.id]) : '';
+    if (g) o.push(kipp ? g.replace('<g ', '<g' + kipp + ' ') : g);
+  });
+
+  o.push('</svg>');
+  return o.join('\n');
+}
+function an(id) { var c = el('e_' + id); return c && c.checked; }
+
+function kupferSvg(lage, f) {
+  var s = '';
+  alleStuecke(lage).forEach(function (it) {
+    if (it.t === 'pad') s += farbig(padSvg(it), 'fill="' + f + '" stroke="none"');
+
+    else if (it.t === 'flaeche') s += '<rect fill="' + f + '" stroke="none" x="' + nr(it.x, 3) + '" y="' + nr(it.y, 3) + '" width="' + nr(it.w, 3) + '" height="' + nr(it.h, 3) + '"/>';
+    else if (it.t === 'bahn' && it.pts.length > 1) {
+      /* Die Bahn bleibt eine dicke Linie — als Fläche müsste man sie erst
+         zu einem Umriss ausrechnen, und fürs Kontrollbild lohnt das nicht. */
+      s += '<path fill="none" stroke="' + f + '" d="' + pfadD(it.pts) + '" stroke-width="' + nr(it.b, 3) + '" stroke-linecap="round" stroke-linejoin="round"/>';
+    }
+    else if (it.t === 'text') {
+      textPfade(it).forEach(function (z) {
+        if (z.length < 2) return;
+        s += '<path fill="none" stroke="' + f + '" d="' + pfadD(z) + '" stroke-width="' + nr(it.b, 3) + '" stroke-linecap="round" stroke-linejoin="round"/>';
+      });
+    }
+  });
+  return s;
+}
+function padSvg(p) {
+  if (p.form === 'eckig') return '<rect x="' + nr(p.x - p.d / 2, 3) + '" y="' + nr(p.y - p.d / 2, 3) + '" width="' + nr(p.d, 3) + '" height="' + nr(p.d, 3) + '"/>';
+  return '<circle cx="' + nr(p.x, 3) + '" cy="' + nr(p.y, 3) + '" r="' + nr(p.d / 2, 3) + '"/>';
+}
+
+function lade(name, text, typ) {
+  var b = new Blob([text], { type: typ });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(b); a.download = name;
+  document.body.appendChild(a); a.click();
+  setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+}
+
+/* ============================================================
+   Statuszeile, Speichern, Verdrahtung
+   ============================================================ */
+function status() {
+  el('stMass').textContent = de(W(), 2) + ' × ' + de(H(), 2) + ' mm';
+  var pads = allePads(null);
+  el('stPads').textContent = pads.length;
+  el('stBahnen').textContent = S.items.filter(function (i) { return i.t === 'bahn'; }).length;
+  el('stBohr').textContent = pads.filter(function (p) { return p.bohr > 0; }).length;
+  var l = 0;
+  if (S.fraes && !S.veraltet) {
+    var alle = alleBahnen(S.fraes.unten).concat(alleBahnen(S.fraes.oben), S.fraes.kontur || []);
+    alle.forEach(function (p) {
+      for (var i = 1; i < p.length; i++) l += Math.hypot(p[i][0] - p[i - 1][0], p[i][1] - p[i - 1][1]);
+    });
+    el('stWeg').textContent = l > 1000 ? de(l / 1000, 2) + ' m' : de(l, 0) + ' mm';
+  } else {
+    el('stWeg').textContent = S.fraes ? '(veraltet)' : '—';
+  }
+  el('masse').textContent = 'Platine ' + de(W(), 2) + ' × ' + de(H(), 2) + ' mm · ' + S.cols + ' × ' + S.rows + ' Rasterpunkte';
+}
+
+var timer = null;
+function veraendert() {
+  S.veraltet = true;
+  status(); zeichne(); sichern();
+  if (el('zeigFraes').checked) {
+    clearTimeout(timer);
+    timer = setTimeout(rechne, 450);
+  }
+}
+
+var SCHLUESSEL = 'pcbmaker-stand';
+/* Erst wenn der letzte Stand geladen ist, darf gespeichert werden — sonst
+   überschreibt das Verdrahten der Regler beim Start die leere Platine
+   über die gemerkte drüber. */
+var bereit = false;
+function sichern() {
+  if (!bereit) return;
+  try {
+    localStorage.setItem(SCHLUESSEL, JSON.stringify({ cols: S.cols, rows: S.rows, items: S.items }));
+  } catch (e) { /* Speicher voll — egal, dann eben ohne */ }
+}
+function holen() {
+  try {
+    var t = localStorage.getItem(SCHLUESSEL);
+    if (!t) return;
+    var d = JSON.parse(t);
+    if (d && d.items) { S.items = umstellen(d.items); S.cols = d.cols || S.cols; S.rows = d.rows || S.rows; }
+  } catch (e) { }
+}
+
+/* Ältere Stände kennen `typ` und eine eigene Lage am Bauteil. Seit der
+   Bibliothek heißt es `bid`, und die Lage steckt in den einzelnen Teilen. */
+function umstellen(items) {
+  (items || []).forEach(function (it) {
+    if (it.t === 'bauteil' && !it.bid && it.typ) it.bid = it.typ;
+  });
+  return items || [];
+}
+
+function setModus(m) {
+  S.modus = m;
+  if (m !== 'bahn') S.entwurf = null;
+  [].forEach.call(document.querySelectorAll('.tool'), function (t) { t.classList.toggle('on', t.dataset.modus === m); });
+  var hinweise = {
+    zeiger: 'Klick wählt aus, Ziehen verschiebt aufs Raster. Entf löscht, Strg+Z nimmt zurück.',
+    pad: 'Jeder Klick setzt ein Pad auf den nächsten Rasterpunkt.',
+    bahn: 'Klick setzt einen Stützpunkt. Doppelklick, Rechtsklick oder Enter beendet die Bahn, Esc verwirft sie.',
+    flaeche: 'Rechteck aufziehen. Als Massefläche wird alles andere Kupfer freigestellt.',
+    bauteil: 'Klick setzt das gewählte Bauteil, Pin 1 auf dem Klickpunkt.',
+    text: 'Klick setzt die Beschriftung frei, linke Kante auf halber Höhe am Klickpunkt. Mit dem Zeiger lässt sie sich ebenso frei verschieben.'
+  };
+  el('modusHint').textContent = hinweise[m];
+  zeichne();
+}
+function setLage(l) {
+  S.lage = l;
+  [].forEach.call(document.querySelectorAll('.lage'), function (t) { t.classList.toggle('on', t.dataset.lage === l); });
+  zeichne();
+}
+function setZoom(z) { S.zoom = Math.max(1, Math.min(40, z)); zeichne(); }
+function fit() {
+  var st = el('stage').getBoundingClientRect();
+  setZoom(Math.min((st.width - 90) / W(), (st.height - 90) / H()));
+}
+
+/* Regler verdrahten */
+function reglerN(id, feld, n, nach) {
+  var e = el(id), v = el(id + 'V');
+  function sync() {
+    S[feld] = parseFloat(e.value);
+    if (v) v.textContent = n === 0 ? S[feld] : de(S[feld], n);
+    if (nach) nach();
+  }
+  e.addEventListener('input', sync);
+  sync();
+}
+
+reglerN('cols', 'cols', 0, function () { S.veraltet = true; status(); zeichne(); sichern(); });
+reglerN('rows', 'rows', 0, function () { S.veraltet = true; status(); zeichne(); sichern(); });
+reglerN('padD', 'padD', 1, null);
+reglerN('bohrD', 'bohrD', 1, null);
+reglerN('bahnB', 'bahnB', 1, null);
+reglerN('frei', 'frei', 2, function () { S.veraltet = true; zeichne(); });
+reglerN('fraeser', 'fraeser', 2, function () { S.veraltet = true; });
+reglerN('umlauf', 'umlauf', 0, function () { S.veraltet = true; isoHinweis(); });
+reglerN('ueber', 'ueber', 2, function () { S.veraltet = true; isoHinweis(); });
+reglerN('res', 'res', 0, function () { S.veraltet = true; });
+reglerN('strich', 'strich', 2, farbenSichern);
+reglerN('kFraeser', 'kFraeser', 1, function () { S.veraltet = true; });
+reglerN('stege', 'stege', 0, function () {
+  S.veraltet = true;
+  el('stegHint').textContent = S.stege
+    ? S.stege + ' Stege heißt ' + S.stege + ' offene Bahnstücke — die Platine hängt beim Schneiden noch fest. Für eine geschlossene Kontur auf 0 stellen.'
+    : 'Ohne Stege ist die Außenkontur ein geschlossener Ring.';
+});
+reglerN('stegB', 'stegB', 1, function () { S.veraltet = true; });
+
+function isoHinweis() {
+  var b = grabenBreite();
+  if (el('isoArt').value === 'linie') {
+    el('isoHint').textContent = 'Ein Pfad je Umlauf, Mittellinie des Fräsers. Im CAM auf der Linie fahren.';
+    el('isoHint').style.color = '';
+    return;
+  }
+  if (S.umlauf < 2) {
+    el('isoHint').textContent = 'Für den Graben braucht es mindestens zwei Umläufe — mit einem hat er keine Breite und die Fläche wird zum Klotz.';
+    el('isoHint').style.color = 'var(--orange-deep)';
+    return;
+  }
+  el('isoHint').style.color = '';
+  el('isoHint').textContent = 'Innerster und äußerster Umlauf in einem Pfad mit evenodd — schon fertig als Compound-Pfad, ' +
+    'xTool Studio graviert damit den Graben statt einer vollen Fläche. Grabenbreite ' + de(b, 2) + ' mm.';
+}
+el('isoArt').addEventListener('change', isoHinweis);
+
+/* Beschriftung */
+reglerN('textH', 'textH', 1, function () { zeichne(); });
+reglerN('textB', 'textB', 2, function () { zeichne(); });
+el('textRot').addEventListener('change', function () { S.textRot = +this.value; zeichne(); });
+el('textRaster').addEventListener('change', function () { S.textRaster = this.checked; zeichne(); });
+el('spOben').addEventListener('change', function () {
+  S.spOben = this.checked;
+  spHinweis();
+  zeichne();
+});
+function spHinweis() {
+  el('spHint').textContent = S.spOben
+    ? 'Die Zeichnung ist der Blick auf die Unterseite. Bei aktiver Oberseite kippt die Ansicht — und platine-oben.svg genauso, damit beide Seiten nach dem Umdrehen übereinander passen.'
+    : 'Beide Seiten werden von der Unterseite aus gezeigt und ungespiegelt ausgegeben. Beim Umdrehen der Platine passen sie dann nicht mehr übereinander.';
+}
+el('textS').addEventListener('input', function () {
+  S.text = this.value;
+  /* Ist gerade eine Beschriftung ausgewählt, wandert die Eingabe direkt
+     dorthin — sonst müsste man sie löschen und neu setzen. */
+  if (S.sel && S.sel.t === 'text') { S.sel.s = S.text; veraendert(); } else zeichne();
+});
+(function () {
+  var VORLAGEN = ['+', '-', 'V+', 'V-', 'VCC', 'GND', '5V', '12V', '3V3', 'IN', 'OUT', 'SIG', 'TX', 'RX', 'SDA', 'SCL', 'PWM', 'NC'];
+  var wo = el('chips');
+  VORLAGEN.forEach(function (v) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'chip'; b.textContent = v;
+    b.addEventListener('click', function () {
+      S.text = v; el('textS').value = v;
+      if (S.sel && S.sel.t === 'text') { S.sel.s = v; veraendert(); }
+      else { setModus('text'); }
+    });
+    wo.appendChild(b);
+  });
+})();
+
+el('padForm').addEventListener('change', function () { S.padForm = this.value; });
+el('rot').addEventListener('change', function () { S.rot = +this.value; zeichne(); });
+el('halb').addEventListener('change', function () { S.halb = this.checked; zeichne(); });
+el('diag').addEventListener('change', function () { S.diag = this.checked; });
+el('zeigFraes').addEventListener('change', function () {
+  if (this.checked && S.veraltet) rechne(); else zeichne();
+});
+
+/* ============================================================
+   Bauteil-Bibliothek: laden, anzeigen, speichern
+   ============================================================ */
+var TOKENKEY = 'pcbmaker-token';
+var EIGENKEY = 'pcbmaker-eigene';
+
+function token() { return localStorage.getItem(TOKENKEY) || ''; }
+
+/* Erst den Server fragen. Antwortet der nicht (kein PHP, Datei geoeffnet
+   statt ausgeliefert), reicht bauteile.json plus das, was im Browser
+   liegt — das Werkzeug muss auch ohne Server benutzbar bleiben. */
+function bibliothekLaden() {
+  return fetch('bibliothek.php', { cache: 'no-store' })
+    .then(function (a) { if (!a.ok) throw new Error(a.status); return a.json(); })
+    .then(function (d) {
+      BIB.standard = d.standard || [];
+      BIB.eigene = d.eigene || [];
+      BIB.kategorien = d.kategorien || [];
+      BIB.schreiben = !!d.schreiben;
+      BIB.quelle = 'server';
+    })
+    .catch(function () {
+      return fetch('bauteile.json', { cache: 'no-store' })
+        .then(function (a) { return a.json(); })
+        .then(function (d) {
+          BIB.standard = d.bauteile || [];
+          BIB.kategorien = d.kategorien || [];
+          BIB.quelle = 'datei';
+        })
+        .catch(function () { BIB.quelle = 'nichts'; });
+    })
+    .then(function () {
+      if (BIB.quelle !== 'server') {
+        try { BIB.eigene = JSON.parse(localStorage.getItem(EIGENKEY) || '[]'); } catch (e) { BIB.eigene = []; }
+      }
+      bauteilListe();
+      bibStatus();
+      veraendert();
+    });
+}
+
+function eigeneLokalSichern() {
+  try { localStorage.setItem(EIGENKEY, JSON.stringify(BIB.eigene)); } catch (e) { }
+}
+
+/* Auswahlliste, nach Kategorie gruppiert. */
+function bauteilListe() {
+  var sel = el('bauteil'), alle = alleBauteile();
+  sel.innerHTML = '';
+  var kats = BIB.kategorien.slice();
+  alle.forEach(function (b) { if (kats.indexOf(b.kategorie) < 0) kats.push(b.kategorie || 'Sonstiges'); });
+  kats.forEach(function (kat) {
+    var drin = alle.filter(function (b) { return (b.kategorie || 'Sonstiges') === kat; });
+    if (!drin.length) return;
+    var gr = document.createElement('optgroup');
+    gr.label = kat;
+    drin.forEach(function (b) {
+      var o = document.createElement('option');
+      o.value = b.id;
+      o.textContent = b.name + (istEigen(b.id) ? ' ·' : '');
+      gr.appendChild(o);
+    });
+    sel.appendChild(gr);
+  });
+  if (!bauteilDef(S.bauteil) && alle.length) S.bauteil = alle[0].id;
+  sel.value = S.bauteil;
+}
+function istEigen(id) {
+  return BIB.eigene.some(function (b) { return b.id === id; });
+}
+
+function bibStatus() {
+  var t = { server: 'Bibliothek vom Server', datei: 'Bibliothek aus bauteile.json, eigene nur in diesem Browser', nichts: 'Bibliothek konnte nicht geladen werden' }[BIB.quelle];
+  el('bibStatus').textContent = t + ' · ' + BIB.standard.length + ' mitgeliefert, ' + BIB.eigene.length + ' eigene';
+  el('bibStatus').style.color = BIB.quelle === 'nichts' ? 'var(--orange-deep)' : '';
+}
+
+el('bauteil').addEventListener('change', function () { S.bauteil = this.value; zeichne(); });
+
+function auswahlStatus() {
+  var n = S.mehr.length ? S.mehr.length : (S.sel ? 1 : 0);
+  el('auswahlZahl').textContent = n ? n + ' ausgewählt' : 'nichts ausgewählt';
+  el('alsBauteil').disabled = !n;
+}
+
+/* Aus der Auswahl ein Bauteil machen.
+   Ankerpunkt ist das oberste linke Pad — dasselbe Pin 1 wie bei den
+   mitgelieferten Bauteilen. Gibt es kein Pad, die obere linke Ecke der
+   Auswahl, aufs Raster gelegt. */
+function auswahlAlsBauteil(name, kategorie) {
+  var quelle = S.mehr.length ? S.mehr : (S.sel ? [S.sel] : []);
+  if (!quelle.length) return null;
+
+  var teile = [];
+  quelle.forEach(function (it) { teile = teile.concat(kopie(entfalten(it))); });
+  if (!teile.length) return null;
+
+  var pads = teile.filter(function (t) { return t.t === 'pad'; });
+  var anker;
+  if (pads.length) {
+    var erst = pads.slice().sort(function (a, b) { return (a.y - b.y) || (a.x - b.x); })[0];
+    anker = [erst.x, erst.y];
+  } else {
+    var x0 = 1e9, y0 = 1e9;
+    quelle.forEach(function (it) { var b = huelle(it); if (b) { x0 = Math.min(x0, b[0]); y0 = Math.min(y0, b[1]); } });
+    anker = [snap(x0), snap(y0)];
+  }
+
+  teile.forEach(function (t) {
+    if (t.t === 'bahn') {
+      t.pts = t.pts.map(function (p) { return [+(p[0] - anker[0]).toFixed(4), +(p[1] - anker[1]).toFixed(4)]; });
+    } else {
+      t.x = +(t.x - anker[0]).toFixed(4);
+      t.y = +(t.y - anker[1]).toFixed(4);
+    }
+  });
+
+  return {
+    id: 'eigen-' + name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) + '-' + Math.abs(hashText(name + teile.length)).toString(36).slice(0, 4),
+    name: name,
+    kategorie: kategorie,
+    teile: teile
+  };
+}
+/* Kurzer, stabiler Hash — nur damit zwei gleichnamige Bauteile nicht
+   dieselbe Kennung bekommen. Math.random waere hier unnoetig. */
+function hashText(s) {
+  var h = 0;
+  for (var i = 0; i < s.length; i++) { h = (h * 31 + s.charCodeAt(i)) | 0; }
+  return h;
+}
+
+function bauteilSpeichern(b) {
+  el('bibWarn').textContent = '';
+  if (BIB.quelle === 'server') {
+    return fetch('bibliothek.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Pcb-Token': token() },
+      body: JSON.stringify(b)
+    }).then(function (a) {
+      return a.json().then(function (d) {
+        if (!a.ok) throw new Error(d.fehler || a.status);
+        return d;
+      });
+    }).then(function () {
+      return bibliothekLaden();
+    });
+  }
+  /* Ohne Server bleibt es im Browser. */
+  BIB.eigene = BIB.eigene.filter(function (x) { return x.id !== b.id; }).concat([b]);
+  eigeneLokalSichern();
+  bauteilListe(); bibStatus();
+  return Promise.resolve();
+}
+
+function bauteilLoeschen(id) {
+  if (BIB.quelle === 'server') {
+    return fetch('bibliothek.php?loeschen=' + encodeURIComponent(id), {
+      method: 'POST',
+      headers: { 'X-Pcb-Token': token() }
+    }).then(function (a) {
+      return a.json().then(function (d) {
+        if (!a.ok) throw new Error(d.fehler || a.status);
+      });
+    }).then(bibliothekLaden);
+  }
+  BIB.eigene = BIB.eigene.filter(function (x) { return x.id !== id; });
+  eigeneLokalSichern();
+  bauteilListe(); bibStatus();
+  return Promise.resolve();
+}
+
+el('alsBauteil').addEventListener('click', function () {
+  var name = (el('bauteilName').value || '').trim();
+  if (!name) { el('bibWarn').textContent = 'Erst einen Namen eintragen.'; el('bauteilName').focus(); return; }
+  var kat = el('bauteilKat').value || 'Sonstiges';
+  var b = auswahlAlsBauteil(name, kat);
+  if (!b) { el('bibWarn').textContent = 'Die Auswahl enthält kein Kupfer.'; return; }
+  var seiten = {};
+  b.teile.forEach(function (t) { seiten[t.lage] = (seiten[t.lage] || 0) + 1; });
+  bauteilSpeichern(b).then(function () {
+    S.bauteil = b.id;
+    bauteilListe();
+    el('bauteilName').value = '';
+    el('bibWarn').style.color = '';
+    el('bibWarn').textContent = '„' + b.name + '" gespeichert: ' +
+      (seiten.unten || 0) + ' Teil(e) unten, ' + (seiten.oben || 0) + ' oben.';
+  }).catch(function (e) {
+    el('bibWarn').style.color = 'var(--orange-deep)';
+    el('bibWarn').textContent = 'Nicht gespeichert: ' + e.message +
+      (String(e.message).indexOf('401') >= 0 || /Token/i.test(e.message) ? ' — Schreibschlüssel unten eintragen.' : '');
+  });
+});
+
+el('bauteilWeg').addEventListener('click', function () {
+  var id = el('bauteil').value;
+  if (!istEigen(id)) { el('bibWarn').textContent = 'Mitgelieferte Bauteile lassen sich nicht löschen.'; return; }
+  var def = bauteilDef(id);
+  if (!confirm('„' + def.name + '" wirklich aus der Bibliothek entfernen?')) return;
+  bauteilLoeschen(id).then(function () {
+    el('bibWarn').textContent = 'Entfernt.';
+  }).catch(function (e) {
+    el('bibWarn').style.color = 'var(--orange-deep)';
+    el('bibWarn').textContent = 'Nicht entfernt: ' + e.message;
+  });
+});
+
+el('bibExport').addEventListener('click', function () {
+  lade('eigene-bauteile.json', JSON.stringify({ version: 1, bauteile: BIB.eigene }, null, 1), 'application/json');
+});
+el('bibImport').addEventListener('click', function () { el('bibDatei').click(); });
+el('bibDatei').addEventListener('change', function () {
+  var f = this.files[0];
+  this.value = '';
+  if (!f) return;
+  var r = new FileReader();
+  r.onload = function () {
+    var d;
+    try { d = JSON.parse(r.result); } catch (e) { el('bibWarn').textContent = 'Datei nicht lesbar.'; return; }
+    var liste = d.bauteile || [];
+    if (!liste.length) { el('bibWarn').textContent = 'Keine Bauteile in der Datei.'; return; }
+    /* Nacheinander, damit der Server nicht mehrere Schreibvorgaenge
+       gleichzeitig auf dieselbe Datei bekommt. */
+    liste.reduce(function (kette, b) {
+      return kette.then(function () { return bauteilSpeichern(b); });
+    }, Promise.resolve()).then(function () {
+      el('bibWarn').textContent = liste.length + ' Bauteil(e) übernommen.';
+    }).catch(function (e) {
+      el('bibWarn').style.color = 'var(--orange-deep)';
+      el('bibWarn').textContent = 'Abgebrochen: ' + e.message;
+    });
+  };
+  r.readAsText(f);
+});
+
+el('tokenFeld').addEventListener('change', function () {
+  localStorage.setItem(TOKENKEY, this.value.trim());
+  el('bibWarn').textContent = this.value.trim() ? 'Schreibschlüssel gemerkt.' : 'Schreibschlüssel gelöscht.';
+});
+
+/* ---------- Platine an einer einzelnen Kante ändern ----------
+   Links und oben heißt: die Platine wächst über den Nullpunkt hinaus.
+   Weil der Nullpunkt oben links bleiben muss, wandert stattdessen die
+   ganze Zeichnung mit — sonst säße sie nach jedem Klick woanders. */
+var MINRAST = 4, MAXRAST = 60;
+
+function kanteAendern(seite, d) {
+  var quer = seite === 'links' || seite === 'rechts';
+  var neu = (quer ? S.cols : S.rows) + d;
+  if (neu < MINRAST || neu > MAXRAST) return;
+  merken();
+  if (quer) S.cols = neu; else S.rows = neu;
+  if (seite === 'links') alleVerschieben(d * G, 0);
+  if (seite === 'oben') alleVerschieben(0, d * G);
+  rasterRegler();
+  veraendert();
+}
+function alleVerschieben(dx, dy) {
+  for (var i = 0; i < S.items.length; i++) verschiebe(S.items[i], dx, dy);
+}
+function rasterRegler() {
+  el('cols').value = S.cols; el('colsV').textContent = S.cols;
+  el('rows').value = S.rows; el('rowsV').textContent = S.rows;
+}
+
+/* Platine auf das schrumpfen, was tatsächlich drauf ist, plus ein
+   Raster Luft ringsum. */
+function zuschneiden() {
+  if (!S.items.length) return;
+  var x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+  for (var i = 0; i < S.items.length; i++) {
+    var b = huelle(S.items[i]);
+    if (!b) continue;
+    x0 = Math.min(x0, b[0]); y0 = Math.min(y0, b[1]);
+    x1 = Math.max(x1, b[2]); y1 = Math.max(y1, b[3]);
+  }
+  if (x1 < x0) return;
+  var luft = G;
+  /* Der Versatz muss ein ganzes Raster sein, sonst liegt hinterher
+     nichts mehr auf den Rasterpunkten. */
+  var dx = Math.round((luft - x0) / G) * G, dy = Math.round((luft - y0) / G) * G;
+  var cols = Math.ceil((x1 + dx + luft) / G), rows = Math.ceil((y1 + dy + luft) / G);
+  cols = Math.max(MINRAST, Math.min(MAXRAST, cols));
+  rows = Math.max(MINRAST, Math.min(MAXRAST, rows));
+  merken();
+  alleVerschieben(dx, dy);
+  S.cols = cols; S.rows = rows;
+  rasterRegler();
+  veraendert();
+  fit();
+}
+
+[].forEach.call(document.querySelectorAll('#kanten .btn'), function (b) {
+  b.addEventListener('click', function () { kanteAendern(b.dataset.seite, +b.dataset.d); });
+});
+el('zuschneiden').addEventListener('click', zuschneiden);
+
+/* ---------- Ebenen und Farben ----------
+   Reihenfolge = Reihenfolge im SVG. Mehrere Zeilen dürfen sich ein
+   Kästchen teilen (Iso unten/oben hängen an einem Schalter), dann
+   trägt nur die erste Zeile das Kästchen. */
+var EBENEN = [
+  { id: 'isoLeit1', an: true,  name: 'Isolierbahn Leiter + Bohrungen (1)', f: '#00897b' },
+  { id: 'bohr',     an: true,  name: 'Bohrungslöcher',                    f: '#e1c000' },
+  { id: 'isoText1', an: true,  name: 'Isolierbahn Symbole + Texte (1)',   f: '#2366ff' },
+  { id: 'isoLeit2', an: true,  name: 'Isolierbahn Leiter + Bohrungen (2)', f: '#fe0002' },
+  { id: 'isoText2', an: true,  name: 'Isolierbahn Symbole + Texte (2)',   f: '#582fa8' },
+  { id: 'schrift',  an: true,  name: 'Schrift selbst',                    f: '#eb3dba' },
+  { id: 'rest',     an: true,  name: 'Restfläche (übriges Kupfer)',       f: '#96d71d' },
+  { id: 'kontur1',  an: true,  name: 'Außenkontur (1)',                   f: '#848b96' },
+  { id: 'kontur2',  an: true,  name: 'Außenkontur (2)',                   f: '#00befe' },
+  { id: 'kupfer',   an: false, name: 'Kupfer (Kontrolle)',                f: '#ffaa00' },
+  { id: 'platine',  an: false, name: 'Platinenrand',                      f: '#00ffff' },
+  { id: 'best',     an: false, name: 'Bestückungsdruck',                  f: '#00aa00' }
+];
+var FARBSTD = {};
+EBENEN.forEach(function (e) { FARBSTD[e.id] = e.f; });
+
+(function () {
+  var wo = el('ebenen');
+  S.farben = {};
+  EBENEN.forEach(function (e, i) {
+    S.farben[e.id] = e.f;
+    var zeile = document.createElement('div');
+    zeile.className = 'ebene';
+    if (i === 10) zeile.style.borderTop = '1px solid var(--border)', zeile.style.paddingTop = '8px';
+
+    var box = document.createElement('span');
+    box.className = 'box';
+    var c = document.createElement('input');
+    c.type = 'checkbox'; c.id = 'e_' + e.id; c.checked = e.an;
+    c.addEventListener('change', ebenenSync);
+    box.appendChild(c);
+    zeile.appendChild(box);
+
+    var n = document.createElement('span');
+    n.className = 'name'; n.textContent = e.name; n.dataset.chk = 'e_' + e.id;
+    zeile.appendChild(n);
+
+    var f = document.createElement('input');
+    f.type = 'color'; f.value = e.f; f.dataset.f = e.id;
+    f.title = e.name;
+    f.addEventListener('input', function () { S.farben[e.id] = this.value; ebenenSync(); });
+    zeile.appendChild(f);
+
+    wo.appendChild(zeile);
+  });
+})();
+
+function ebenenSync() {
+  /* Namen ausgrauen, wenn die Gruppe nicht exportiert wird */
+  [].forEach.call(document.querySelectorAll('.ebene .name'), function (n) {
+    n.classList.toggle('aus', !el(n.dataset.chk).checked);
+  });
+  /* Doppelte Farben melden — die landen im Importer auf einer Ebene */
+  var gesehen = {}, doppelt = [];
+  EBENEN.forEach(function (e) {
+    if (!an(e.id)) return;
+    var f = S.farben[e.id];
+    if (gesehen[f]) { if (doppelt.indexOf(f) < 0) doppelt.push(f); }
+    gesehen[f] = true;
+  });
+  el('farbWarn').textContent = doppelt.length
+    ? 'Gleiche Farbe mehrfach vergeben (' + doppelt.join(', ') + ') — diese Gruppen landen auf derselben Ebene.'
+    : '';
+  farbenSichern();
+}
+
+var FARBKEY = 'pcbmaker-farben';
+/* Hochzählen, sobald sich die Ebenenliste ändert — sonst zieht ein alter
+   gespeicherter Satz Farben Namen mit, die inzwischen etwas anderes
+   bedeuten. Genau das hat 'bohr' schon einmal blau statt gelb gemacht. */
+var FARBVERSION = 4;
+function farbenSichern() {
+  if (!bereit) return;
+  try { localStorage.setItem(FARBKEY, JSON.stringify({ v: FARBVERSION, farben: S.farben, strich: S.strich })); } catch (e) { }
+}
+function farbenHolen() {
+  try {
+    var d = JSON.parse(localStorage.getItem(FARBKEY) || 'null');
+    if (!d || d.v !== FARBVERSION) return;
+    if (d.farben) Object.keys(d.farben).forEach(function (k) { if (S.farben[k]) S.farben[k] = d.farben[k]; });
+    if (d.strich) { S.strich = d.strich; el('strich').value = d.strich; }
+    [].forEach.call(document.querySelectorAll('.ebene input[type=color]'), function (i) { i.value = S.farben[i.dataset.f]; });
+  } catch (e) { }
+}
+el('farbStd').addEventListener('click', function () {
+  Object.keys(FARBSTD).forEach(function (k) { S.farben[k] = FARBSTD[k]; });
+  [].forEach.call(document.querySelectorAll('.ebene input[type=color]'), function (i) { i.value = S.farben[i.dataset.f]; });
+  ebenenSync();
+});
+el('kopieSvg').addEventListener('click', function () {
+  var b = this;
+  navigator.clipboard.writeText(svgSeite(S.lage)).then(function () {
+    b.textContent = 'kopiert';
+    setTimeout(function () { b.textContent = 'aktive Seite kopieren'; }, 1400);
+  });
+});
+
+/* Kästchen "Massefläche" direkt neben die Freistellung hängen */
+(function () {
+  var box = document.createElement('label');
+  box.className = 'check';
+  box.innerHTML = '<input type="checkbox" id="masseNeu"> neue Flächen sind Masseflächen';
+  el('frei').closest('.group').appendChild(box);
+})();
+
+[].forEach.call(document.querySelectorAll('.tool'), function (t) {
+  t.addEventListener('click', function () { setModus(t.dataset.modus); });
+});
+[].forEach.call(document.querySelectorAll('.lage'), function (t) {
+  t.addEventListener('click', function () { setLage(t.dataset.lage); });
+});
+
+el('calc').addEventListener('click', rechne);
+/* Zwei Dateien: eine je Seite, beide ungespiegelt. Eine Seite ohne
+   eigenes Kupfer wird übersprungen — ein SVG, in dem nur die Kontur
+   steht, hilft niemandem. */
+el('expSvg').addEventListener('click', function () {
+  offenVerworfen = 0;
+  var raus = [];
+  ['unten', 'oben'].forEach(function (lage) {
+    var hat = S.items.some(function (i) { return i.lage === lage; });
+    if (!hat) return;
+    lade('platine-' + lage + '.svg', svgSeite(lage), 'image/svg+xml');
+    raus.push(lage);
+  });
+  el('stWarn').textContent = !raus.length ? 'Nichts zu exportieren — die Platine ist leer.'
+    : offenVerworfen ? offenVerworfen + ' offene Kontur(en) nicht in die Fläche übernommen'
+    : raus.length === 1 ? 'Nur die ' + (raus[0] === 'unten' ? 'Unterseite' : 'Oberseite') + ' hat Kupfer — eine Datei geschrieben.'
+    : '';
+});
+el('save').addEventListener('click', function () {
+  lade('platine.json', JSON.stringify({ pcbmaker: 1, cols: S.cols, rows: S.rows, items: S.items }, null, 1), 'application/json');
+});
+el('load').addEventListener('click', function () { el('file').click(); });
+el('file').addEventListener('change', function () {
+  var f = this.files[0];
+  if (!f) return;
+  var r = new FileReader();
+  r.onload = function () {
+    try {
+      var d = JSON.parse(r.result);
+      if (!d.items) throw new Error('keine Platine');
+      merken();
+      S.items = d.items; S.cols = d.cols || S.cols; S.rows = d.rows || S.rows;
+      el('cols').value = S.cols; el('rows').value = S.rows;
+      el('colsV').textContent = S.cols; el('rowsV').textContent = S.rows;
+      S.sel = null; veraendert(); fit();
+    } catch (e) {
+      el('stWarn').textContent = 'Datei nicht lesbar: ' + e.message;
+    }
+  };
+  r.readAsText(f);
+  this.value = '';
+});
+el('clear').addEventListener('click', function () {
+  if (!S.items.length) return;
+  merken();
+  S.items = []; S.sel = null; S.fraes = null;
+  veraendert();
+});
+
+el('zIn').addEventListener('click', function () { setZoom(S.zoom * 1.25); });
+el('zOut').addEventListener('click', function () { setZoom(S.zoom / 1.25); });
+el('zFit').addEventListener('click', fit);
+el('stage').addEventListener('wheel', function (e) {
+  if (!(e.ctrlKey || e.metaKey)) return;
+  e.preventDefault();
+  setZoom(S.zoom * (e.deltaY < 0 ? 1.1 : 1 / 1.1));
+}, { passive: false });
+
+/* ---------- Start ---------- */
+holen();
+bereit = true;
+farbenHolen();
+ebenenSync();
+el('cols').value = S.cols; el('rows').value = S.rows;
+el('colsV').textContent = S.cols; el('rowsV').textContent = S.rows;
+setModus('zeiger');
+setLage('unten');
+isoHinweis();
+spHinweis();
+auswahlStatus();
+el('tokenFeld').value = token();
+
+/* Kategorien in die Auswahl beim Speichern */
+(function () {
+  var std = ['ICs', 'Stiftleisten', 'Passive', 'Halbleiter', 'Anschlüsse', 'Module', 'Sonstiges'];
+  var sel = el('bauteilKat');
+  std.forEach(function (k) {
+    var o = document.createElement('option');
+    o.value = k; o.textContent = k;
+    sel.appendChild(o);
+  });
+  sel.value = 'Module';
+})();
+
+bibliothekLaden();
+status();
+fit();
+zeichne();
+</script>
+
+<script src="/_stat/zaehler.js" data-seite="pcbmaker" defer></script>
+<script src="/_ui/fuss.js" defer></script>
+
+</body>
+</html>

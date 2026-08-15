@@ -1,0 +1,2331 @@
+{
+ "version": 1,
+ "_hinweis": "Mitgelieferte Bauteil-Bibliothek von pcbmaker. Masse in mm, Ursprung ist Pin 1. Eigene Bauteile legt bibliothek.php in daten/eigene.json ab — diese Datei hier wird beim Deploy ueberschrieben.",
+ "kategorien": [
+  "ICs",
+  "Stiftleisten",
+  "Passive",
+  "Halbleiter",
+  "Anschlüsse",
+  "Module",
+  "Sonstiges"
+ ],
+ "bauteile": [
+  {
+   "id": "dip8",
+   "name": "DIP-8 / IC-Sockel",
+   "kategorie": "ICs",
+   "teile": [
+    {
+     "t": "pad",
+     "x": 0,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "eckig",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 2.54,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 5.08,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 7.62,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 7.62,
+     "y": 7.62,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 5.08,
+     "y": 7.62,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 2.54,
+     "y": 7.62,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 0,
+     "y": 7.62,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    }
+   ],
+   "korpus": [
+    -1.524,
+    0.508,
+    9.144,
+    7.112
+   ]
+  },
+  {
+   "id": "dip14",
+   "name": "DIP-14",
+   "kategorie": "ICs",
+   "teile": [
+    {
+     "t": "pad",
+     "x": 0,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "eckig",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 2.54,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 5.08,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 7.62,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 10.16,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 12.7,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 15.24,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 15.24,
+     "y": 7.62,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 12.7,
+     "y": 7.62,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 10.16,
+     "y": 7.62,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 7.62,
+     "y": 7.62,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 5.08,
+     "y": 7.62,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 2.54,
+     "y": 7.62,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 0,
+     "y": 7.62,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    }
+   ],
+   "korpus": [
+    -1.524,
+    0.508,
+    16.764,
+    7.112
+   ]
+  },
+  {
+   "id": "dip16",
+   "name": "DIP-16",
+   "kategorie": "ICs",
+   "teile": [
+    {
+     "t": "pad",
+     "x": 0,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "eckig",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 2.54,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 5.08,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 7.62,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 10.16,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 12.7,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 15.24,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 17.78,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 17.78,
+     "y": 7.62,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 15.24,
+     "y": 7.62,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 12.7,
+     "y": 7.62,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 10.16,
+     "y": 7.62,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 7.62,
+     "y": 7.62,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 5.08,
+     "y": 7.62,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 2.54,
+     "y": 7.62,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 0,
+     "y": 7.62,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    }
+   ],
+   "korpus": [
+    -1.524,
+    0.508,
+    19.304,
+    7.112
+   ]
+  },
+  {
+   "id": "dip20",
+   "name": "DIP-20",
+   "kategorie": "ICs",
+   "teile": [
+    {
+     "t": "pad",
+     "x": 0,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "eckig",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 2.54,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 5.08,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 7.62,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 10.16,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 12.7,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 15.24,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 17.78,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 20.32,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 22.86,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 22.86,
+     "y": 7.62,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 20.32,
+     "y": 7.62,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 17.78,
+     "y": 7.62,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 15.24,
+     "y": 7.62,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 12.7,
+     "y": 7.62,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 10.16,
+     "y": 7.62,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 7.62,
+     "y": 7.62,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 5.08,
+     "y": 7.62,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 2.54,
+     "y": 7.62,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 0,
+     "y": 7.62,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    }
+   ],
+   "korpus": [
+    -1.524,
+    0.508,
+    24.384,
+    7.112
+   ]
+  },
+  {
+   "id": "dip28",
+   "name": "DIP-28 (600 mil)",
+   "kategorie": "ICs",
+   "teile": [
+    {
+     "t": "pad",
+     "x": 0,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "eckig",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 2.54,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 5.08,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 7.62,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 10.16,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 12.7,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 15.24,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 17.78,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 20.32,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 22.86,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 25.4,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 27.94,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 30.48,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 33.02,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 33.02,
+     "y": 15.24,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 30.48,
+     "y": 15.24,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 27.94,
+     "y": 15.24,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 25.4,
+     "y": 15.24,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 22.86,
+     "y": 15.24,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 20.32,
+     "y": 15.24,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 17.78,
+     "y": 15.24,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 15.24,
+     "y": 15.24,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 12.7,
+     "y": 15.24,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 10.16,
+     "y": 15.24,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 7.62,
+     "y": 15.24,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 5.08,
+     "y": 15.24,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 2.54,
+     "y": 15.24,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 0,
+     "y": 15.24,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    }
+   ],
+   "korpus": [
+    -1.524,
+    4.318,
+    34.544,
+    10.922
+   ]
+  },
+  {
+   "id": "dip40",
+   "name": "DIP-40 (600 mil)",
+   "kategorie": "ICs",
+   "teile": [
+    {
+     "t": "pad",
+     "x": 0,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "eckig",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 2.54,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 5.08,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 7.62,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 10.16,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 12.7,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 15.24,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 17.78,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 20.32,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 22.86,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 25.4,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 27.94,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 30.48,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 33.02,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 35.56,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 38.1,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 40.64,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 43.18,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 45.72,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 48.26,
+     "y": 0,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 48.26,
+     "y": 15.24,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 45.72,
+     "y": 15.24,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 43.18,
+     "y": 15.24,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 40.64,
+     "y": 15.24,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 38.1,
+     "y": 15.24,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 35.56,
+     "y": 15.24,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 33.02,
+     "y": 15.24,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 30.48,
+     "y": 15.24,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 27.94,
+     "y": 15.24,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 25.4,
+     "y": 15.24,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 22.86,
+     "y": 15.24,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 20.32,
+     "y": 15.24,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 17.78,
+     "y": 15.24,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 15.24,
+     "y": 15.24,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 12.7,
+     "y": 15.24,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 10.16,
+     "y": 15.24,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 7.62,
+     "y": 15.24,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 5.08,
+     "y": 15.24,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 2.54,
+     "y": 15.24,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 0,
+     "y": 15.24,
+     "d": 1.5,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    }
+   ],
+   "korpus": [
+    -1.524,
+    4.318,
+    49.784,
+    10.922
+   ]
+  },
+  {
+   "id": "h1x2",
+   "name": "Stiftleiste 1×2",
+   "kategorie": "Stiftleisten",
+   "teile": [
+    {
+     "t": "pad",
+     "x": 0,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "eckig",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 2.54,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    }
+   ],
+   "korpus": [
+    -1.27,
+    -1.27,
+    3.81,
+    1.27
+   ]
+  },
+  {
+   "id": "h1x3",
+   "name": "Stiftleiste 1×3",
+   "kategorie": "Stiftleisten",
+   "teile": [
+    {
+     "t": "pad",
+     "x": 0,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "eckig",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 2.54,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 5.08,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    }
+   ],
+   "korpus": [
+    -1.27,
+    -1.27,
+    6.35,
+    1.27
+   ]
+  },
+  {
+   "id": "h1x4",
+   "name": "Stiftleiste 1×4",
+   "kategorie": "Stiftleisten",
+   "teile": [
+    {
+     "t": "pad",
+     "x": 0,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "eckig",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 2.54,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 5.08,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 7.62,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    }
+   ],
+   "korpus": [
+    -1.27,
+    -1.27,
+    8.89,
+    1.27
+   ]
+  },
+  {
+   "id": "h1x6",
+   "name": "Stiftleiste 1×6",
+   "kategorie": "Stiftleisten",
+   "teile": [
+    {
+     "t": "pad",
+     "x": 0,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "eckig",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 2.54,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 5.08,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 7.62,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 10.16,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 12.7,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    }
+   ],
+   "korpus": [
+    -1.27,
+    -1.27,
+    13.97,
+    1.27
+   ]
+  },
+  {
+   "id": "h1x8",
+   "name": "Stiftleiste 1×8",
+   "kategorie": "Stiftleisten",
+   "teile": [
+    {
+     "t": "pad",
+     "x": 0,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "eckig",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 2.54,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 5.08,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 7.62,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 10.16,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 12.7,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 15.24,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 17.78,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    }
+   ],
+   "korpus": [
+    -1.27,
+    -1.27,
+    19.05,
+    1.27
+   ]
+  },
+  {
+   "id": "h1x10",
+   "name": "Stiftleiste 1×10",
+   "kategorie": "Stiftleisten",
+   "teile": [
+    {
+     "t": "pad",
+     "x": 0,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "eckig",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 2.54,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 5.08,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 7.62,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 10.16,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 12.7,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 15.24,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 17.78,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 20.32,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 22.86,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    }
+   ],
+   "korpus": [
+    -1.27,
+    -1.27,
+    24.13,
+    1.27
+   ]
+  },
+  {
+   "id": "h2x3",
+   "name": "Stiftleiste 2×3",
+   "kategorie": "Stiftleisten",
+   "teile": [
+    {
+     "t": "pad",
+     "x": 0,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "eckig",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 0,
+     "y": 2.54,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 2.54,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 2.54,
+     "y": 2.54,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 5.08,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 5.08,
+     "y": 2.54,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    }
+   ],
+   "korpus": [
+    -1.27,
+    -1.27,
+    6.35,
+    3.81
+   ]
+  },
+  {
+   "id": "h2x5",
+   "name": "Stiftleiste 2×5",
+   "kategorie": "Stiftleisten",
+   "teile": [
+    {
+     "t": "pad",
+     "x": 0,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "eckig",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 0,
+     "y": 2.54,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 2.54,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 2.54,
+     "y": 2.54,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 5.08,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 5.08,
+     "y": 2.54,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 7.62,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 7.62,
+     "y": 2.54,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 10.16,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 10.16,
+     "y": 2.54,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    }
+   ],
+   "korpus": [
+    -1.27,
+    -1.27,
+    11.43,
+    3.81
+   ]
+  },
+  {
+   "id": "h2x8",
+   "name": "Stiftleiste 2×8",
+   "kategorie": "Stiftleisten",
+   "teile": [
+    {
+     "t": "pad",
+     "x": 0,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "eckig",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 0,
+     "y": 2.54,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 2.54,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 2.54,
+     "y": 2.54,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 5.08,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 5.08,
+     "y": 2.54,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 7.62,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 7.62,
+     "y": 2.54,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 10.16,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 10.16,
+     "y": 2.54,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 12.7,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 12.7,
+     "y": 2.54,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 15.24,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 15.24,
+     "y": 2.54,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 17.78,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 17.78,
+     "y": 2.54,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    }
+   ],
+   "korpus": [
+    -1.27,
+    -1.27,
+    19.05,
+    3.81
+   ]
+  },
+  {
+   "id": "r10",
+   "name": "Widerstand 10,16",
+   "kategorie": "Passive",
+   "teile": [
+    {
+     "t": "pad",
+     "x": 0,
+     "y": 0,
+     "d": 1.6,
+     "bohr": 0.8,
+     "form": "eckig",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 10.16,
+     "y": 0,
+     "d": 1.6,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    }
+   ],
+   "korpus": [
+    1.143,
+    -1.143,
+    9.017,
+    1.143
+   ]
+  },
+  {
+   "id": "r7",
+   "name": "Widerstand 7,62",
+   "kategorie": "Passive",
+   "teile": [
+    {
+     "t": "pad",
+     "x": 0,
+     "y": 0,
+     "d": 1.6,
+     "bohr": 0.8,
+     "form": "eckig",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 7.62,
+     "y": 0,
+     "d": 1.6,
+     "bohr": 0.8,
+     "form": "rund",
+     "lage": "unten"
+    }
+   ],
+   "korpus": [
+    1.143,
+    -1.143,
+    6.477,
+    1.143
+   ]
+  },
+  {
+   "id": "diode",
+   "name": "Diode 7,62",
+   "kategorie": "Halbleiter",
+   "teile": [
+    {
+     "t": "pad",
+     "x": 0,
+     "y": 0,
+     "d": 1.6,
+     "bohr": 0.9,
+     "form": "eckig",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 7.62,
+     "y": 0,
+     "d": 1.6,
+     "bohr": 0.9,
+     "form": "rund",
+     "lage": "unten"
+    }
+   ],
+   "korpus": [
+    1.143,
+    -1.016,
+    6.477,
+    1.016
+   ]
+  },
+  {
+   "id": "led5",
+   "name": "LED 5 mm",
+   "kategorie": "Halbleiter",
+   "teile": [
+    {
+     "t": "pad",
+     "x": 0,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 0.9,
+     "form": "eckig",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 2.54,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 0.9,
+     "form": "rund",
+     "lage": "unten"
+    }
+   ],
+   "korpus": [
+    -1.27,
+    -2.54,
+    3.81,
+    2.54
+   ]
+  },
+  {
+   "id": "elko25",
+   "name": "Elko RM 2,54",
+   "kategorie": "Passive",
+   "teile": [
+    {
+     "t": "pad",
+     "x": 0,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 0.9,
+     "form": "eckig",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 2.54,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 0.9,
+     "form": "rund",
+     "lage": "unten"
+    }
+   ],
+   "korpus": [
+    -1.524,
+    -2.794,
+    4.064,
+    2.794
+   ]
+  },
+  {
+   "id": "elko50",
+   "name": "Elko RM 5,08",
+   "kategorie": "Passive",
+   "teile": [
+    {
+     "t": "pad",
+     "x": 0,
+     "y": 0,
+     "d": 1.9,
+     "bohr": 1,
+     "form": "eckig",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 5.08,
+     "y": 0,
+     "d": 1.9,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    }
+   ],
+   "korpus": [
+    -2.032,
+    -4.064,
+    7.112,
+    4.064
+   ]
+  },
+  {
+   "id": "to92",
+   "name": "Transistor TO-92",
+   "kategorie": "Halbleiter",
+   "teile": [
+    {
+     "t": "pad",
+     "x": 0,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 0.9,
+     "form": "eckig",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 2.54,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 0.9,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 5.08,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 0.9,
+     "form": "rund",
+     "lage": "unten"
+    }
+   ],
+   "korpus": [
+    -1.016,
+    -2.286,
+    6.096,
+    1.27
+   ]
+  },
+  {
+   "id": "to220",
+   "name": "TO-220 / Regler",
+   "kategorie": "Halbleiter",
+   "teile": [
+    {
+     "t": "pad",
+     "x": 0,
+     "y": 0,
+     "d": 2.1,
+     "bohr": 1.1,
+     "form": "eckig",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 2.54,
+     "y": 0,
+     "d": 2.1,
+     "bohr": 1.1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 5.08,
+     "y": 0,
+     "d": 2.1,
+     "bohr": 1.1,
+     "form": "rund",
+     "lage": "unten"
+    }
+   ],
+   "korpus": [
+    -1.27,
+    -5.588,
+    6.35,
+    -1.27
+   ]
+  },
+  {
+   "id": "klemme2",
+   "name": "Schraubklemme 2×5,08",
+   "kategorie": "Anschlüsse",
+   "teile": [
+    {
+     "t": "pad",
+     "x": 0,
+     "y": 0,
+     "d": 2.4,
+     "bohr": 1.3,
+     "form": "eckig",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 5.08,
+     "y": 0,
+     "d": 2.4,
+     "bohr": 1.3,
+     "form": "rund",
+     "lage": "unten"
+    }
+   ],
+   "korpus": [
+    -2.54,
+    -3.556,
+    7.62,
+    3.556
+   ]
+  },
+  {
+   "id": "klemme3",
+   "name": "Schraubklemme 3×5,08",
+   "kategorie": "Anschlüsse",
+   "teile": [
+    {
+     "t": "pad",
+     "x": 0,
+     "y": 0,
+     "d": 2.4,
+     "bohr": 1.3,
+     "form": "eckig",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 5.08,
+     "y": 0,
+     "d": 2.4,
+     "bohr": 1.3,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 10.16,
+     "y": 0,
+     "d": 2.4,
+     "bohr": 1.3,
+     "form": "rund",
+     "lage": "unten"
+    }
+   ],
+   "korpus": [
+    -2.54,
+    -3.556,
+    12.7,
+    3.556
+   ]
+  },
+  {
+   "id": "taster",
+   "name": "Taster 4-polig",
+   "kategorie": "Anschlüsse",
+   "teile": [
+    {
+     "t": "pad",
+     "x": 0,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "eckig",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 5.08,
+     "y": 0,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 0,
+     "y": 5.08,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    },
+    {
+     "t": "pad",
+     "x": 5.08,
+     "y": 5.08,
+     "d": 1.7,
+     "bohr": 1,
+     "form": "rund",
+     "lage": "unten"
+    }
+   ],
+   "korpus": [
+    -0.762,
+    -0.762,
+    5.842,
+    5.842
+   ]
+  },
+  {
+   "id": "schraub",
+   "name": "Bohrung M3 (ohne Pad)",
+   "kategorie": "Sonstiges",
+   "teile": [
+    {
+     "t": "pad",
+     "x": 0,
+     "y": 0,
+     "d": 3.2,
+     "bohr": 3.2,
+     "form": "rund",
+     "lage": "unten"
+    }
+   ]
+  }
+ ]
+}
