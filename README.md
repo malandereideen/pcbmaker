@@ -237,7 +237,7 @@ Kein zweiter Editor — gebaut wird mit den Werkzeugen, die es ohnehin gibt:
 1. Pins auf der Unterseite setzen, auf die Oberseite wechseln, beschriften.
 2. Mit dem **Zeiger** einen Rahmen über alles ziehen. Was **ganz** darin liegt, kommt mit —
    über beide Seiten hinweg. Halb erwischte Leiterbahnen bleiben absichtlich draußen.
-3. Unter *Eigenes Bauteil* Namen und Kategorie eintragen, **Speichern**.
+3. Rechts unter *Eigenes Bauteil* Namen und Kategorie eintragen, **Speichern**.
 
 Der Ankerpunkt wird das oberste linke Pad, also dasselbe Pin 1 wie bei den mitgelieferten
 Bauteilen. `Strg`/`⌘` + `A` wählt alles aus, `Esc` hebt die Auswahl auf.

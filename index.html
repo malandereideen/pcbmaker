@@ -27,14 +27,22 @@
   .seiteRoll { flex: 1; overflow-y: auto; padding: 16px; }
 
 
-  .group { margin-bottom: 18px; }
-  .group + .group { border-top: 1px solid var(--border); padding-top: 16px; }
+  /* Eng gesetzt, damit beide Leisten ohne Scrollen auf einen Bildschirm
+     passen. Die langen Erklaerungen haengen an title-Attributen statt
+     dauerhaft dazwischenzustehen. */
+  .group { margin-bottom: 12px; }
+  .group + .group { border-top: 1px solid var(--border); padding-top: 12px; }
   .group__title {
     font-family: var(--font-display); font-size: 13px; font-weight: 500;
-    color: var(--text); margin: 0 0 10px;
+    color: var(--text); margin: 0 0 8px;
+  }
+  /* Ein gestrichelter Unterstrich verraet, wo eine Erklaerung dranhaengt —
+     sonst sucht man sie nicht. */
+  [title] > .group__title, .group__title[title], .hint[title], .check[title], label.key[title] {
+    text-decoration: underline dotted var(--border-strong); text-underline-offset: 3px; cursor: help;
   }
 
-  .row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
   .row > label.key { flex: 0 0 108px; color: var(--text-muted); font-size: 13px; line-height: 1.3; }
   .row input[type=range] {
     flex: 1; min-width: 0; height: 18px; padding: 0; border: none; background: transparent;
@@ -48,6 +56,10 @@
   }
   input[type=range]:focus { outline: none; box-shadow: none; }
   .val { flex: 0 0 54px; text-align: right; font-family: var(--font-mono); font-size: 12px; color: var(--text); font-variant-numeric: tabular-nums; }
+  /* brand.css setzt 8px/14px — in einer 320px-Leiste mit einem Dutzend Feldern
+     kostet das ueber hundert Pixel Hoehe, ohne dass es lesbarer wird. */
+  .seite select, .seite input[type=text], .seite input[type=password],
+  .dlg select, .dlg input[type=text] { padding: 4px 8px; font-size: 13px; }
   .row select { flex: 1; min-width: 0; }
   .row input[type=number] { width: 78px; }
 
@@ -61,9 +73,17 @@
   .btns .btn { justify-content: center; padding: 8px 6px; font-size: 13px; }
   .full { grid-column: 1 / -1; }
 
-  .hint { color: var(--text-faint); font-size: 12px; line-height: 1.5; margin: 8px 0 0; }
+  .hint { color: var(--text-faint); font-size: 12px; line-height: 1.45; margin: 6px 0 0; }
+  .hint:empty { display: none; }
 
-  .chips { display: flex; flex-wrap: wrap; gap: 4px; margin: 0 0 10px; }
+  /* Eine Zeile zum Wischen statt drei umgebrochener — die Kuerzel sind
+     Abkuerzungen, keine Liste zum Ueberfliegen. */
+  .chips {
+    display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 4px; margin: 0 0 8px;
+    padding-bottom: 2px; scrollbar-width: none;
+  }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip { flex: 0 0 auto; }
   .chip {
     border: 1px solid var(--border); border-radius: var(--radius-pill, 999px);
     background: var(--surface); color: var(--text-muted); cursor: pointer;
@@ -211,11 +231,10 @@
           <div class="lage" data-lage="oben"><i style="background:#D9553F"></i>Oberseite</div>
         </div>
         <div class="checks">
-          <label class="check"><input type="checkbox" id="halb"> halbes Raster (1,27)</label>
+          <label class="check"><input type="checkbox" id="halb"> halbes Raster</label>
           <label class="check"><input type="checkbox" id="diag" checked> nur 45°</label>
-          <label class="check"><input type="checkbox" id="spOben" checked> Oberseite spiegeln</label>
+          <label class="check" id="spHint"><input type="checkbox" id="spOben" checked> Oberseite spiegeln</label>
         </div>
-        <p class="hint" id="spHint"></p>
         <p class="hint" id="modusHint"></p>
       </div>
 
@@ -223,15 +242,16 @@
         <h2 class="group__title">Platine</h2>
         <div class="row"><label class="key" for="cols">Raster quer</label><input type="range" id="cols" min="4" max="60" step="1" value="20"><span class="val" id="colsV"></span></div>
         <div class="row"><label class="key" for="rows">Raster hoch</label><input type="range" id="rows" min="4" max="60" step="1" value="16"><span class="val" id="rowsV"></span></div>
-        <div class="kanten" id="kanten">
+        <!-- Die Erklaerung haengt am Titel statt darunter zu stehen: die
+             Regler wachsen nur nach rechts und unten, ueber die Kanten-Knoepfe
+             kommt links und oben eine Reihe dazu oder weg. -->
+        <div class="kanten" id="kanten" title="Die Regler wachsen nur nach rechts und unten. Über diese Knöpfe kommt links und oben eine Rasterreihe dazu oder weg — die Zeichnung wandert mit.">
           <span>Links</span><button class="btn" data-seite="links" data-d="-1">−</button><button class="btn" data-seite="links" data-d="1">+</button>
           <span>Oben</span><button class="btn" data-seite="oben" data-d="-1">−</button><button class="btn" data-seite="oben" data-d="1">+</button>
           <span>Rechts</span><button class="btn" data-seite="rechts" data-d="-1">−</button><button class="btn" data-seite="rechts" data-d="1">+</button>
           <span>Unten</span><button class="btn" data-seite="unten" data-d="-1">−</button><button class="btn" data-seite="unten" data-d="1">+</button>
         </div>
         <div class="btns"><button id="zuschneiden" class="btn full">Auf Inhalt zuschneiden</button></div>
-        <p class="hint">Die Regler wachsen nur nach rechts und unten. Über die Kanten-Knöpfe kommt links und
-          oben eine Rasterreihe dazu oder weg — die Zeichnung wandert dabei mit, bleibt also da, wo sie hingehört.</p>
         <p class="hint" id="masse"></p>
       </div>
 
@@ -244,8 +264,7 @@
           <option value="eckig">quadratisch</option>
         </select></div>
         <div class="row"><label class="key" for="bahnB">Bahnbreite</label><input type="range" id="bahnB" min="0.2" max="4" step="0.1" value="0.8"><span class="val" id="bahnBV"></span></div>
-        <div class="row"><label class="key" for="frei">Freistellung</label><input type="range" id="frei" min="0.2" max="2" step="0.05" value="0.5"><span class="val" id="freiV"></span></div>
-        <p class="hint">Die Freistellung gilt nur für Masseflächen: alles andere Kupfer wird um diesen Abstand aus ihr ausgespart.</p>
+        <div class="row"><label class="key" for="frei" title="Gilt nur für Masseflächen: alles andere Kupfer wird um diesen Abstand aus ihr ausgespart.">Freistellung</label><input type="range" id="frei" min="0.2" max="2" step="0.05" value="0.5"><span class="val" id="freiV"></span></div>
       </div>
 
       <div class="group">
@@ -255,29 +274,7 @@
           <option value="0" selected>0°</option><option value="90">90°</option>
           <option value="180">180°</option><option value="270">270°</option>
         </select></div>
-        <p class="hint">Klick setzt das Bauteil, Pin 1 liegt am Klickpunkt. <b>r</b> dreht — auch ein bereits gesetztes, ausgewähltes Bauteil.</p>
-        <p class="hint" id="bibStatus"></p>
-      </div>
-
-      <div class="group">
-        <h2 class="group__title">Eigenes Bauteil</h2>
-        <p class="hint" style="margin-top:0">Pins unten zeichnen, oben beschriften, mit dem Zeiger einen Rahmen
-          darum ziehen — was ganz darin liegt, kommt mit, über beide Seiten hinweg. Dann Namen vergeben
-          und speichern. Ankerpunkt wird das oberste linke Pad.</p>
-        <div class="row"><label class="key">Auswahl</label><span id="auswahlZahl" style="flex:1;font-size:12.5px;color:var(--text-muted)"></span></div>
-        <div class="row"><label class="key" for="bauteilName">Name</label><input type="text" id="bauteilName" maxlength="60" placeholder="ESP32 DevKit"></div>
-        <div class="row"><label class="key" for="bauteilKat">Kategorie</label><select id="bauteilKat"></select></div>
-        <div class="btns">
-          <button id="alsBauteil" class="btn btn--primary" disabled>Speichern</button>
-          <button id="bauteilWeg" class="btn">Gewähltes löschen</button>
-        </div>
-        <div class="btns">
-          <button id="bibExport" class="btn">Eigene sichern</button>
-          <button id="bibImport" class="btn">Einlesen</button>
-        </div>
-        <input type="file" id="bibDatei" accept=".json,application/json" hidden>
-        <div class="row"><label class="key" for="tokenFeld">Schreibschlüssel</label><input type="password" id="tokenFeld" placeholder="nur zum Speichern"></div>
-        <p class="hint" id="bibWarn"></p>
+        <p class="hint" id="bibStatus" title="Klick setzt das Bauteil, Pin 1 liegt am Klickpunkt. r dreht — auch ein bereits gesetztes, ausgewähltes."></p>
       </div>
 
       <div class="group">
@@ -291,10 +288,8 @@
           <option value="180">180°</option><option value="270">270°</option>
         </select></div>
         <div class="checks">
-          <label class="check"><input type="checkbox" id="textRaster"> ans Raster binden</label>
+          <label class="check" title="Die Schrift ist Kupfer wie alles andere — die Isolierbahnen umfahren sie von selbst. r dreht, eine ausgewählte Beschriftung genauso wie die nächste zu setzende."><input type="checkbox" id="textRaster"> ans Raster binden</label>
         </div>
-        <p class="hint">Die Schrift ist Kupfer wie alles andere — die Isolierbahnen umfahren sie von selbst.
-          <b>r</b> dreht ebenfalls, eine ausgewählte Beschriftung genauso wie die nächste zu setzende.</p>
       </div>
 
     </div>
@@ -338,9 +333,8 @@
         <div class="row"><label class="key" for="ueber">Bahnabstand</label><input type="range" id="ueber" min="0.05" max="1.5" step="0.05" value="0.15"><span class="val" id="ueberV"></span></div>
         <div class="row"><label class="key" for="res">Genauigkeit</label><input type="range" id="res" min="6" max="40" step="2" value="16"><span class="val" id="resV"></span></div>
         <div class="checks">
-          <label class="check"><input type="checkbox" id="zeigFraes" checked> Bahnen anzeigen</label>
+          <label class="check" title="Die Bahnen sind Mittellinien des Fräsers. Der erste Umlauf läuft im halben Fräser-Ø ums Kupfer, jeder weitere um den Bahnabstand weiter nach außen."><input type="checkbox" id="zeigFraes" checked> Bahnen anzeigen</label>
         </div>
-        <p class="hint">Die Bahnen sind Mittellinien des Fräsers. Der erste Umlauf läuft im halben Fräser-Ø ums Kupfer, jeder weitere um den Bahnabstand weiter nach außen.</p>
       </div>
 
       <div class="group">
@@ -349,6 +343,26 @@
         <div class="row"><label class="key" for="stege">Haltestege</label><input type="range" id="stege" min="0" max="12" step="1" value="0"><span class="val" id="stegeV"></span></div>
         <div class="row"><label class="key" for="stegB">Stegbreite</label><input type="range" id="stegB" min="0.5" max="6" step="0.5" value="2"><span class="val" id="stegBV"></span></div>
         <p class="hint" id="stegHint"></p>
+      </div>
+
+      <!-- Steht rechts, nicht links: hier wird nicht gezeichnet, sondern aus
+           dem Gezeichneten etwas gemacht — wie Export und Fraesbahnen. -->
+      <div class="group">
+        <h2 class="group__title" title="Pins unten zeichnen, oben beschriften, mit dem Zeiger einen Rahmen darum ziehen — was ganz darin liegt, kommt mit, über beide Seiten hinweg. Ankerpunkt wird das oberste linke Pad.">Eigenes Bauteil</h2>
+        <div class="row"><label class="key">Auswahl</label><span id="auswahlZahl" style="flex:1;font-size:12.5px;color:var(--text-muted)"></span></div>
+        <div class="row"><label class="key" for="bauteilName">Name</label><input type="text" id="bauteilName" maxlength="60" placeholder="ESP32 DevKit"></div>
+        <div class="row"><label class="key" for="bauteilKat">Kategorie</label><select id="bauteilKat"></select></div>
+        <div class="btns">
+          <button id="alsBauteil" class="btn btn--primary" disabled>Speichern</button>
+          <button id="bauteilWeg" class="btn">Gewähltes löschen</button>
+        </div>
+        <div class="btns">
+          <button id="bibExport" class="btn">Eigene sichern</button>
+          <button id="bibImport" class="btn">Einlesen</button>
+        </div>
+        <input type="file" id="bibDatei" accept=".json,application/json" hidden>
+        <div class="row"><label class="key" for="tokenFeld">Schreibschlüssel</label><input type="password" id="tokenFeld" placeholder="nur zum Speichern"></div>
+        <p class="hint" id="bibWarn"></p>
       </div>
 
     </div>
@@ -386,22 +400,16 @@
       </select></div>
       <div class="row"><label class="key" for="strich">Linienstärke</label><input type="range" id="strich" min="0.01" max="0.5" step="0.01" value="0.05"><span class="val" id="strichV"></span></div>
       <p class="hint" id="expLeer" style="color:var(--orange-deep)"></p>
-      <p class="hint"><b>Restfläche</b> ist das Kupfer, das nach dem Isolieren neben den Bahnen
-        stehen bleibt. Auf der Rohplatine ist alles Kupfer — trägt man das Feld nicht ab, brückt
-        das Lötzinn beim Löten über den schmalen Graben dorthin. Diese Ebene komplett abtragen
-        lassen, dann bleibt nur noch, was leiten soll. Sie reicht <b>1 mm über die Außenkontur
-        hinaus</b> — sonst bliebe zwischen Platinenrand und Schnittbahn ein Kupferstreifen stehen.</p>
+      <p class="hint" title="Auf der Rohplatine ist alles Kupfer. Trägt man das Feld neben den Bahnen nicht ab, brückt das Lötzinn beim Löten über den schmalen Graben dorthin. Die Ebene reicht 1 mm über die Außenkontur hinaus, sonst bliebe zwischen Platinenrand und Schnittbahn ein Kupferstreifen stehen."><b>Restfläche</b> ist das Kupfer neben den Bahnen —
+        komplett abtragen lassen, sonst brückt das Lötzinn.</p>
     </div>
 
     <div>
       <h3 class="group__title">Ebenen und Farben</h3>
       <div id="ebenen"></div>
       <p class="hint" id="farbWarn" style="color:var(--orange-deep)"></p>
-      <p class="hint">Die Datei heißt <code id="expName">platine-unten.svg</code>, ist ungespiegelt
-        und enthält die angehakten Ebenen in genau dieser Reihenfolge. xTool Studio sortiert beim
-        Import nach Farbe: <b>eine Farbe = eine Ebene</b>; die Farbe steht an jedem einzelnen
-        Element, nicht nur an der Gruppe. Die Paare (1) und (2) sind dieselbe Geometrie zweimal —
-        für zwei Durchgänge mit eigenen Einstellungen.</p>
+      <p class="hint" title="Die Farbe steht an jedem einzelnen Element, nicht nur an der Gruppe — darauf verlassen sich diese Importer nicht. Die Paare (1) und (2) sind dieselbe Geometrie zweimal, für zwei Durchgänge mit eigenen Einstellungen."><code id="expName">platine-unten.svg</code> · angehakte Ebenen
+        in dieser Reihenfolge · <b>eine Farbe = eine Ebene</b></p>
     </div>
   </div>
 
@@ -1804,7 +1812,9 @@ function status() {
   } else {
     el('stWeg').textContent = S.fraes ? '(veraltet)' : '—';
   }
-  el('masse').textContent = 'Platine ' + de(W(), 2) + ' × ' + de(H(), 2) + ' mm · ' + S.cols + ' × ' + S.rows + ' Rasterpunkte';
+  /* Die Millimeter stehen schon in der Statuszeile — hier nur noch, was dort
+     fehlt. */
+  el('masse').textContent = S.cols + ' × ' + S.rows + ' Rasterpunkte';
 }
 
 var timer = null;
@@ -1850,13 +1860,16 @@ function setModus(m) {
   S.modus = m;
   if (m !== 'bahn') S.entwurf = null;
   [].forEach.call(document.querySelectorAll('.tool'), function (t) { t.classList.toggle('on', t.dataset.modus === m); });
+  /* Eine Zeile je Werkzeug, nicht mehr. Was hier stand, waren drei Zeilen,
+     die nach dem zweiten Mal niemand mehr liest, aber jedes Mal die Regler
+     nach unten aus dem Bild geschoben haben. */
   var hinweise = {
-    zeiger: 'Klick wählt aus, Ziehen verschiebt aufs Raster. Entf löscht, Strg+Z nimmt zurück.',
-    pad: 'Jeder Klick setzt ein Pad auf den nächsten Rasterpunkt.',
-    bahn: 'Klick setzt einen Stützpunkt. Doppelklick, Rechtsklick oder Enter beendet die Bahn, Esc verwirft sie.',
-    flaeche: 'Rechteck aufziehen. Als Massefläche wird alles andere Kupfer freigestellt.',
-    bauteil: 'Klick setzt das gewählte Bauteil, Pin 1 auf dem Klickpunkt.',
-    text: 'Klick setzt die Beschriftung frei, linke Kante auf halber Höhe am Klickpunkt. Mit dem Zeiger lässt sie sich ebenso frei verschieben.'
+    zeiger: 'Klick wählt, Ziehen verschiebt · Entf löscht · Strg+Z zurück',
+    pad: 'Klick setzt ein Pad auf den nächsten Rasterpunkt',
+    bahn: 'Klick setzt Stützpunkt · Doppelklick/Enter beendet · Esc verwirft',
+    flaeche: 'Rechteck aufziehen · als Massefläche wird alles andere freigestellt',
+    bauteil: 'Klick setzt das Bauteil, Pin 1 am Klickpunkt · r dreht',
+    text: 'Klick setzt die Beschriftung frei · r dreht'
   };
   el('modusHint').textContent = hinweise[m];
   zeichne();
@@ -1899,8 +1912,8 @@ reglerN('kFraeser', 'kFraeser', 1, function () { S.veraltet = true; });
 reglerN('stege', 'stege', 0, function () {
   S.veraltet = true;
   el('stegHint').textContent = S.stege
-    ? S.stege + ' Stege heißt ' + S.stege + ' offene Bahnstücke — die Platine hängt beim Schneiden noch fest. Für eine geschlossene Kontur auf 0 stellen.'
-    : 'Ohne Stege ist die Außenkontur ein geschlossener Ring.';
+    ? S.stege + ' Lücken — die Platine hängt beim Schneiden noch fest.'
+    : 'Kontur ist ein geschlossener Ring.';
 });
 reglerN('stegB', 'stegB', 1, function () { S.veraltet = true; });
 
@@ -1917,8 +1930,8 @@ function isoHinweis() {
     return;
   }
   el('isoHint').style.color = '';
-  el('isoHint').textContent = 'Innerster und äußerster Umlauf in einem Pfad mit evenodd — schon fertig als Compound-Pfad, ' +
-    'xTool Studio graviert damit den Graben statt einer vollen Fläche. Grabenbreite ' + de(b, 2) + ' mm.';
+  el('isoHint').textContent = 'Graben als Compound-Pfad, Breite ' + de(b, 2) + ' mm.';
+  el('isoHint').title = 'Innerster und äußerster Umlauf in einem Pfad mit evenodd — xTool Studio graviert damit den Graben statt einer vollen Fläche.';
 }
 el('isoArt').addEventListener('change', isoHinweis);
 
@@ -1933,7 +1946,10 @@ el('spOben').addEventListener('change', function () {
   zeichne();
 });
 function spHinweis() {
-  el('spHint').textContent = S.spOben
+  /* Die Erklaerung haengt jetzt am Kaestchen selbst statt als eigener Absatz
+     darunter — sie sagt zweimal im Jahr etwas Neues und stand dafuer
+     dauerhaft ueber vier Zeilen da. */
+  el('spHint').title = S.spOben
     ? 'Die Zeichnung ist der Blick auf die Unterseite. Bei aktiver Oberseite kippt die Ansicht — und platine-oben.svg genauso, damit beide Seiten nach dem Umdrehen übereinander passen.'
     : 'Beide Seiten werden von der Unterseite aus gezeigt und ungespiegelt ausgegeben. Beim Umdrehen der Platine passen sie dann nicht mehr übereinander.';
 }
@@ -2038,7 +2054,11 @@ function istEigen(id) {
 }
 
 function bibStatus() {
-  var t = { server: 'Bibliothek vom Server', datei: 'Bibliothek aus bauteile.json, eigene nur in diesem Browser', nichts: 'Bibliothek konnte nicht geladen werden' }[BIB.quelle];
+  /* Eine Zeile, die lange Fassung im Tooltip. */
+  var t = { server: 'vom Server', datei: 'aus bauteile.json', nichts: 'nicht geladen' }[BIB.quelle];
+  el('bibStatus').title = { server: 'Bibliothek vom Server — eigene Bauteile liegen dort und stehen auf jedem Gerät bereit.',
+    datei: 'Bibliothek aus bauteile.json, eigene Bauteile nur in diesem Browser.',
+    nichts: 'Die Bibliothek konnte nicht geladen werden.' }[BIB.quelle];
   el('bibStatus').textContent = t + ' · ' + BIB.standard.length + ' mitgeliefert, ' + BIB.eigene.length + ' eigene';
   el('bibStatus').style.color = BIB.quelle === 'nichts' ? 'var(--orange-deep)' : '';
 }
