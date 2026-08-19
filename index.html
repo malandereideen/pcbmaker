@@ -1915,7 +1915,12 @@ var XSVERFAHREN = {
   isoText1: { art: 'FILL_VECTOR_ENGRAVING' },
   isoLeit2: { art: 'FILL_VECTOR_ENGRAVING' },
   isoText2: { art: 'FILL_VECTOR_ENGRAVING' },
-  schrift:  { art: 'FILL_VECTOR_ENGRAVING' },
+  /* 2026-08-19, Screenshot: Gravieren · benutzerdefiniert. Schnell und
+     zurückhaltend — die Schrift wird auf der Oberseite nur markiert, nicht
+     freigelegt wie die Restfläche unten. */
+  schrift:  { art: 'FILL_VECTOR_ENGRAVING', power: 80, speed: 2000, repeat: 3,
+              density: 300, frequency: 40, bitmapScanMode: 'zMode',
+              gemessen: true },
   /* 2026-08-19, Screenshot: Schneiden · benutzerdefiniert. 35 Durchgänge —
      durch 1,6 mm FR4 kommt der UV-Laser nur schichtweise. Fokusabstieg,
      Schnittfugenkorrektur und Tab-Erstellung aus. */
