@@ -148,6 +148,10 @@
   .xswerte td:not(:first-child) { text-align: right; font-family: var(--font-mono); font-size: 11.5px; white-space: nowrap; }
   .xswerte td.xsnr { width: 14px; text-align: right; color: var(--text-faint); font-family: var(--font-mono); font-size: 11px; }
   .xswerte td.xsnr + td { color: var(--text); text-align: left; font-family: inherit; font-size: 12px; white-space: normal; }
+  .xswerte tr.roh td { opacity: .62; }
+  .xsroh { display: inline-block; width: 13px; height: 13px; line-height: 13px; text-align: center;
+           border-radius: 50%; background: var(--orange-tint, #fde8d0); color: var(--orange-deep);
+           font-size: 10px; font-family: var(--font-mono); vertical-align: 1px; cursor: help; }
   .dlg .row > label.key { flex: 0 0 118px; }
   .dlg__titel { margin: 0 0 14px; font-size: 15px; font-weight: 600; letter-spacing: -.01em; }
   .dlg__spalten { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 26px; align-items: start; }
@@ -1893,23 +1897,50 @@ var XSGERAET = {
 };
 
 /* Was die Maschine mit welcher Ebene tut.
-   ACHTUNG — die Zahlen sind bis jetzt die Materialvorgaben aus pcb.xs, nicht
-   Marios gemessene Werte. Sie werden Ebene für Ebene aus seinen Studio-
-   Screenshots ersetzt. Bis dahin: in Studio nachsehen, bevor es losgeht. */
+
+   `gemessen: true` heisst: von Mario in Studio eingestellt und abgelesen.
+   Ohne die Marke sind es die Materialvorgaben aus pcb.xs — brauchbar zum
+   Öffnen, aber nicht zum Losfahren. Der Export-Dialog kennzeichnet das je
+   Zeile, damit im Zweifel sichtbar ist, welche Ebene noch geraten ist. */
+var XSVORGABE = { power: 30, speed: 500, repeat: 1 };
 var XSVERFAHREN = {
-  isoLeit1: { art: 'FILL_VECTOR_ENGRAVING', power: 30,  speed: 500, repeat: 1 },
-  isoText1: { art: 'FILL_VECTOR_ENGRAVING', power: 30,  speed: 500, repeat: 1 },
-  isoLeit2: { art: 'FILL_VECTOR_ENGRAVING', power: 30,  speed: 500, repeat: 1 },
-  isoText2: { art: 'FILL_VECTOR_ENGRAVING', power: 30,  speed: 500, repeat: 1 },
-  rest:     { art: 'FILL_VECTOR_ENGRAVING', power: 30,  speed: 500, repeat: 1 },
-  schrift:  { art: 'FILL_VECTOR_ENGRAVING', power: 30,  speed: 500, repeat: 1 },
-  bohr:     { art: 'VECTOR_CUTTING',        power: 100, speed: 3,   repeat: 3 },
-  kontur1:  { art: 'FILL_VECTOR_ENGRAVING', power: 30,  speed: 500, repeat: 1 },
-  kontur2:  { art: 'VECTOR_CUTTING',        power: 100, speed: 3,   repeat: 3 },
+  /* 2026-08-19, Screenshot: Gravieren · benutzerdefiniert · 45° zunehmend,
+     Konturverfolgung an, Schraffur und Verweilzeit aus. */
+  schrift:  { art: 'FILL_VECTOR_ENGRAVING', power: 100, speed: 80, repeat: 3,
+              density: 200, frequency: 40, scanAngle: 45, angleType: 2,
+              crossAngle: false, outlineTrace: true, bitmapScanMode: 'zMode',
+              enableDelayPerLine: false, enableKerf: false, gemessen: true },
+
+  isoLeit1: { art: 'FILL_VECTOR_ENGRAVING' },
+  isoText1: { art: 'FILL_VECTOR_ENGRAVING' },
+  isoLeit2: { art: 'FILL_VECTOR_ENGRAVING' },
+  isoText2: { art: 'FILL_VECTOR_ENGRAVING' },
+  rest:     { art: 'FILL_VECTOR_ENGRAVING' },
+  bohr:     { art: 'VECTOR_CUTTING',        power: 100, speed: 3,    repeat: 3 },
+  kontur1:  { art: 'FILL_VECTOR_ENGRAVING' },
+  kontur2:  { art: 'VECTOR_CUTTING',        power: 100, speed: 3,    repeat: 3 },
   kupfer:   { art: 'VECTOR_ENGRAVING',      power: 70,  speed: 1100, repeat: 1 },
   platine:  { art: 'VECTOR_ENGRAVING',      power: 70,  speed: 1100, repeat: 1 },
   best:     { art: 'VECTOR_ENGRAVING',      power: 70,  speed: 1100, repeat: 1 }
 };
+/* Ein Verfahren zusammen mit den Vorgaben, die es nicht selbst mitbringt. */
+function xsWerte(id) {
+  var v = XSVERFAHREN[id];
+  if (!v) return null;
+  var w = {
+    power: XSVORGABE.power, speed: XSVORGABE.speed, repeat: XSVORGABE.repeat,
+    frequency: 40, defocus: false, defocus_distance: 1,
+    enableKerf: false, kerfDistance: 0,
+    bitmapEngraveMode: 'normal', density: 300, dotDuration: 100, dpi: 500,
+    bitmapScanMode: 'zMode', scanAngle: 0, angleType: 2, crossAngle: false,
+    enableDelayPerLine: false, delayPerLine: 0.3, outlineTrace: false,
+    needGapNumDensity: true
+  };
+  Object.keys(v).forEach(function (k) {
+    if (k !== 'art' && k !== 'gemessen') w[k] = v[k];
+  });
+  return w;
+}
 
 /* Ebenen, die mitfahren, aber nicht bearbeitet werden. Die Außenkontur auf
    der Oberseite ist so ein Fall: sie dient dem Ausrichten der umgedrehten
@@ -2133,17 +2164,7 @@ function xsBauen(lage) {
       bucket[h] = e.d;
       index[h] = { hash: h, size: e.d.length };
 
-      profile[pid] = {
-        id: pid, processingType: v.art,
-        values: {
-          power: v.power, speed: v.speed, repeat: v.repeat, frequency: 40,
-          defocus: false, defocus_distance: 1, enableKerf: false, kerfDistance: 0,
-          bitmapEngraveMode: 'normal', density: 300, dotDuration: 100, dpi: 500,
-          bitmapScanMode: 'zMode', scanAngle: 0, angleType: 2, crossAngle: false,
-          enableDelayPerLine: false, delayPerLine: 0.3, outlineTrace: false,
-          needGapNumDensity: true
-        }
-      };
+      profile[pid] = { id: pid, processingType: v.art, values: xsWerte(e.id) };
 
       displays.push({
         id: did, name: e.name, type: 'PATH',
@@ -2999,12 +3020,21 @@ function xsWerteZeile(lage) {
     if (!v) return '';
     var nr = '<td class="xsnr">' + (i + 1) + '</td>';
     if (stumm.indexOf(id) >= 0) return '<tr>' + nr + '<td>' + e.name + '</td><td colspan="3">nur zum Ausrichten, wird nicht bearbeitet</td></tr>';
-    return '<tr>' + nr + '<td>' + e.name + '</td><td>' + (XSNAMEN[v.art] || v.art) + '</td>' +
-           '<td>' + v.power + ' %</td><td>' + v.speed + ' mm/s</td><td>' + v.repeat + '×</td></tr>';
+    var w = xsWerte(id);
+    /* Ungeprüfte Zeilen kennzeichnen — sonst sieht eine geratene Vorgabe
+       genauso verbindlich aus wie ein abgelesener Wert. */
+    var marke = v.gemessen ? '' : ' <span class="xsroh" title="Noch die Materialvorgabe, nicht eingestellt">?</span>';
+    return '<tr' + (v.gemessen ? '' : ' class="roh"') + '>' + nr + '<td>' + e.name + marke + '</td><td>' + (XSNAMEN[v.art] || v.art) + '</td>' +
+           '<td>' + w.power + ' %</td><td>' + w.speed + ' mm/s</td><td>' + w.repeat + '×</td></tr>';
   });
+  var offen = xsReihenfolge(lage).filter(function (id) {
+    return XSVERFAHREN[id] && !XSVERFAHREN[id].gemessen && (XSSTUMM[lage] || []).indexOf(id) < 0;
+  }).length;
   return '<table class="xswerte"><tbody>' + zeilen.join('') + '</tbody></table>' +
-         '<p class="hint">Gerät: ' + XSGERAET.name + '. <b>Die Werte sind noch die Materialvorgaben</b> — ' +
-         'in Studio prüfen, bevor es losgeht.</p>';
+         '<p class="hint">Gerät: ' + XSGERAET.name + '. ' +
+         (offen ? '<b>' + offen + ' Ebene' + (offen > 1 ? 'n' : '') + ' mit ? ' +
+                  (offen > 1 ? 'tragen' : 'trägt') + ' noch die Materialvorgabe</b> — in Studio prüfen, bevor es losgeht.'
+                : 'Alle Werte sind eingestellt.') + '</p>';
 }
 el('expStd').addEventListener('click', function () { expSetzen(expStandardsatz(expLage)); expSichern(); });
 el('expAb').addEventListener('click', function () { el('expDlg').close(); });
