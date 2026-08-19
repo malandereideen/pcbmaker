@@ -1916,7 +1916,12 @@ var XSVERFAHREN = {
   isoLeit2: { art: 'FILL_VECTOR_ENGRAVING' },
   isoText2: { art: 'FILL_VECTOR_ENGRAVING' },
   schrift:  { art: 'FILL_VECTOR_ENGRAVING' },
-  bohr:     { art: 'VECTOR_CUTTING',        power: 100, speed: 3,    repeat: 3 },
+  /* 2026-08-19, Screenshot: Schneiden · benutzerdefiniert. 35 Durchgänge —
+     durch 1,6 mm FR4 kommt der UV-Laser nur schichtweise. Fokusabstieg,
+     Schnittfugenkorrektur und Tab-Erstellung aus. */
+  bohr:     { art: 'VECTOR_CUTTING', power: 100, speed: 100, repeat: 35,
+              frequency: 40, cuttingDrop: false, enableKerf: false,
+              enableBreakPoint: false, gemessen: true },
   kontur1:  { art: 'FILL_VECTOR_ENGRAVING' },
   kontur2:  { art: 'VECTOR_CUTTING',        power: 100, speed: 3,    repeat: 3 },
   kupfer:   { art: 'VECTOR_ENGRAVING',      power: 70,  speed: 1100, repeat: 1 },
@@ -1931,10 +1936,20 @@ function xsWerte(id) {
     power: XSVORGABE.power, speed: XSVORGABE.speed, repeat: XSVORGABE.repeat,
     frequency: 40, defocus: false, defocus_distance: 1,
     enableKerf: false, kerfDistance: 0,
+    /* Gravieren */
     bitmapEngraveMode: 'normal', density: 300, dotDuration: 100, dpi: 500,
     bitmapScanMode: 'zMode', scanAngle: 0, angleType: 2, crossAngle: false,
     enableDelayPerLine: false, delayPerLine: 0.3, outlineTrace: false,
-    needGapNumDensity: true
+    needGapNumDensity: true,
+    /* Schneiden. Fokusabstieg und Haltestege stehen hier aus — die Stege
+       macht der pcbmaker selbst über den Regler Haltestege, als Lücken in
+       der Kontur. Zweimal wäre einmal zu viel. */
+    cuttingDrop: false, sinkingMethod: 'one', firstCuttingDropValue: 0.01,
+    cuttingDropValue: 0.01, descentIntervalDescent: 1, descentPerStep: 0.01,
+    enableBreakPoint: false, breakPointGenMode: 'auto', breakPointSize: 0.5,
+    breakPointMode: 'count', breakPointCount: 2, breakPointDistance: 100,
+    breakPointPower: 0,
+    wobbleEnable: false, wobbleDiameter: 0.05, wobbleSpacing: 0.015
   };
   Object.keys(v).forEach(function (k) {
     if (k !== 'art' && k !== 'gemessen') w[k] = v[k];
