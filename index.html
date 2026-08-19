@@ -141,6 +141,11 @@
   }
   .dlg::backdrop { background: rgba(0,0,0,.45); }
   .dlg--schmal { width: min(420px, calc(100vw - 32px)); }
+  /* Was gleich losfaehrt, in einer Zeile je Ebene. */
+  .xswerte { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+  .xswerte td { padding: 3px 6px 3px 0; border-top: 1px solid var(--border); color: var(--text-muted); }
+  .xswerte td:first-child { color: var(--text); }
+  .xswerte td:not(:first-child) { text-align: right; font-family: var(--font-mono); font-size: 11.5px; white-space: nowrap; }
   .dlg .row > label.key { flex: 0 0 118px; }
   .dlg__titel { margin: 0 0 14px; font-size: 15px; font-weight: 600; letter-spacing: -.01em; }
   .dlg__spalten { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 26px; align-items: start; }
@@ -352,6 +357,12 @@
           <button id="expUnten" class="btn btn--primary" title="Fragt vorher, was hineinsoll, und schreibt platine-unten.svg">SVG unten</button>
           <button id="expOben" class="btn btn--primary" title="Fragt vorher, was hineinsoll, und schreibt platine-oben.svg">SVG oben</button>
         </div>
+        <!-- Dieselbe Geometrie, aber als fertiges Studio-Projekt: die
+             Bearbeitungswerte stehen mit in der Datei. -->
+        <div class="btns">
+          <button id="xsUnten" class="btn" title="Fertiges xTool-Studio-Projekt der Unterseite, mit Bearbeitungswerten">XTool unten</button>
+          <button id="xsOben" class="btn" title="Fertiges xTool-Studio-Projekt der Oberseite, mit Bearbeitungswerten">XTool oben</button>
+        </div>
         <div class="btns eins">
           <button id="calc" class="btn btn--accent">Fräsbahnen</button>
         </div>
@@ -448,11 +459,12 @@
 </dialog>
 
 <dialog id="expDlg" class="dlg">
-  <h2 class="dlg__titel">SVG-Export — <span id="expSeite">Unterseite</span></h2>
+  <h2 class="dlg__titel" id="expTitel">SVG-Export — Unterseite</h2>
+  <span id="expSeite" hidden>Unterseite</span>
 
   <div class="dlg__spalten">
     <div>
-      <h3 class="group__title">Was ins SVG kommt</h3>
+      <h3 class="group__title" id="expWasTitel">Was ins SVG kommt</h3>
       <div class="row"><label class="key" for="isoArt">Isolierbahnen</label><select id="isoArt">
         <option value="linie">Linien — Fräsen</option>
         <option value="flaeche" selected>Fläche — Gravieren</option>
@@ -472,6 +484,7 @@
       <h3 class="group__title">Ebenen und Farben</h3>
       <div id="ebenen"></div>
       <p class="hint" id="farbWarn" style="color:var(--orange-deep)"></p>
+      <div id="expWerte"></div>
       <p class="hint" title="Die Farbe steht an jedem einzelnen Element, nicht nur an der Gruppe — darauf verlassen sich diese Importer nicht. Die Paare (1) und (2) sind dieselbe Geometrie zweimal, für zwei Durchgänge mit eigenen Einstellungen."><code id="expName">platine-unten.svg</code> · angehakte Ebenen
         in dieser Reihenfolge · <b>eine Farbe = eine Ebene</b></p>
     </div>
@@ -1794,7 +1807,26 @@ function svgSeite(lage) {
   o.push('<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="' + nr(vb[2], 3) + 'mm" height="' + nr(vb[3], 3) +
          'mm" viewBox="' + nr(vb[0], 3) + ' ' + nr(vb[1], 3) + ' ' + nr(vb[2], 3) + ' ' + nr(vb[3], 3) + '">');
 
-  var bauer = {
+  /* Auch der XS-Export fuer xTool Studio holt sich die Geometrie hier —
+     eine zweite Bauanleitung waere eine zweite Wahrheit, und die beiden
+     wuerden auseinanderlaufen, sobald jemand nur an einer schraubt. */
+  var bauer = gruppenBauer(lage, st, w, h);
+
+  /* Dieselbe Kippung wie in der Ansicht, an jede Gruppe geschrieben —
+     so bleiben die Gruppen oberste Ebene und der Importer findet sie. */
+  var kipp = gespiegelt(lage) ? ' transform="translate(' + nr(w, 3) + ' 0) scale(-1 1)"' : '';
+  EBENEN.forEach(function (e) {
+    if (!an(e.id)) return;
+    var g = bauer[e.id] ? bauer[e.id](S.farben[e.id]) : '';
+    if (g) o.push(kipp ? g.replace('<g ', '<g' + kipp + ' ') : g);
+  });
+
+  o.push('</svg>');
+  return o.join('\n');
+}
+
+function gruppenBauer(lage, st, w, h) {
+  return {
     isoLeit1: function (f) { return isoGruppe('isolation-leiter-1', st.leiter, f); },
     isoLeit2: function (f) { return isoGruppe('isolation-leiter-2', st.leiter, f); },
     isoText1: function (f) { return isoGruppe('isolation-text-1', st.text, f); },
@@ -1808,18 +1840,6 @@ function svgSeite(lage) {
     platine:  function (f) { return '<g id="platinenrand">' + farbig('<rect x="0" y="0" width="' + nr(w, 3) + '" height="' + nr(h, 3) + '"/>', stil(f, 'linie')) + '</g>'; },
     best:     function (f) { return bestGruppe(lage, f); }
   };
-
-  /* Dieselbe Kippung wie in der Ansicht, an jede Gruppe geschrieben —
-     so bleiben die Gruppen oberste Ebene und der Importer findet sie. */
-  var kipp = gespiegelt(lage) ? ' transform="translate(' + nr(w, 3) + ' 0) scale(-1 1)"' : '';
-  EBENEN.forEach(function (e) {
-    if (!an(e.id)) return;
-    var g = bauer[e.id] ? bauer[e.id](S.farben[e.id]) : '';
-    if (g) o.push(kipp ? g.replace('<g ', '<g' + kipp + ' ') : g);
-  });
-
-  o.push('</svg>');
-  return o.join('\n');
 }
 function an(id) { var c = el('e_' + id); return c && c.checked; }
 
@@ -1846,6 +1866,360 @@ function kupferSvg(lage, f) {
 function padSvg(p) {
   if (p.form === 'eckig') return '<rect x="' + nr(p.x - p.d / 2, 3) + '" y="' + nr(p.y - p.d / 2, 3) + '" width="' + nr(p.d, 3) + '" height="' + nr(p.d, 3) + '"/>';
   return '<circle cx="' + nr(p.x, 3) + '" cy="' + nr(p.y, 3) + '" r="' + nr(p.d / 2, 3) + '"/>';
+}
+
+/* ============================================================
+   XS — fertiges Projekt für xTool Studio
+
+   Eine .xs ist ein ZIP aus JSON-Dateien. Der Unterschied zum SVG: die
+   Bearbeitungswerte stehen mit drin. Wer ein SVG importiert, muss in Studio
+   jede Farbebene von Hand auf Gravieren oder Schneiden stellen und Leistung,
+   Geschwindigkeit und Durchgänge eintippen — bei sieben Ebenen jedes Mal.
+   Hier steht das schon in der Datei.
+
+   Format entschlüsselt am 2026-08-19 aus Marios eigenen Studio-Dateien:
+   Pfadgeometrie ist ein normaler SVG-d-String, adressiert über das reine
+   SHA-256 des Strings. Nichts daran ist geschützt — aber auch nichts
+   dokumentiert. Deshalb bleibt der SVG-Export daneben stehen.
+   ============================================================ */
+
+/* Das Gerät. Übernommen aus Marios pcb.xs, damit die Materialbindung
+   stimmt statt geraten zu sein. */
+var XSGERAET = {
+  id: 'GS009-CLASS-4-1', code: 'GS009-CLASS-4', name: 'F2 Ultra UV', power: [5],
+  material: 3938, lichtquelle: 'uv', dicke: 84.6, luefter: 3, filter: 4
+};
+
+/* Was die Maschine mit welcher Ebene tut.
+   ACHTUNG — die Zahlen sind bis jetzt die Materialvorgaben aus pcb.xs, nicht
+   Marios gemessene Werte. Sie werden Ebene für Ebene aus seinen Studio-
+   Screenshots ersetzt. Bis dahin: in Studio nachsehen, bevor es losgeht. */
+var XSVERFAHREN = {
+  isoLeit1: { art: 'FILL_VECTOR_ENGRAVING', power: 30,  speed: 500, repeat: 1 },
+  isoText1: { art: 'FILL_VECTOR_ENGRAVING', power: 30,  speed: 500, repeat: 1 },
+  isoLeit2: { art: 'FILL_VECTOR_ENGRAVING', power: 30,  speed: 500, repeat: 1 },
+  isoText2: { art: 'FILL_VECTOR_ENGRAVING', power: 30,  speed: 500, repeat: 1 },
+  rest:     { art: 'FILL_VECTOR_ENGRAVING', power: 30,  speed: 500, repeat: 1 },
+  schrift:  { art: 'FILL_VECTOR_ENGRAVING', power: 30,  speed: 500, repeat: 1 },
+  bohr:     { art: 'VECTOR_CUTTING',        power: 100, speed: 3,   repeat: 3 },
+  kontur1:  { art: 'FILL_VECTOR_ENGRAVING', power: 30,  speed: 500, repeat: 1 },
+  kontur2:  { art: 'VECTOR_CUTTING',        power: 100, speed: 3,   repeat: 3 },
+  kupfer:   { art: 'VECTOR_ENGRAVING',      power: 70,  speed: 1100, repeat: 1 },
+  platine:  { art: 'VECTOR_ENGRAVING',      power: 70,  speed: 1100, repeat: 1 },
+  best:     { art: 'VECTOR_ENGRAVING',      power: 70,  speed: 1100, repeat: 1 }
+};
+
+/* Ebenen, die mitfahren, aber nicht bearbeitet werden. Die Außenkontur auf
+   der Oberseite ist so ein Fall: sie dient dem Ausrichten der umgedrehten
+   Platine, gelasert wird sie nur einmal, nämlich von unten. */
+var XSSTUMM = { unten: [], oben: ['kontur1'] };
+
+function uuid() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    var r = Math.random() * 16 | 0;
+    return (c === 'x' ? r : (r & 3 | 8)).toString(16);
+  });
+}
+
+/* SHA-256 als Hex. Die Pfaddaten werden im Archiv darüber adressiert. */
+function sha256Hex(text) {
+  return crypto.subtle.digest('SHA-256', new TextEncoder().encode(text)).then(function (b) {
+    return [].map.call(new Uint8Array(b), function (x) { return ('0' + x.toString(16)).slice(-2); }).join('');
+  });
+}
+
+/* Ein SVG-Element in einen d-String, gespiegelt falls nötig.
+   Der Export schreibt nur absolute M/L/Z und Kreise — deshalb reicht diese
+   knappe Umrechnung und es braucht keinen Pfad-Parser. */
+function alsPfad(e, spiegelBreite, dx, dy) {
+  dx = dx || 0; dy = dy || 0;
+  function sx(x) { return (spiegelBreite == null ? x : spiegelBreite - x) + dx; }
+  function sy(y) { return y + dy; }
+  var t = e.tagName;
+  if (t === 'circle') {
+    var cx = sx(+e.getAttribute('cx')), cy = sy(+e.getAttribute('cy')), r = +e.getAttribute('r');
+    /* Zwei Halbbögen — ein Kreis lässt sich als Pfad nicht in einem Bogen
+       schließen, Anfang und Ende wären derselbe Punkt. */
+    return 'M' + nr(cx - r, 4) + ' ' + nr(cy, 4) +
+           'A' + nr(r, 4) + ' ' + nr(r, 4) + ' 0 1 0 ' + nr(cx + r, 4) + ' ' + nr(cy, 4) +
+           'A' + nr(r, 4) + ' ' + nr(r, 4) + ' 0 1 0 ' + nr(cx - r, 4) + ' ' + nr(cy, 4) + 'Z';
+  }
+  if (t === 'rect') {
+    var x = +e.getAttribute('x'), y = sy(+e.getAttribute('y'));
+    var bw = +e.getAttribute('width'), bh = +e.getAttribute('height');
+    var a = sx(x), b = sx(x + bw);
+    return 'M' + nr(Math.min(a, b), 4) + ' ' + nr(y, 4) + 'H' + nr(Math.max(a, b), 4) +
+           'V' + nr(y + bh, 4) + 'H' + nr(Math.min(a, b), 4) + 'Z';
+  }
+  if (t !== 'path') return '';
+  var d = e.getAttribute('d') || '';
+  if (spiegelBreite == null && !dx && !dy) return d;
+  /* Nur Kommandobuchstaben und Zahlen — jede erste Zahl eines Paares ist ein x. */
+  var i = 0;
+  return d.replace(/[MLHVZ]|-?[\d.]+/g, function (tk) {
+    if (/[A-Z]/.test(tk)) { i = 0; return tk; }
+    var z = +tk;
+    i++;
+    return nr((i % 2) ? sx(z) : sy(z), 4);
+  });
+}
+
+/* Umriss eines Elements in Millimetern.
+
+   Kreise und Rechtecke werden direkt gemessen, nicht über ihren Pfad: die
+   Bögen eines Kreises haben beide Enden auf derselben Höhe, aus dem d-String
+   allein kämen die Bohrlöcher 5,08 statt 5,98 mm hoch heraus. Nur echte
+   Pfade werden abgetastet — und die schreibt dieser Export ausschliesslich
+   mit absoluten M/L/Z, deshalb reicht der einfache Durchlauf. */
+function elementBox(e, spiegelBreite, dx, dy) {
+  dx = dx || 0; dy = dy || 0;
+  function sx(x) { return (spiegelBreite == null ? x : spiegelBreite - x) + dx; }
+  if (e.tagName === 'circle') {
+    var cx = sx(+e.getAttribute('cx')), cy = +e.getAttribute('cy') + dy, r = +e.getAttribute('r');
+    return { x0: cx - r, y0: cy - r, x1: cx + r, y1: cy + r };
+  }
+  if (e.tagName === 'rect') {
+    var rx = +e.getAttribute('x'), ry = +e.getAttribute('y') + dy;
+    var rw = +e.getAttribute('width'), rh = +e.getAttribute('height');
+    var a = sx(rx), b = sx(rx + rw);
+    return { x0: Math.min(a, b), y0: ry, x1: Math.max(a, b), y1: ry + rh };
+  }
+  var d = alsPfad(e, spiegelBreite, dx, dy);
+  var x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9, x = 0, y = 0;
+  function merk() { if (x < x0) x0 = x; if (y < y0) y0 = y; if (x > x1) x1 = x; if (y > y1) y1 = y; }
+  (d.match(/[A-Za-z][^A-Za-z]*/g) || []).forEach(function (t) {
+    var k = t[0], n = (t.match(/-?[\d.]+/g) || []).map(Number), i;
+    if (k === 'M' || k === 'L') { for (i = 0; i + 1 < n.length; i += 2) { x = n[i]; y = n[i + 1]; merk(); } }
+    else if (k === 'H') { n.forEach(function (v) { x = v; merk(); }); }
+    else if (k === 'V') { n.forEach(function (v) { y = v; merk(); }); }
+  });
+  return x1 < x0 ? null : { x0: x0, y0: y0, x1: x1, y1: y1 };
+}
+function boxDazu(a, b) {
+  if (!b) return a;
+  if (!a) return b;
+  return { x0: Math.min(a.x0, b.x0), y0: Math.min(a.y0, b.y0),
+           x1: Math.max(a.x1, b.x1), y1: Math.max(a.y1, b.y1) };
+}
+
+/* Eine Ebene = ein Objekt in Studio. Alle Teilpfade einer Ebene wandern in
+   einen Pfad mit evenodd — genau wie im SVG, wo der Graben schon als
+   Compound-Pfad steht und die Restfläche ihre Löcher darüber bekommt. */
+/* Rand zur Ecke der Arbeitsfläche. Restfläche und Außenkontur ragen über die
+   Platine hinaus und lägen ohne diese Verschiebung im Negativen, also
+   ausserhalb der Fläche — Studio hätte dort nichts zu gravieren. */
+var XSRAND = 10;
+
+function xsEbenen(lage) {
+  if (S.veraltet || !S.fraes) rechne();
+  var w = W(), h = H();
+  var st = S.fraes[lage] || { leiter: [], text: [] };
+  var bauer = gruppenBauer(lage, st, w, h);
+  var spiegel = gespiegelt(lage) ? w : null;
+
+  /* Erst sammeln, was überhaupt Inhalt hat, und dabei messen. Die
+     Verschiebung steht erst fest, wenn alle Ebenen vermessen sind — sie
+     müssen alle um denselben Betrag wandern, sonst passen sie nachher nicht
+     mehr zueinander. */
+  /* Die Verschiebung darf NICHT davon abhängen, welche Ebenen angehakt sind.
+     Sonst landet die Außenkontur in platine-unten.xs woanders als in
+     platine-oben.xs — bei der ersten Fassung um genau das eine Millimeter,
+     das die Restfläche weiter hinausragt — und die beiden Seiten passen
+     nach dem Umdrehen nicht mehr übereinander. Massgeblich ist deshalb der
+     grösstmögliche Überstand, nicht der tatsächliche. */
+  var ueber = Math.max(restRand(), S.kFraeser / 2,
+                       S.fraeser / 2 + (S.umlauf - 1) * S.ueber) + 0.1;
+  var dx = XSRAND + ueber, dy = XSRAND + ueber;
+
+  var teile = [];
+  EBENEN.forEach(function (e) {
+    if (!an(e.id) || !bauer[e.id]) return;
+    var roh = bauer[e.id](S.farben[e.id]);
+    if (!roh) return;
+    var doc = new DOMParser().parseFromString('<svg xmlns="http://www.w3.org/2000/svg">' + roh + '</svg>', 'image/svg+xml');
+    var elemente = [].filter.call(doc.querySelectorAll('path,circle,rect'), function (el) {
+      return !!alsPfad(el, spiegel);
+    });
+    if (!elemente.length) return;
+    var box = null;
+    elemente.forEach(function (el) { box = boxDazu(box, elementBox(el, spiegel)); });
+    if (!box) return;
+    teile.push({ e: e, elemente: elemente, box: box });
+  });
+  if (!teile.length) return [];
+
+  return teile.map(function (t) {
+    var d = t.elemente.map(function (el) { return alsPfad(el, spiegel, dx, dy); });
+    return {
+      id: t.e.id, name: t.e.name, farbe: S.farben[t.e.id], d: d.join(' '),
+      box: { x: t.box.x0 + dx, y: t.box.y0 + dy,
+             w: t.box.x1 - t.box.x0, h: t.box.y1 - t.box.y0 }
+    };
+  });
+}
+
+/* Das Archiv. ZIP ohne Bibliothek: Einträge werden ungepackt abgelegt
+   (Methode 0). Das ist ein paar hundert Kilobyte grösser als gepackt und
+   dafür in dreissig Zeilen erledigt statt in einer Abhängigkeit. */
+var CRCTAB = (function () {
+  var t = new Uint32Array(256), c, i, k;
+  for (i = 0; i < 256; i++) {
+    c = i;
+    for (k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+    t[i] = c >>> 0;
+  }
+  return t;
+})();
+function crc32(b) {
+  var c = 0xFFFFFFFF;
+  for (var i = 0; i < b.length; i++) c = CRCTAB[(c ^ b[i]) & 0xFF] ^ (c >>> 8);
+  return (c ^ 0xFFFFFFFF) >>> 0;
+}
+function zipBauen(dateien) {
+  var enc = new TextEncoder(), teile = [], zentral = [], versatz = 0;
+  function u16(v) { return [v & 255, (v >>> 8) & 255]; }
+  function u32(v) { return [v & 255, (v >>> 8) & 255, (v >>> 16) & 255, (v >>> 24) & 255]; }
+
+  Object.keys(dateien).forEach(function (name) {
+    var nb = enc.encode(name), db = enc.encode(dateien[name]), c = crc32(db);
+    var kopf = [].concat([80, 75, 3, 4], u16(20), u16(0), u16(0), u16(0), u16(0),
+                         u32(c), u32(db.length), u32(db.length), u16(nb.length), u16(0));
+    teile.push(new Uint8Array(kopf), nb, db);
+    zentral.push({ name: nb, crc: c, len: db.length, versatz: versatz });
+    versatz += kopf.length + nb.length + db.length;
+  });
+
+  var zStart = versatz, zLaenge = 0;
+  zentral.forEach(function (e) {
+    var kopf = [].concat([80, 75, 1, 2], u16(20), u16(20), u16(0), u16(0), u16(0), u16(0),
+                         u32(e.crc), u32(e.len), u32(e.len), u16(e.name.length),
+                         u16(0), u16(0), u16(0), u16(0), u32(0), u32(e.versatz));
+    teile.push(new Uint8Array(kopf), e.name);
+    zLaenge += kopf.length + e.name.length;
+  });
+  teile.push(new Uint8Array([].concat([80, 75, 5, 6], u16(0), u16(0),
+             u16(zentral.length), u16(zentral.length), u32(zLaenge), u32(zStart), u16(0))));
+
+  return new Blob(teile, { type: 'application/zip' });
+}
+
+function xsBauen(lage) {
+  var ebenen = xsEbenen(lage);
+  if (!ebenen.length) return Promise.resolve(null);
+
+  var canvasId = uuid(), projectId = uuid(), jetzt = Date.now();
+  var stumm = XSSTUMM[lage] || [];
+
+  return Promise.all(ebenen.map(function (e) { return sha256Hex(e.d); })).then(function (hashes) {
+    var layerData = {}, profile = {}, displays = [], bucket = {}, index = {};
+    var jeProfil = {}, ignoriert = [];
+
+    ebenen.forEach(function (e, i) {
+      var v = XSVERFAHREN[e.id] || XSVERFAHREN.rest;
+      var did = uuid(), pid = 'profile:' + e.id, h = hashes[i], box = e.box;
+
+      layerData[e.farbe] = { name: e.farbe.toUpperCase(), order: i + 1, visible: true };
+      bucket[h] = e.d;
+      index[h] = { hash: h, size: e.d.length };
+
+      profile[pid] = {
+        id: pid, processingType: v.art,
+        values: {
+          power: v.power, speed: v.speed, repeat: v.repeat, frequency: 40,
+          defocus: false, defocus_distance: 1, enableKerf: false, kerfDistance: 0,
+          bitmapEngraveMode: 'normal', density: 300, dotDuration: 100, dpi: 500,
+          bitmapScanMode: 'zMode', scanAngle: 0, angleType: 2, crossAngle: false,
+          enableDelayPerLine: false, delayPerLine: 0.3, outlineTrace: false,
+          needGapNumDensity: true
+        }
+      };
+
+      displays.push({
+        id: did, name: e.name, type: 'PATH',
+        x: box.x, y: box.y, angle: 0,
+        scale: { x: 1, y: 1 }, skew: { x: 0, y: 0 },
+        pivot: { x: 0, y: 0 }, localSkew: { x: 0, y: 0 },
+        offsetX: box.x, offsetY: box.y,
+        lockRatio: true, isClosePath: true, zOrder: i + 1,
+        groupTags: [], groupTag: '',
+        layerTag: e.farbe, layerColor: e.farbe,
+        visible: true, originColor: e.farbe,
+        enableTransform: true, visibleState: true, lockState: false,
+        resourceOrigin: '',
+        customData: { tabBreaks: {}, startPoint: {} },
+        rootComponentId: '', minCanvasVersion: '0.0.0', alpha: 1,
+        fill: { paintType: 'color', visible: false, color: 0, alpha: 1 },
+        stroke: { paintType: 'color', visible: true, color: 0, alpha: 1,
+                  width: 1, cap: 'butt', join: 'miter', miterLimit: 4, alignment: 0.5 },
+        effects: [],
+        width: box.w, height: box.h,
+        isFill: false, lineColor: 16421416, fillColor: '#f9932b',
+        points: [], fillRule: 'evenodd',
+        graphicX: box.x, graphicY: box.y,
+        isCompoundPath: (e.d.match(/M/g) || []).length > 1,
+        vectorRef: { vectorHash: h, bucketType: 'svg', originalField: 'dPath' }
+      });
+
+      if (stumm.indexOf(e.id) >= 0) ignoriert.push(did);
+      else (jeProfil[pid] = jeProfil[pid] || []).push(did);
+    });
+
+    var bindings = Object.keys(jeProfil).map(function (pid) {
+      return { bindingId: 'binding:' + pid.slice(8), canvasId: canvasId,
+               mode: 'LASER_PLANE', baseProfileId: pid, displayIds: jeProfil[pid] };
+    });
+
+    var g = XSGERAET;
+    var dateien = {};
+    dateien['.format'] = 'v2';
+    dateien['meta/persistence-meta.json'] = JSON.stringify({ schemaVersion: '2.0.0', protocol: 'xcs-workspace-v2' });
+    dateien['project.json'] = JSON.stringify({
+      __v2__: true, version: '2.0.0',
+      schemaMeta: { schemaVersion: '2.1.0', format: 'directory' },
+      projectId: projectId, projectTraceID: projectId,
+      projectName: 'platine-' + lage,
+      activeCanvasId: canvasId, activeDeviceId: g.id,
+      versionInfo: { source: 'web', appVersion: '1.7.30', savedAt: jetzt,
+                     ua: 'pcbmaker · makr.tools', minRequiredVersion: '2.6.0',
+                     appMinRequiredVersion: '', webMinRequiredVersion: '' },
+      created: jetzt, modify: jetzt,
+      modules: { canvases: [canvasId], devices: [g.id] },
+      customProjectData: { projectTraceID: projectId }
+    });
+    dateien['profiles.json'] = JSON.stringify({ profiles: profile });
+    dateien['canvases/' + canvasId + '.json'] = JSON.stringify({
+      id: canvasId, title: '{panel}1', hidden: false,
+      layerData: layerData, groupData: {}, extendInfo: {}
+    });
+    dateien['canvases/' + canvasId + '/displays-0.json'] = JSON.stringify({
+      canvasId: canvasId, chunkIndex: 0, displays: displays
+    });
+    dateien['vectors/svg/index.json'] = JSON.stringify({
+      bucketType: 'svg', version: '1.0', entryCount: Object.keys(index).length, entries: index
+    });
+    dateien['vectors/svg/data-0.json'] = JSON.stringify({
+      bucketType: 'svg', chunkIndex: 0, entries: bucket
+    });
+    dateien['devices/device-' + g.id + '.json'] = JSON.stringify({
+      id: g.id, deviceCode: g.code, extId: g.code, extName: g.name, power: g.power,
+      processing: (function () {
+        var p = {};
+        p[canvasId] = { id: canvasId, activeMode: 'LASER_PLANE', modes: { LASER_PLANE: {
+          ignoredDisplayIds: ignoriert,
+          data: { material: g.material, lightSourceMode: g.lichtquelle, thickness: g.dicke,
+                  perimeter: null, diameter: null, isProcessByLayer: true,
+                  pathPlanning: 'auto', fillPlanning: 'separate', scanDirection: 'topToBottom',
+                  fanGear: g.luefter, purifierGear: g.filter },
+          profileRefs: Object.keys(profile),
+          patches: {},
+          bindings: bindings
+        } } };
+        return p;
+      })()
+    });
+
+    return { blob: zipBauen(dateien), ebenen: ebenen.length, stumm: ignoriert.length };
+  });
 }
 
 function lade(name, text, typ) {
@@ -2427,6 +2801,13 @@ var STDEBENEN = {
   unten: ['isoLeit1', 'bohr', 'rest', 'kontur1', 'kontur2'],
   oben:  ['schrift', 'kontur1']
 };
+/* Der XS-Export geht an eine andere Maschine und braucht darum einen eigenen
+   Satz: unten wird die Restfläche gereinigt, gebohrt und geschnitten; oben
+   steht nur die Schrift, die Außenkontur faehrt zum Ausrichten mit. */
+var XSEBENEN = {
+  unten: ['rest', 'bohr', 'kontur1', 'kontur2'],
+  oben:  ['schrift', 'kontur1']
+};
 var STDSVG = { isoArt: 'flaeche', bohrArt: 'linie' };
 
 (function () {
@@ -2526,13 +2907,17 @@ el('kopieSvg').addEventListener('click', function () {
    Spalte. Sie gehoeren aber zur Seite, die man gerade exportiert, nicht zur
    Zeichnung — deshalb fragt der Dialog vor jedem Export und haelt fuer
    'unten' und 'oben' getrennte Saetze vor. */
-var EXPKEY = 'pcbmaker-export', EXPVERSION = 1;
-var expLage = 'unten';
+var EXPKEY = 'pcbmaker-export', EXPVERSION = 2;
+var expLage = 'unten', expArt = 'svg';
+/* SVG und XS haben eigene Ebenensaetze und merken sich die auch getrennt —
+   im SVG steckt die Isolierbahn, im XS die Restflaeche. */
+function expSchlues() { return expArt + ':' + expLage; }
 
 function expGespeichert(lage) {
   try {
     var d = JSON.parse(localStorage.getItem(EXPKEY) || 'null');
-    if (d && d.v === EXPVERSION && d[lage] && d[lage].ebenen) return d[lage];
+    var z = d && d.v === EXPVERSION && d[expArt + ':' + lage];
+    if (z && z.ebenen) return z;
   } catch (e) { }
   return null;
 }
@@ -2541,7 +2926,7 @@ function expSichern() {
   var d = null;
   try { d = JSON.parse(localStorage.getItem(EXPKEY) || 'null'); } catch (e) { }
   if (!d || d.v !== EXPVERSION) d = { v: EXPVERSION };
-  d[expLage] = {
+  d[expSchlues()] = {
     ebenen: EBENEN.filter(function (e) { return an(e.id); }).map(function (e) { return e.id; }),
     isoArt: el('isoArt').value,
     bohrArt: el('bohrArt').value
@@ -2554,14 +2939,27 @@ function expSetzen(z) {
   el('bohrArt').value = z.bohrArt || STDSVG.bohrArt;
   ebenenSync();
   isoHinweis();
+  if (expArt === 'xs') el('expWerte').innerHTML = xsWerteZeile(expLage);
 }
 function expStandardsatz(lage) {
-  return { ebenen: (STDEBENEN[lage] || []).slice(), isoArt: STDSVG.isoArt, bohrArt: STDSVG.bohrArt };
+  var satz = (expArt === 'xs' ? XSEBENEN : STDEBENEN)[lage] || [];
+  return { ebenen: satz.slice(), isoArt: STDSVG.isoArt, bohrArt: STDSVG.bohrArt };
 }
-function expOeffnen(lage) {
+function expOeffnen(lage, art) {
   expLage = lage;
-  el('expSeite').textContent = lage === 'unten' ? 'Unterseite' : 'Oberseite';
-  el('expName').textContent = 'platine-' + lage + '.svg';
+  expArt = art || 'svg';
+  var seite = lage === 'unten' ? 'Unterseite' : 'Oberseite';
+  el('expTitel').textContent = (expArt === 'xs' ? 'xTool-Studio-Projekt — ' : 'SVG-Export — ') + seite;
+  el('expSeite').textContent = seite;
+  el('expName').textContent = 'platine-' + lage + (expArt === 'xs' ? '.xs' : '.svg');
+  el('expJetzt').textContent = 'Herunterladen';
+  el('expWasTitel').textContent = expArt === 'xs' ? 'Was hineinkommt' : 'Was ins SVG kommt';
+  /* Kopieren gibt es nur beim SVG — ein ZIP in der Zwischenablage nuetzt
+     niemandem. */
+  el('kopieSvg').hidden = (expArt === 'xs');
+  /* Beim XS liegen die Bearbeitungswerte in der Datei — das gehoert
+     sichtbar hin, sonst laesst sich nicht erkennen, was gleich losfaehrt. */
+  el('expWerte').innerHTML = expArt === 'xs' ? xsWerteZeile(lage) : '';
   expSetzen(expGespeichert(lage) || expStandardsatz(lage));
   /* Eine Seite ohne eigenes Kupfer ist kein Fehler — die Oberseite traegt oft
      nur Schrift. Frueher hat der Export sie stumm uebersprungen, das sah wie
@@ -2570,8 +2968,25 @@ function expOeffnen(lage) {
   el('expLeer').textContent = hat ? '' : 'Auf dieser Seite liegt nichts — im SVG stehen dann nur Kontur und Zugaben.';
   el('expDlg').showModal();
 }
-el('expUnten').addEventListener('click', function () { expOeffnen('unten'); });
-el('expOben').addEventListener('click', function () { expOeffnen('oben'); });
+el('expUnten').addEventListener('click', function () { expOeffnen('unten', 'svg'); });
+el('expOben').addEventListener('click', function () { expOeffnen('oben', 'svg'); });
+el('xsUnten').addEventListener('click', function () { expOeffnen('unten', 'xs'); });
+el('xsOben').addEventListener('click', function () { expOeffnen('oben', 'xs'); });
+
+/* Übersicht der Werte, die mit in die Datei gehen. */
+var XSNAMEN = { FILL_VECTOR_ENGRAVING: 'Fläche gravieren', VECTOR_ENGRAVING: 'Linie gravieren', VECTOR_CUTTING: 'schneiden' };
+function xsWerteZeile(lage) {
+  var stumm = XSSTUMM[lage] || [];
+  var zeilen = EBENEN.filter(function (e) { return an(e.id) && XSVERFAHREN[e.id]; }).map(function (e) {
+    var v = XSVERFAHREN[e.id];
+    if (stumm.indexOf(e.id) >= 0) return '<tr><td>' + e.name + '</td><td colspan="4">nur zum Ausrichten, wird nicht bearbeitet</td></tr>';
+    return '<tr><td>' + e.name + '</td><td>' + (XSNAMEN[v.art] || v.art) + '</td>' +
+           '<td>' + v.power + ' %</td><td>' + v.speed + ' mm/s</td><td>' + v.repeat + '×</td></tr>';
+  });
+  return '<table class="xswerte"><tbody>' + zeilen.join('') + '</tbody></table>' +
+         '<p class="hint">Gerät: ' + XSGERAET.name + '. <b>Die Werte sind noch die Materialvorgaben</b> — ' +
+         'in Studio prüfen, bevor es losgeht.</p>';
+}
 el('expStd').addEventListener('click', function () { expSetzen(expStandardsatz(expLage)); expSichern(); });
 el('expAb').addEventListener('click', function () { el('expDlg').close(); });
 el('isoArt').addEventListener('change', expSichern);
@@ -2579,6 +2994,28 @@ el('bohrArt').addEventListener('change', expSichern);
 el('expJetzt').addEventListener('click', function () {
   offenVerworfen = 0;
   expSichern();
+
+  if (expArt === 'xs') {
+    var b = this;
+    b.disabled = true; b.textContent = 'baut …';
+    xsBauen(expLage).then(function (r) {
+      b.disabled = false; b.textContent = 'Herunterladen';
+      if (!r) { el('stWarn').textContent = 'Nichts zu exportieren — keine der gewählten Ebenen hat Inhalt.'; return; }
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(r.blob); a.download = 'platine-' + expLage + '.xs';
+      document.body.appendChild(a); a.click();
+      setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+      el('stWarn').textContent = 'platine-' + expLage + '.xs geschrieben — ' + r.ebenen + ' Ebenen'
+        + (r.stumm ? ', ' + r.stumm + ' nur zum Ausrichten' : '')
+        + (offenVerworfen ? ', ' + offenVerworfen + ' offene Kontur(en) verworfen' : '') + '.';
+      el('expDlg').close();
+    }).catch(function (e) {
+      b.disabled = false; b.textContent = 'Herunterladen';
+      el('stWarn').textContent = 'XS nicht geschrieben: ' + e.message;
+    });
+    return;
+  }
+
   lade('platine-' + expLage + '.svg', svgSeite(expLage), 'image/svg+xml');
   el('stWarn').textContent = offenVerworfen
     ? offenVerworfen + ' offene Kontur(en) nicht in die Fläche übernommen'
