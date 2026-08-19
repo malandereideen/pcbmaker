@@ -146,6 +146,8 @@
   .xswerte td { padding: 3px 6px 3px 0; border-top: 1px solid var(--border); color: var(--text-muted); }
   .xswerte td:first-child { color: var(--text); }
   .xswerte td:not(:first-child) { text-align: right; font-family: var(--font-mono); font-size: 11.5px; white-space: nowrap; }
+  .xswerte td.xsnr { width: 14px; text-align: right; color: var(--text-faint); font-family: var(--font-mono); font-size: 11px; }
+  .xswerte td.xsnr + td { color: var(--text); text-align: left; font-family: inherit; font-size: 12px; white-space: normal; }
   .dlg .row > label.key { flex: 0 0 118px; }
   .dlg__titel { margin: 0 0 14px; font-size: 15px; font-weight: 600; letter-spacing: -.01em; }
   .dlg__spalten { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 26px; align-items: start; }
@@ -1914,6 +1916,16 @@ var XSVERFAHREN = {
    Platine, gelasert wird sie nur einmal, nämlich von unten. */
 var XSSTUMM = { unten: [], oben: ['kontur1'] };
 
+/* Die Reihenfolge im XS ist die Arbeitsreihenfolge und kommt aus XSEBENEN,
+   nicht aus EBENEN. Die beiden sind verschieden: im SVG stehen die
+   Bohrungslöcher weit oben, gearbeitet wird aber erst die Restfläche und
+   danach gebohrt. Was zusätzlich angehakt wird, hängt sich hinten an. */
+function xsReihenfolge(lage) {
+  var r = (XSEBENEN[lage] || []).slice();
+  EBENEN.forEach(function (e) { if (r.indexOf(e.id) < 0) r.push(e.id); });
+  return r.filter(function (id) { return an(id); });
+}
+
 function uuid() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
     var r = Math.random() * 16 | 0;
@@ -2017,10 +2029,6 @@ function xsEbenen(lage) {
   var bauer = gruppenBauer(lage, st, w, h);
   var spiegel = gespiegelt(lage) ? w : null;
 
-  /* Erst sammeln, was überhaupt Inhalt hat, und dabei messen. Die
-     Verschiebung steht erst fest, wenn alle Ebenen vermessen sind — sie
-     müssen alle um denselben Betrag wandern, sonst passen sie nachher nicht
-     mehr zueinander. */
   /* Die Verschiebung darf NICHT davon abhängen, welche Ebenen angehakt sind.
      Sonst landet die Außenkontur in platine-unten.xs woanders als in
      platine-oben.xs — bei der ersten Fassung um genau das eine Millimeter,
@@ -2031,9 +2039,12 @@ function xsEbenen(lage) {
                        S.fraeser / 2 + (S.umlauf - 1) * S.ueber) + 0.1;
   var dx = XSRAND + ueber, dy = XSRAND + ueber;
 
+  /* In Arbeitsreihenfolge sammeln, nicht in EBENEN-Reihenfolge — sie
+     bestimmt, was Studio zuerst abfährt. */
   var teile = [];
-  EBENEN.forEach(function (e) {
-    if (!an(e.id) || !bauer[e.id]) return;
+  xsReihenfolge(lage).forEach(function (id) {
+    var e = EBENEN.filter(function (x) { return x.id === id; })[0];
+    if (!e || !bauer[e.id]) return;
     var roh = bauer[e.id](S.farben[e.id]);
     if (!roh) return;
     var doc = new DOMParser().parseFromString('<svg xmlns="http://www.w3.org/2000/svg">' + roh + '</svg>', 'image/svg+xml');
@@ -2977,10 +2988,14 @@ el('xsOben').addEventListener('click', function () { expOeffnen('oben', 'xs'); }
 var XSNAMEN = { FILL_VECTOR_ENGRAVING: 'Fläche gravieren', VECTOR_ENGRAVING: 'Linie gravieren', VECTOR_CUTTING: 'schneiden' };
 function xsWerteZeile(lage) {
   var stumm = XSSTUMM[lage] || [];
-  var zeilen = EBENEN.filter(function (e) { return an(e.id) && XSVERFAHREN[e.id]; }).map(function (e) {
-    var v = XSVERFAHREN[e.id];
-    if (stumm.indexOf(e.id) >= 0) return '<tr><td>' + e.name + '</td><td colspan="4">nur zum Ausrichten, wird nicht bearbeitet</td></tr>';
-    return '<tr><td>' + e.name + '</td><td>' + (XSNAMEN[v.art] || v.art) + '</td>' +
+  /* Dieselbe Reihenfolge wie in der Datei — die Tabelle ist der Ablaufplan. */
+  var zeilen = xsReihenfolge(lage).map(function (id, i) {
+    var e = EBENEN.filter(function (x) { return x.id === id; })[0];
+    var v = e && XSVERFAHREN[id];
+    if (!v) return '';
+    var nr = '<td class="xsnr">' + (i + 1) + '</td>';
+    if (stumm.indexOf(id) >= 0) return '<tr>' + nr + '<td>' + e.name + '</td><td colspan="3">nur zum Ausrichten, wird nicht bearbeitet</td></tr>';
+    return '<tr>' + nr + '<td>' + e.name + '</td><td>' + (XSNAMEN[v.art] || v.art) + '</td>' +
            '<td>' + v.power + ' %</td><td>' + v.speed + ' mm/s</td><td>' + v.repeat + '×</td></tr>';
   });
   return '<table class="xswerte"><tbody>' + zeilen.join('') + '</tbody></table>' +
