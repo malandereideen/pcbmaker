@@ -1928,7 +1928,13 @@ var XSVERFAHREN = {
   kontur1:  { art: 'FILL_VECTOR_ENGRAVING', power: 30, speed: 500, repeat: 1,
               density: 300, frequency: 40, bitmapScanMode: 'zMode',
               gemessen: true },
-  kontur2:  { art: 'VECTOR_CUTTING',        power: 100, speed: 3,    repeat: 3 },
+  /* 2026-08-19, Screenshot: Schneiden · benutzerdefiniert. 33 Durchgänge,
+     zwei weniger als bei den Bohrungen — die Kontur ist eine lange Bahn,
+     die Löcher sind kurze Kreise. Tab-Erstellung aus, die Haltestege macht
+     der pcbmaker selbst als Lücken in der Bahn. */
+  kontur2:  { art: 'VECTOR_CUTTING', power: 100, speed: 100, repeat: 33,
+              frequency: 40, cuttingDrop: false, enableKerf: false,
+              enableBreakPoint: false, gemessen: true },
   kupfer:   { art: 'VECTOR_ENGRAVING',      power: 70,  speed: 1100, repeat: 1 },
   platine:  { art: 'VECTOR_ENGRAVING',      power: 70,  speed: 1100, repeat: 1 },
   best:     { art: 'VECTOR_ENGRAVING',      power: 70,  speed: 1100, repeat: 1 }
