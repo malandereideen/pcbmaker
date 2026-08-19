@@ -2207,7 +2207,11 @@ function xsBauen(lage) {
            oben. Aufsteigend nummeriert stand die Arbeitsreihenfolge dort
            verkehrt herum. Marios eigene Studio-Dateien machen es genauso —
            das erste Objekt im Array trägt die höchste Nummer. */
-        lockRatio: true, isClosePath: true, zOrder: ebenen.length - i,
+        /* Geschlossen ist nur, was auch ein Z hat. Die Schrift ist eine
+           Einlinien-Schrift: offene Striche ohne Fläche. Mit isClosePath
+           true macht Studio aus jedem Strich ein Polygon und füllt es —
+           die Buchstaben kamen als Klumpen heraus. */
+        lockRatio: true, isClosePath: /Z/.test(e.d), zOrder: ebenen.length - i,
         groupTags: [], groupTag: '',
         layerTag: e.farbe, layerColor: e.farbe,
         visible: true, originColor: e.farbe,
