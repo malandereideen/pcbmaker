@@ -57,6 +57,7 @@
 
   .btns { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 8px; }
   .btns.three { grid-template-columns: repeat(3, 1fr); }
+  .btns.eins { grid-template-columns: 1fr; }
   .btns .btn { justify-content: center; padding: 8px 6px; font-size: 13px; }
   .full { grid-column: 1 / -1; }
 
@@ -79,6 +80,12 @@
   .kanten .btn { padding: 3px 0; min-width: 28px; justify-content: center; font-size: 14px; line-height: 1.1; }
 
   .ebene { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  /* Die Nummer steht bewusst dran: ueber die spricht man ueber die Ebenen,
+     ohne die langen Namen abtippen zu muessen ("unten ist 1-2-7-8-9"). */
+  .ebene > .nr {
+    flex: 0 0 18px; text-align: right; font-family: var(--font-mono);
+    font-size: 11px; color: var(--text-faint);
+  }
   .ebene > .box { flex: 0 0 15px; }
   .ebene > .box input { width: 15px; height: 15px; padding: 0; margin: 0; accent-color: var(--blue); }
   .ebene > .name { flex: 1; min-width: 0; font-size: 12.5px; color: var(--text-muted); }
@@ -87,6 +94,24 @@
     flex: 0 0 40px; width: 40px; height: 24px; padding: 2px;
     border: 1px solid var(--border); border-radius: 5px; background: var(--surface); cursor: pointer;
   }
+
+  /* Export-Dialog. <dialog> bringt Fokusfalle und Esc von selbst mit —
+     deshalb kein selbstgebautes Overlay. */
+  .dlg {
+    border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px 16px;
+    background: var(--bg); color: var(--text); width: min(860px, calc(100vw - 32px));
+    max-height: calc(100vh - 48px); overflow: auto; box-shadow: 0 18px 50px rgba(0,0,0,.35);
+  }
+  .dlg::backdrop { background: rgba(0,0,0,.45); }
+  .dlg__titel { margin: 0 0 14px; font-size: 15px; font-weight: 600; letter-spacing: -.01em; }
+  .dlg__spalten { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 26px; align-items: start; }
+  @media (max-width: 720px) { .dlg__spalten { grid-template-columns: 1fr; } }
+  .dlg__fuss {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+    margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border);
+  }
+  .dlg__luecke { flex: 1 1 auto; }
+  .dlg__fuss .btn { padding: 8px 14px; font-size: 13px; }
 
   /* Werkzeugwahl */
   .tools { display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; margin-bottom: 10px; }
@@ -292,7 +317,10 @@
 
       <div class="group">
         <div class="btns">
-          <button id="expSvg" class="btn btn--primary" title="Schreibt platine-unten.svg und platine-oben.svg">SVG · 2 Seiten</button>
+          <button id="expUnten" class="btn btn--primary" title="Fragt vorher, was hineinsoll, und schreibt platine-unten.svg">SVG unten</button>
+          <button id="expOben" class="btn btn--primary" title="Fragt vorher, was hineinsoll, und schreibt platine-oben.svg">SVG oben</button>
+        </div>
+        <div class="btns eins">
           <button id="calc" class="btn btn--accent">Fräsbahnen</button>
         </div>
         <div class="btns three">
@@ -323,41 +351,6 @@
         <p class="hint" id="stegHint"></p>
       </div>
 
-      <div class="group">
-        <h2 class="group__title">Was ins SVG kommt</h2>
-        <div class="row"><label class="key" for="isoArt">Isolierbahnen</label><select id="isoArt">
-          <option value="linie" selected>Linien — Fräsen</option>
-          <option value="flaeche">Fläche — Gravieren</option>
-        </select></div>
-        <p class="hint" id="isoHint"></p>
-        <div class="row"><label class="key" for="bohrArt">Bohrungen als</label><select id="bohrArt">
-          <option value="linie" selected>Kreis-Umriss</option>
-          <option value="flaeche">gefüllter Punkt</option>
-        </select></div>
-      </div>
-
-      <div class="group">
-        <h2 class="group__title">Ebenen und Farben</h2>
-        <div id="ebenen"></div>
-        <div class="btns">
-          <button id="farbStd" class="btn">Farben zurücksetzen</button>
-          <button id="kopieSvg" class="btn">aktive Seite kopieren</button>
-        </div>
-        <p class="hint">Der Export schreibt <b>zwei Dateien</b>, <code>platine-unten.svg</code> und
-          <code>platine-oben.svg</code>, beide ungespiegelt und beide mit genau diesen Ebenen in
-          genau dieser Reihenfolge. xTool Studio sortiert beim Import nach Farbe:
-          <b>eine Farbe = eine Ebene</b>; die Farbe steht an jedem einzelnen Element, nicht nur an
-          der Gruppe. Die Paare (1) und (2) sind dieselbe Geometrie zweimal — für zwei Durchgänge
-          mit eigenen Einstellungen. Die untersten drei sind Zugaben, normalerweise aus.</p>
-        <p class="hint"><b>Restfläche</b> ist das Kupfer, das nach dem Isolieren neben den Bahnen
-          stehen bleibt. Auf der Rohplatine ist alles Kupfer — trägt man das Feld nicht ab, brückt
-          das Lötzinn beim Löten über den schmalen Graben dorthin. Diese Ebene komplett abtragen
-          lassen, dann bleibt nur noch, was leiten soll. Sie reicht <b>1 mm über die Außenkontur
-          hinaus</b> — sonst bliebe zwischen Platinenrand und Schnittbahn ein Kupferstreifen stehen.</p>
-        <p class="hint" id="farbWarn" style="color:var(--orange-deep)"></p>
-        <div class="row"><label class="key" for="strich">Linienstärke</label><input type="range" id="strich" min="0.01" max="0.5" step="0.01" value="0.05"><span class="val" id="strichV"></span></div>
-      </div>
-
     </div>
   </aside>
 </div>
@@ -371,6 +364,56 @@
   <span>Fräsweg <b id="stWeg">—</b></span>
   <span id="stWarn"></span>
 </div>
+
+<!-- Der Export fragt, statt dass die Einstellungen dauerhaft in der rechten
+     Spalte stehen: Unter- und Oberseite brauchen verschiedene Ebenen, und in
+     einem festen Kasten muesste man vor jedem der beiden Exporte umhaken und
+     danach zurueck. Der Dialog merkt sich beide Saetze getrennt. -->
+<dialog id="expDlg" class="dlg">
+  <h2 class="dlg__titel">SVG-Export — <span id="expSeite">Unterseite</span></h2>
+
+  <div class="dlg__spalten">
+    <div>
+      <h3 class="group__title">Was ins SVG kommt</h3>
+      <div class="row"><label class="key" for="isoArt">Isolierbahnen</label><select id="isoArt">
+        <option value="linie">Linien — Fräsen</option>
+        <option value="flaeche" selected>Fläche — Gravieren</option>
+      </select></div>
+      <p class="hint" id="isoHint"></p>
+      <div class="row"><label class="key" for="bohrArt">Bohrungen als</label><select id="bohrArt">
+        <option value="linie" selected>Kreis-Umriss</option>
+        <option value="flaeche">gefüllter Punkt</option>
+      </select></div>
+      <div class="row"><label class="key" for="strich">Linienstärke</label><input type="range" id="strich" min="0.01" max="0.5" step="0.01" value="0.05"><span class="val" id="strichV"></span></div>
+      <p class="hint" id="expLeer" style="color:var(--orange-deep)"></p>
+      <p class="hint"><b>Restfläche</b> ist das Kupfer, das nach dem Isolieren neben den Bahnen
+        stehen bleibt. Auf der Rohplatine ist alles Kupfer — trägt man das Feld nicht ab, brückt
+        das Lötzinn beim Löten über den schmalen Graben dorthin. Diese Ebene komplett abtragen
+        lassen, dann bleibt nur noch, was leiten soll. Sie reicht <b>1 mm über die Außenkontur
+        hinaus</b> — sonst bliebe zwischen Platinenrand und Schnittbahn ein Kupferstreifen stehen.</p>
+    </div>
+
+    <div>
+      <h3 class="group__title">Ebenen und Farben</h3>
+      <div id="ebenen"></div>
+      <p class="hint" id="farbWarn" style="color:var(--orange-deep)"></p>
+      <p class="hint">Die Datei heißt <code id="expName">platine-unten.svg</code>, ist ungespiegelt
+        und enthält die angehakten Ebenen in genau dieser Reihenfolge. xTool Studio sortiert beim
+        Import nach Farbe: <b>eine Farbe = eine Ebene</b>; die Farbe steht an jedem einzelnen
+        Element, nicht nur an der Gruppe. Die Paare (1) und (2) sind dieselbe Geometrie zweimal —
+        für zwei Durchgänge mit eigenen Einstellungen.</p>
+    </div>
+  </div>
+
+  <div class="dlg__fuss">
+    <button id="expStd" class="btn" type="button" title="Zurück auf den Standardsatz dieser Seite">Standard</button>
+    <button id="farbStd" class="btn" type="button">Farben zurücksetzen</button>
+    <button id="kopieSvg" class="btn" type="button">Kopieren</button>
+    <span class="dlg__luecke"></span>
+    <button id="expAb" class="btn" type="button">Abbrechen</button>
+    <button id="expJetzt" class="btn btn--primary" type="button">Herunterladen</button>
+  </div>
+</dialog>
 
 <script>
 (function () {
@@ -2241,6 +2284,16 @@ var EBENEN = [
 var FARBSTD = {};
 EBENEN.forEach(function (e) { FARBSTD[e.id] = e.f; });
 
+/* Was der Export-Dialog anhakt, wenn er das erste Mal fuer eine Seite
+   aufgeht. Die beiden Saetze sind verschieden, weil die Seiten verschiedene
+   Aufgaben haben: unten wird Kupfer isoliert und gebohrt, oben steht nur die
+   Beschriftung plus die Kontur zum Ausrichten. */
+var STDEBENEN = {
+  unten: ['isoLeit1', 'bohr', 'rest', 'kontur1', 'kontur2'],
+  oben:  ['schrift', 'kontur1']
+};
+var STDSVG = { isoArt: 'flaeche', bohrArt: 'linie' };
+
 (function () {
   var wo = el('ebenen');
   S.farben = {};
@@ -2250,10 +2303,18 @@ EBENEN.forEach(function (e) { FARBSTD[e.id] = e.f; });
     zeile.className = 'ebene';
     if (i === 10) zeile.style.borderTop = '1px solid var(--border)', zeile.style.paddingTop = '8px';
 
+    /* Nicht 'nr' nennen — so heisst die globale Zahlenformatierung. */
+    var zahl = document.createElement('span');
+    zahl.className = 'nr'; zahl.textContent = (i + 1);
+    zeile.appendChild(zahl);
+
     var box = document.createElement('span');
     box.className = 'box';
     var c = document.createElement('input');
-    c.type = 'checkbox'; c.id = 'e_' + e.id; c.checked = e.an;
+    /* Startzustand ist der Standardsatz der Unterseite. Das Feld 'an' oben
+       gibt es nur noch als Beschreibung — massgeblich ist STDEBENEN, und der
+       Dialog setzt die Haken vor jedem Export ohnehin neu. */
+    c.type = 'checkbox'; c.id = 'e_' + e.id; c.checked = STDEBENEN.unten.indexOf(e.id) >= 0;
     c.addEventListener('change', ebenenSync);
     box.appendChild(c);
     zeile.appendChild(box);
@@ -2289,6 +2350,9 @@ function ebenenSync() {
     ? 'Gleiche Farbe mehrfach vergeben (' + doppelt.join(', ') + ') — diese Gruppen landen auf derselben Ebene.'
     : '';
   farbenSichern();
+  /* Farben gelten fuer beide Seiten, die Haken nicht — die haengen an der
+     Seite, die der Dialog gerade zeigt. Deshalb zwei getrennte Speicher. */
+  expSichern();
 }
 
 var FARBKEY = 'pcbmaker-farben';
@@ -2316,10 +2380,75 @@ el('farbStd').addEventListener('click', function () {
 });
 el('kopieSvg').addEventListener('click', function () {
   var b = this;
-  navigator.clipboard.writeText(svgSeite(S.lage)).then(function () {
+  navigator.clipboard.writeText(svgSeite(expLage)).then(function () {
     b.textContent = 'kopiert';
-    setTimeout(function () { b.textContent = 'aktive Seite kopieren'; }, 1400);
+    setTimeout(function () { b.textContent = 'Kopieren'; }, 1400);
   });
+});
+
+/* ---------- Export-Dialog ----------
+   Ebenen, Farben und "was ins SVG kommt" standen frueher fest in der rechten
+   Spalte. Sie gehoeren aber zur Seite, die man gerade exportiert, nicht zur
+   Zeichnung — deshalb fragt der Dialog vor jedem Export und haelt fuer
+   'unten' und 'oben' getrennte Saetze vor. */
+var EXPKEY = 'pcbmaker-export', EXPVERSION = 1;
+var expLage = 'unten';
+
+function expGespeichert(lage) {
+  try {
+    var d = JSON.parse(localStorage.getItem(EXPKEY) || 'null');
+    if (d && d.v === EXPVERSION && d[lage] && d[lage].ebenen) return d[lage];
+  } catch (e) { }
+  return null;
+}
+function expSichern() {
+  if (!bereit || !el('expDlg').open) return;
+  var d = null;
+  try { d = JSON.parse(localStorage.getItem(EXPKEY) || 'null'); } catch (e) { }
+  if (!d || d.v !== EXPVERSION) d = { v: EXPVERSION };
+  d[expLage] = {
+    ebenen: EBENEN.filter(function (e) { return an(e.id); }).map(function (e) { return e.id; }),
+    isoArt: el('isoArt').value,
+    bohrArt: el('bohrArt').value
+  };
+  try { localStorage.setItem(EXPKEY, JSON.stringify(d)); } catch (e) { }
+}
+function expSetzen(z) {
+  EBENEN.forEach(function (e) { el('e_' + e.id).checked = z.ebenen.indexOf(e.id) >= 0; });
+  el('isoArt').value = z.isoArt || STDSVG.isoArt;
+  el('bohrArt').value = z.bohrArt || STDSVG.bohrArt;
+  ebenenSync();
+  isoHinweis();
+}
+function expStandardsatz(lage) {
+  return { ebenen: (STDEBENEN[lage] || []).slice(), isoArt: STDSVG.isoArt, bohrArt: STDSVG.bohrArt };
+}
+function expOeffnen(lage) {
+  expLage = lage;
+  el('expSeite').textContent = lage === 'unten' ? 'Unterseite' : 'Oberseite';
+  el('expName').textContent = 'platine-' + lage + '.svg';
+  expSetzen(expGespeichert(lage) || expStandardsatz(lage));
+  /* Eine Seite ohne eigenes Kupfer ist kein Fehler — die Oberseite traegt oft
+     nur Schrift. Frueher hat der Export sie stumm uebersprungen, das sah wie
+     ein Defekt aus. Jetzt steht es da und man entscheidet selbst. */
+  var hat = S.items.some(function (i) { return i.lage === lage; });
+  el('expLeer').textContent = hat ? '' : 'Auf dieser Seite liegt nichts — im SVG stehen dann nur Kontur und Zugaben.';
+  el('expDlg').showModal();
+}
+el('expUnten').addEventListener('click', function () { expOeffnen('unten'); });
+el('expOben').addEventListener('click', function () { expOeffnen('oben'); });
+el('expStd').addEventListener('click', function () { expSetzen(expStandardsatz(expLage)); expSichern(); });
+el('expAb').addEventListener('click', function () { el('expDlg').close(); });
+el('isoArt').addEventListener('change', expSichern);
+el('bohrArt').addEventListener('change', expSichern);
+el('expJetzt').addEventListener('click', function () {
+  offenVerworfen = 0;
+  expSichern();
+  lade('platine-' + expLage + '.svg', svgSeite(expLage), 'image/svg+xml');
+  el('stWarn').textContent = offenVerworfen
+    ? offenVerworfen + ' offene Kontur(en) nicht in die Fläche übernommen'
+    : 'platine-' + expLage + '.svg geschrieben.';
+  el('expDlg').close();
 });
 
 /* Kästchen "Massefläche" direkt neben die Freistellung hängen */
@@ -2338,23 +2467,7 @@ el('kopieSvg').addEventListener('click', function () {
 });
 
 el('calc').addEventListener('click', rechne);
-/* Zwei Dateien: eine je Seite, beide ungespiegelt. Eine Seite ohne
-   eigenes Kupfer wird übersprungen — ein SVG, in dem nur die Kontur
-   steht, hilft niemandem. */
-el('expSvg').addEventListener('click', function () {
-  offenVerworfen = 0;
-  var raus = [];
-  ['unten', 'oben'].forEach(function (lage) {
-    var hat = S.items.some(function (i) { return i.lage === lage; });
-    if (!hat) return;
-    lade('platine-' + lage + '.svg', svgSeite(lage), 'image/svg+xml');
-    raus.push(lage);
-  });
-  el('stWarn').textContent = !raus.length ? 'Nichts zu exportieren — die Platine ist leer.'
-    : offenVerworfen ? offenVerworfen + ' offene Kontur(en) nicht in die Fläche übernommen'
-    : raus.length === 1 ? 'Nur die ' + (raus[0] === 'unten' ? 'Unterseite' : 'Oberseite') + ' hat Kupfer — eine Datei geschrieben.'
-    : '';
-});
+/* Der Export selbst haengt am Dialog, siehe Abschnitt "Export-Dialog". */
 el('save').addEventListener('click', function () {
   lade('platine.json', JSON.stringify({ pcbmaker: 1, cols: S.cols, rows: S.rows, items: S.items }, null, 1), 'application/json');
 });

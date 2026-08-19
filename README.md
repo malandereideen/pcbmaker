@@ -84,8 +84,26 @@ eine Notbremse, die die Auflösung selbst zurücknimmt und das in der Statuszeil
 
 ## Was im SVG steht
 
-Der Export schreibt **zwei Dateien** — `platine-unten.svg` und `platine-oben.svg` —, jede mit
-nur dem Kupfer ihrer Seite, 1:1 in mm. Eine Seite ohne eigenes Kupfer wird übersprungen.
+Exportiert wird **eine Seite pro Knopf**: *SVG unten* schreibt `platine-unten.svg`,
+*SVG oben* schreibt `platine-oben.svg`, jede mit nur dem Kupfer ihrer Seite, 1:1 in mm.
+
+Vor jedem Export geht ein Fenster auf und fragt, was hinein soll — Ebenen, Farben und die
+Frage Linie oder Fläche. Das steht dort und nicht dauerhaft in der Seitenleiste, weil beide
+Seiten verschiedene Sätze brauchen: unten wird isoliert und gebohrt, oben steht meist nur die
+Beschriftung. Die App merkt sich für jede Seite ihren eigenen Satz.
+
+Der Standard, den *Standard* wiederherstellt:
+
+| | Unterseite | Oberseite |
+|---|---|---|
+| Ebenen | 1 Isolierbahn Leiter + Bohrungen (1) · 2 Bohrungslöcher · 7 Restfläche · 8 Außenkontur (1) · 9 Außenkontur (2) | 6 Schrift selbst · 8 Außenkontur (1) |
+| Isolierbahnen | Fläche — Gravieren | Fläche — Gravieren |
+| Bohrungen | Kreis-Umriss | Kreis-Umriss |
+
+Die Nummern stehen im Fenster vor jeder Zeile — sie sind die Reihenfolge im SVG.
+
+Eine Seite ohne eigenes Kupfer wird nicht mehr stillschweigend übersprungen; das Fenster sagt
+es und man entscheidet selbst.
 
 Die Zeichnung ist der **Blick auf die Unterseite**. Schaltet man auf die Oberseite um, kippt
 die Ansicht — man sieht die Platine dann von oben, so wie sie liegt, wenn man sie zum
@@ -179,14 +197,14 @@ Importer wie xTool Studio sortieren die Objekte eines SVG nach ihrer Farbe auf g
 Ebenen: **eine Farbe = eine Ebene**. Deshalb steht die Farbe an **jedem einzelnen Element** —
 auf Vererbung von der `<g>` verlassen sich diese Programme nicht.
 
-Alle Farben sind im Abschnitt *Ebenen und Farben* frei änderbar. Zwei gleiche Farben landen
+Alle Farben sind im Export-Fenster unter *Ebenen und Farben* frei änderbar. Zwei gleiche Farben landen
 im Importer auf derselben Ebene, und die App meldet das, sobald es passiert. Farben und
 Linienstärke bleiben im Browser gespeichert: einmal auf die eigene Vorlage eingestellt, passt
 jedes weitere SVG ohne Nacharbeit.
 
 **Der Graben braucht mindestens zwei Umläufe** — seine Breite ist (Umläufe − 1) ×
 Bahnabstand. Mit einem Umlauf hat er keine Breite und die Fläche wird zum Klotz; die App
-sagt das in der Seitenleiste und in der Statuszeile.
+sagt das im Export-Fenster und in der Statuszeile.
 
 ## Ablauf bis zur Platine
 
