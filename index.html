@@ -95,11 +95,10 @@
   /* Umbrechend, nicht wischend: eine Zeile zum Scrollen hat die hinteren
      Kuerzel unsichtbar gemacht, und man sucht nicht, was man nicht sieht. */
   .chips { display: flex; flex-wrap: wrap; gap: 4px; margin: 0 0 8px; }
-  /* Die Zahlen sind zu viele fuer die volle Hoehe — feste Hoehe mit
-     Rollbalken, damit sie den Rest der Leiste nicht wegdruecken. */
+  /* Alle 45 auf einmal sichtbar, kein Rollbalken: eine Nummer sucht man mit
+     dem Auge, und was in einer Rollliste steckt, findet das Auge nicht. */
   .chips--zahlen {
     display: grid; grid-template-columns: repeat(9, 1fr); gap: 3px;
-    max-height: 92px; overflow-y: auto; padding-right: 2px;
   }
   .chips--zahlen .chip { padding: 3px 0; text-align: center; }
   .chip {
@@ -141,6 +140,8 @@
     max-height: calc(100vh - 48px); overflow: auto; box-shadow: 0 18px 50px rgba(0,0,0,.35);
   }
   .dlg::backdrop { background: rgba(0,0,0,.45); }
+  .dlg--schmal { width: min(420px, calc(100vw - 32px)); }
+  .dlg .row > label.key { flex: 0 0 118px; }
   .dlg__titel { margin: 0 0 14px; font-size: 15px; font-weight: 600; letter-spacing: -.01em; }
   .dlg__spalten { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 26px; align-items: start; }
   @media (max-width: 720px) { .dlg__spalten { grid-template-columns: 1fr; } }
@@ -264,18 +265,6 @@
         <p class="hint" id="masse"></p>
       </div>
 
-      <div class="group">
-        <h2 class="group__title">Pad und Bahn</h2>
-        <div class="row"><label class="key" for="padD">Pad-Ø</label><input type="range" id="padD" min="0.8" max="4" step="0.1" value="1.8"><input type="text" inputmode="decimal" class="val" id="padDV"></div>
-        <div class="row"><label class="key" for="bohrD">Bohrung Ø</label><input type="range" id="bohrD" min="0" max="2.5" step="0.1" value="0.9"><input type="text" inputmode="decimal" class="val" id="bohrDV"></div>
-        <div class="row"><label class="key" for="padForm">Pad-Form</label><select id="padForm">
-          <option value="rund" selected>rund</option>
-          <option value="eckig">quadratisch</option>
-        </select></div>
-        <div class="row"><label class="key" for="bahnB">Bahnbreite</label><input type="range" id="bahnB" min="0.2" max="4" step="0.1" value="0.8"><input type="text" inputmode="decimal" class="val" id="bahnBV"></div>
-        <div class="row"><label class="key" for="frei" title="Gilt nur für Masseflächen: alles andere Kupfer wird um diesen Abstand aus ihr ausgespart.">Freistellung</label><input type="range" id="frei" min="0.2" max="2" step="0.05" value="0.5"><input type="text" inputmode="decimal" class="val" id="freiV"></div>
-      </div>
-
       <!-- Eine Drehung fuer Bauteil und Beschriftung. Vorher hatte jedes seine
            eigene, und wer ein gedrehtes Bauteil beschriften wollte, musste sie
            an zwei Stellen gleich einstellen. -->
@@ -371,7 +360,22 @@
           <button id="load" class="btn">Laden</button>
           <button id="clear" class="btn">Leeren</button>
         </div>
+        <div class="btns eins">
+          <button id="bauteilAuf" class="btn">Eigenes Bauteil …</button>
+        </div>
         <input type="file" id="file" accept=".json,application/json" hidden>
+      </div>
+
+      <div class="group">
+        <h2 class="group__title">Pad und Bahn</h2>
+        <div class="row"><label class="key" for="padD">Pad-Ø</label><input type="range" id="padD" min="0.8" max="4" step="0.1" value="1.8"><input type="text" inputmode="decimal" class="val" id="padDV"></div>
+        <div class="row"><label class="key" for="bohrD">Bohrung Ø</label><input type="range" id="bohrD" min="0" max="2.5" step="0.1" value="0.9"><input type="text" inputmode="decimal" class="val" id="bohrDV"></div>
+        <div class="row"><label class="key" for="padForm">Pad-Form</label><select id="padForm">
+          <option value="rund" selected>rund</option>
+          <option value="eckig">quadratisch</option>
+        </select></div>
+        <div class="row"><label class="key" for="bahnB">Bahnbreite</label><input type="range" id="bahnB" min="0.2" max="4" step="0.1" value="0.8"><input type="text" inputmode="decimal" class="val" id="bahnBV"></div>
+        <div class="row"><label class="key" for="frei" title="Gilt nur für Masseflächen: alles andere Kupfer wird um diesen Abstand aus ihr ausgespart.">Freistellung</label><input type="range" id="frei" min="0.2" max="2" step="0.05" value="0.5"><input type="text" inputmode="decimal" class="val" id="freiV"></div>
       </div>
 
       <div class="group">
@@ -393,25 +397,6 @@
         <p class="hint" id="stegHint"></p>
       </div>
 
-      <!-- Steht rechts, nicht links: hier wird nicht gezeichnet, sondern aus
-           dem Gezeichneten etwas gemacht — wie Export und Fraesbahnen. -->
-      <div class="group">
-        <h2 class="group__title" title="Pins unten zeichnen, oben beschriften, mit dem Zeiger einen Rahmen darum ziehen — was ganz darin liegt, kommt mit, über beide Seiten hinweg. Ankerpunkt wird das oberste linke Pad.">Eigenes Bauteil</h2>
-        <div class="row"><label class="key">Auswahl</label><span id="auswahlZahl" style="flex:1;font-size:12.5px;color:var(--text-muted)"></span></div>
-        <div class="row"><label class="key" for="bauteilName">Name</label><input type="text" id="bauteilName" maxlength="60" placeholder="ESP32 DevKit"></div>
-        <div class="row"><label class="key" for="bauteilKat">Kategorie</label><select id="bauteilKat"></select></div>
-        <div class="btns">
-          <button id="alsBauteil" class="btn btn--primary" disabled>Speichern</button>
-          <button id="bauteilWeg" class="btn">Gewähltes löschen</button>
-        </div>
-        <div class="btns">
-          <button id="bibExport" class="btn">Eigene sichern</button>
-          <button id="bibImport" class="btn">Einlesen</button>
-        </div>
-        <input type="file" id="bibDatei" accept=".json,application/json" hidden>
-        <div class="row"><label class="key" for="tokenFeld">Schreibschlüssel</label><input type="password" id="tokenFeld" placeholder="nur zum Speichern"></div>
-        <p class="hint" id="bibWarn"></p>
-      </div>
 
     </div>
   </aside>
@@ -435,6 +420,33 @@
      Spalte stehen: Unter- und Oberseite brauchen verschiedene Ebenen, und in
      einem festen Kasten muesste man vor jedem der beiden Exporte umhaken und
      danach zurueck. Der Dialog merkt sich beide Saetze getrennt. -->
+<!-- Eigene Bauteile werden selten angelegt und brauchen dann sechs Felder.
+     Dauerhaft in der Leiste kosten sie Platz, den die Regler taeglich brauchen
+     — deshalb hinter einem Knopf. -->
+<dialog id="bauteilDlg" class="dlg dlg--schmal">
+  <h2 class="dlg__titel">Eigenes Bauteil</h2>
+  <p class="hint" style="margin:0 0 12px">Pins unten zeichnen, oben beschriften, mit dem Zeiger einen
+    Rahmen darum ziehen — was ganz darin liegt, kommt mit, über beide Seiten hinweg. Ankerpunkt
+    wird das oberste linke Pad.</p>
+  <div class="row"><label class="key">Auswahl</label><span id="auswahlZahl" style="flex:1;font-size:12.5px;color:var(--text-muted)"></span></div>
+  <div class="row"><label class="key" for="bauteilName">Name</label><input type="text" id="bauteilName" maxlength="60" placeholder="ESP32 DevKit"></div>
+  <div class="row"><label class="key" for="bauteilKat">Kategorie</label><select id="bauteilKat"></select></div>
+  <div class="row"><label class="key" for="tokenFeld">Schreibschlüssel</label><input type="password" id="tokenFeld" placeholder="nur zum Speichern"></div>
+  <div class="btns">
+    <button id="bibExport" class="btn" type="button">Eigene sichern</button>
+    <button id="bibImport" class="btn" type="button">Einlesen</button>
+  </div>
+  <input type="file" id="bibDatei" accept=".json,application/json" hidden>
+  <p class="hint" id="bibWarn"></p>
+
+  <div class="dlg__fuss">
+    <button id="bauteilWeg" class="btn" type="button">Gewähltes löschen</button>
+    <span class="dlg__luecke"></span>
+    <button id="bauteilZu" class="btn" type="button">Schließen</button>
+    <button id="alsBauteil" class="btn btn--primary" type="button" disabled>Speichern</button>
+  </div>
+</dialog>
+
 <dialog id="expDlg" class="dlg">
   <h2 class="dlg__titel">SVG-Export — <span id="expSeite">Unterseite</span></h2>
 
@@ -2058,6 +2070,12 @@ el('textS').addEventListener('input', function () {
 })();
 
 el('padForm').addEventListener('change', function () { S.padForm = this.value; });
+
+/* Der Bauteil-Dialog haelt die Auswahl fest: waehrend er offen ist, kann man
+   nicht auf der Platine klicken, und das ist gut so — sonst waere die
+   Auswahl, die gespeichert werden soll, mit dem ersten Klick weg. */
+el('bauteilAuf').addEventListener('click', function () { auswahlStatus(); el('bauteilDlg').showModal(); });
+el('bauteilZu').addEventListener('click', function () { el('bauteilDlg').close(); });
 
 /* ---------- Ausrichtung ----------
    Ein Wert fuer Bauteil und Beschriftung. S.rot und S.textRot bleiben als
