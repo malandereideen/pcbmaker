@@ -153,8 +153,25 @@
   .lage i { width: 11px; height: 11px; border-radius: 3px; display: block; }
   .lage.on { border-color: var(--text); color: var(--text); box-shadow: 0 0 0 1px var(--text); }
 
+  /* Werkzeugleiste ueber der Buehne. Dieselben .tool/.lage-Bausteine wie
+     frueher in der Leiste, nur waagerecht gelegt. */
+  #werkzeugleiste {
+    display: flex; align-items: center; flex-wrap: wrap; gap: 6px;
+    padding: 6px 10px; border-bottom: 1px solid var(--border);
+    background: var(--surface); flex: none;
+  }
+  #werkzeugleiste .tools, #werkzeugleiste .lagen { display: flex; gap: 4px; margin: 0; }
+  #werkzeugleiste .tool {
+    flex-direction: row; gap: 5px; padding: 5px 8px; font-size: 12px; line-height: 1.1;
+  }
+  #werkzeugleiste .tool svg { width: 16px; height: 16px; }
+  #werkzeugleiste .lage { padding: 5px 9px; }
+  #werkzeugleiste .hint { margin: 0; }
+  .wl-strich { width: 1px; align-self: stretch; background: var(--border); margin: 0 2px; }
+  .wl-luecke { flex: 1 1 auto; }
+
   /* Bühne */
-  #stagewrap { flex: 1; min-width: 0; position: relative; display: flex; }
+  #stagewrap { flex: 1; min-width: 0; position: relative; display: flex; flex-direction: column; }
   #stage {
     flex: 1; min-width: 0; overflow: auto; background: var(--bg);
     background-image: linear-gradient(var(--border) 1px, transparent 1px),
@@ -180,6 +197,8 @@
     background: var(--surface); color: var(--text-muted); font-size: 12px;
   }
   #statusbar b { color: var(--text); font-weight: 500; font-family: var(--font-mono); }
+  .st-luecke { flex: 1 1 auto; }
+  #modusHint { color: var(--text-faint); }
   #stWarn { color: var(--orange-deep, #C25E0C); }
 
   /* Schmales Fenster: beide Leisten oben nebeneinander, Bühne darunter.
@@ -209,34 +228,6 @@
 <div id="app">
   <aside id="side" class="seite">
     <div class="seiteRoll">
-
-      <div class="group">
-        <h2 class="group__title">Werkzeug</h2>
-        <div class="tools" id="tools">
-          <div class="tool on" data-modus="zeiger" title="Auswählen, verschieben (1)">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="m4 3 7 17 2.5-6.5L20 11 4 3Z"/></svg>Zeiger</div>
-          <div class="tool" data-modus="pad" title="Pad setzen (2)">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.2"/></svg>Pad</div>
-          <div class="tool" data-modus="bahn" title="Leiterbahn ziehen (3)">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18h6l6-6h6"/></svg>Bahn</div>
-          <div class="tool" data-modus="flaeche" title="Kupferfläche aufziehen (4)">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="6" width="16" height="12" rx="1"/></svg>Fläche</div>
-          <div class="tool" data-modus="bauteil" title="Bauteil setzen (5)">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="7" y="4" width="10" height="16" rx="1"/><path d="M7 8H4M7 12H4M7 16H4M20 8h-3M20 12h-3M20 16h-3"/></svg>Bauteil</div>
-          <div class="tool" data-modus="text" title="Beschriftung setzen (6)">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 6V4h14v2M12 4v16M9 20h6"/></svg>Text</div>
-        </div>
-        <div class="lagen" id="lagen">
-          <div class="lage on" data-lage="unten"><i style="background:#E2A32C"></i>Unterseite</div>
-          <div class="lage" data-lage="oben"><i style="background:#D9553F"></i>Oberseite</div>
-        </div>
-        <div class="checks">
-          <label class="check"><input type="checkbox" id="halb"> halbes Raster</label>
-          <label class="check"><input type="checkbox" id="diag" checked> nur 45°</label>
-          <label class="check" id="spHint"><input type="checkbox" id="spOben" checked> Oberseite spiegeln</label>
-        </div>
-        <p class="hint" id="modusHint"></p>
-      </div>
 
       <div class="group">
         <h2 class="group__title">Platine</h2>
@@ -296,6 +287,39 @@
   </aside>
 
   <div id="stagewrap">
+    <!-- Die Werkzeuge stehen ueber der Flaeche, auf der man sie benutzt, statt
+         in der linken Leiste. Der Weg von "Bahn" zum ersten Klick ist damit
+         kurz, und links wird Platz frei fuer die Einstellungen. -->
+    <div id="werkzeugleiste">
+      <div class="tools" id="tools">
+        <div class="tool on" data-modus="zeiger" title="Auswählen, verschieben (1)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="m4 3 7 17 2.5-6.5L20 11 4 3Z"/></svg>Zeiger</div>
+        <div class="tool" data-modus="pad" title="Pad setzen (2)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.2"/></svg>Pad</div>
+        <div class="tool" data-modus="bahn" title="Leiterbahn ziehen (3)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18h6l6-6h6"/></svg>Bahn</div>
+        <div class="tool" data-modus="flaeche" title="Kupferfläche aufziehen (4)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="6" width="16" height="12" rx="1"/></svg>Fläche</div>
+        <div class="tool" data-modus="bauteil" title="Bauteil setzen (5)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="7" y="4" width="10" height="16" rx="1"/><path d="M7 8H4M7 12H4M7 16H4M20 8h-3M20 12h-3M20 16h-3"/></svg>Bauteil</div>
+        <div class="tool" data-modus="text" title="Beschriftung setzen (6)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 6V4h14v2M12 4v16M9 20h6"/></svg>Text</div>
+      </div>
+
+      <span class="wl-strich"></span>
+
+      <div class="lagen" id="lagen">
+        <div class="lage on" data-lage="unten"><i style="background:#E2A32C"></i>Unterseite</div>
+        <div class="lage" data-lage="oben"><i style="background:#D9553F"></i>Oberseite</div>
+      </div>
+
+      <span class="wl-strich"></span>
+
+      <label class="check" title="Halbes Raster: 1,27 mm — für Bahnen, die zwischen den Pins durchmüssen."><input type="checkbox" id="halb"> ½ Raster</label>
+      <label class="check"><input type="checkbox" id="diag" checked> nur 45°</label>
+      <label class="check" id="spHint"><input type="checkbox" id="spOben" checked> spiegeln</label>
+    </div>
+
     <div id="stage">
       <div id="padder"><div id="paper"><canvas id="cv"></canvas></div></div>
     </div>
@@ -377,6 +401,10 @@
   <span>Bohrungen <b id="stBohr">0</b></span>
   <span>Fräsweg <b id="stWeg">—</b></span>
   <span id="stWarn"></span>
+  <!-- Was das gewaehlte Werkzeug tut, steht hier statt in der Werkzeugleiste:
+       dort haette es die Leiste zweizeilig gemacht. -->
+  <span class="st-luecke"></span>
+  <span id="modusHint"></span>
 </div>
 
 <!-- Der Export fragt, statt dass die Einstellungen dauerhaft in der rechten

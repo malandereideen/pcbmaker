@@ -36,6 +36,14 @@ und ein paar lokale Dateien.
 
 ## Bedienung
 
+Drei Zonen: **oben** über der Zeichenfläche die Werkzeuge, die Seitenwahl und die drei
+Schalter, die beim Zeichnen gelten. **Links** die Einstellungen dessen, was man gerade setzt —
+Platine, Pad und Bahn, Bauteil, Beschriftung. **Rechts** alles, was aus dem Gezeichneten
+etwas macht: Export, Fräsbahnen, eigene Bauteile.
+
+Erklärungen stehen nicht mehr als Absätze zwischen den Reglern, sondern hängen als Tooltip an
+dem Element, das sie erklären — erkennbar am gepunkteten Unterstrich.
+
 | Eingabe | Wirkung |
 |---|---|
 | `1` … `6` | Zeiger · Pad · Bahn · Fläche · Bauteil · Text |
