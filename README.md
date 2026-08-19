@@ -44,10 +44,22 @@ etwas macht: Export, Fräsbahnen, eigene Bauteile.
 Erklärungen stehen nicht mehr als Absätze zwischen den Reglern, sondern hängen als Tooltip an
 dem Element, das sie erklären — erkennbar am gepunkteten Unterstrich.
 
+**Ausrichtung** gilt für Bauteile und Beschriftungen gemeinsam — vier Knöpfe, ein Wert. Vorher
+hatte jedes seine eigene Drehung, und wer ein gedrehtes Bauteil beschriften wollte, musste sie
+an zwei Stellen gleich einstellen.
+
+**Jede Zahl neben einem Regler ist ein Eingabefeld.** Hineinschreiben, Enter — mit dem Regler
+trifft man 0,15 sonst nur mit Glück. Komma und Punkt gehen beide; Werte außerhalb des Reglers
+werden auf dessen Grenzen gezogen, Unsinn verworfen.
+
+Unter *Beschriftung* liegen die üblichen Kürzel (GND, VCC, TX …) und darunter die Pin-Nummern
+**00 bis 44**, immer zweistellig — die Strichschrift hat feste Zeichenbreiten, „1" und „10"
+stünden an der Stiftleiste sonst verschieden weit.
+
 | Eingabe | Wirkung |
 |---|---|
 | `1` … `6` | Zeiger · Pad · Bahn · Fläche · Bauteil · Text |
-| `r` | Bauteil oder Beschriftung drehen (ausgewähltes oder das nächste zu setzende) |
+| `r` | dreht — ein ausgewähltes Stück, sonst die *Ausrichtung* für das nächste |
 | `l` | Seite wechseln — die Ansicht kippt dabei mit |
 | Doppelklick, Rechtsklick, `Enter` | laufende Bahn beenden |
 | `Esc` | Bahn verwerfen, Auswahl aufheben |

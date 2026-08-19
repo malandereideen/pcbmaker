@@ -55,10 +55,26 @@
     box-shadow: 0 0 0 1px var(--blue);
   }
   input[type=range]:focus { outline: none; box-shadow: none; }
-  .val { flex: 0 0 54px; text-align: right; font-family: var(--font-mono); font-size: 12px; color: var(--text); font-variant-numeric: tabular-nums; }
+  /* Anzeige und Eingabe in einem: sieht aus wie Text, wird beim Anklicken zum
+     Feld. Ein sichtbarer Rahmen an jedem Regler waere unruhig. */
+  .val {
+    flex: 0 0 54px; width: 54px; text-align: right; font-family: var(--font-mono);
+    font-size: 12px; color: var(--text); font-variant-numeric: tabular-nums;
+    padding: 1px 3px; border: 1px solid transparent; border-radius: 4px; background: transparent;
+  }
+  .val:hover { border-color: var(--border); }
+  .val:focus { border-color: var(--blue); background: var(--bg); box-shadow: none; outline: none; }
+
+  /* Ausrichtung */
+  .richtungen { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+  .richtung {
+    cursor: pointer; border: 1px solid var(--border); border-radius: 8px; padding: 6px 2px;
+    background: var(--surface); color: var(--text-muted); font: inherit; font-size: 12px; line-height: 1;
+  }
+  .richtung.on { border-color: var(--blue); color: var(--blue); box-shadow: 0 0 0 1px var(--blue); background: var(--blue-tint); }
   /* brand.css setzt 8px/14px — in einer 320px-Leiste mit einem Dutzend Feldern
      kostet das ueber hundert Pixel Hoehe, ohne dass es lesbarer wird. */
-  .seite select, .seite input[type=text], .seite input[type=password],
+  .seite select, .seite input[type=text]:not(.val), .seite input[type=password],
   .dlg select, .dlg input[type=text] { padding: 4px 8px; font-size: 13px; }
   .row select { flex: 1; min-width: 0; }
   .row input[type=number] { width: 78px; }
@@ -76,14 +92,16 @@
   .hint { color: var(--text-faint); font-size: 12px; line-height: 1.45; margin: 6px 0 0; }
   .hint:empty { display: none; }
 
-  /* Eine Zeile zum Wischen statt drei umgebrochener — die Kuerzel sind
-     Abkuerzungen, keine Liste zum Ueberfliegen. */
-  .chips {
-    display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 4px; margin: 0 0 8px;
-    padding-bottom: 2px; scrollbar-width: none;
+  /* Umbrechend, nicht wischend: eine Zeile zum Scrollen hat die hinteren
+     Kuerzel unsichtbar gemacht, und man sucht nicht, was man nicht sieht. */
+  .chips { display: flex; flex-wrap: wrap; gap: 4px; margin: 0 0 8px; }
+  /* Die Zahlen sind zu viele fuer die volle Hoehe — feste Hoehe mit
+     Rollbalken, damit sie den Rest der Leiste nicht wegdruecken. */
+  .chips--zahlen {
+    display: grid; grid-template-columns: repeat(9, 1fr); gap: 3px;
+    max-height: 92px; overflow-y: auto; padding-right: 2px;
   }
-  .chips::-webkit-scrollbar { display: none; }
-  .chip { flex: 0 0 auto; }
+  .chips--zahlen .chip { padding: 3px 0; text-align: center; }
   .chip {
     border: 1px solid var(--border); border-radius: var(--radius-pill, 999px);
     background: var(--surface); color: var(--text-muted); cursor: pointer;
@@ -231,8 +249,8 @@
 
       <div class="group">
         <h2 class="group__title">Platine</h2>
-        <div class="row"><label class="key" for="cols">Raster quer</label><input type="range" id="cols" min="4" max="60" step="1" value="20"><span class="val" id="colsV"></span></div>
-        <div class="row"><label class="key" for="rows">Raster hoch</label><input type="range" id="rows" min="4" max="60" step="1" value="16"><span class="val" id="rowsV"></span></div>
+        <div class="row"><label class="key" for="cols">Raster quer</label><input type="range" id="cols" min="4" max="60" step="1" value="20"><input type="text" inputmode="decimal" class="val" id="colsV"></div>
+        <div class="row"><label class="key" for="rows">Raster hoch</label><input type="range" id="rows" min="4" max="60" step="1" value="16"><input type="text" inputmode="decimal" class="val" id="rowsV"></div>
         <!-- Die Erklaerung haengt am Titel statt darunter zu stehen: die
              Regler wachsen nur nach rechts und unten, ueber die Kanten-Knoepfe
              kommt links und oben eine Reihe dazu oder weg. -->
@@ -248,23 +266,32 @@
 
       <div class="group">
         <h2 class="group__title">Pad und Bahn</h2>
-        <div class="row"><label class="key" for="padD">Pad-Ø</label><input type="range" id="padD" min="0.8" max="4" step="0.1" value="1.8"><span class="val" id="padDV"></span></div>
-        <div class="row"><label class="key" for="bohrD">Bohrung Ø</label><input type="range" id="bohrD" min="0" max="2.5" step="0.1" value="0.9"><span class="val" id="bohrDV"></span></div>
+        <div class="row"><label class="key" for="padD">Pad-Ø</label><input type="range" id="padD" min="0.8" max="4" step="0.1" value="1.8"><input type="text" inputmode="decimal" class="val" id="padDV"></div>
+        <div class="row"><label class="key" for="bohrD">Bohrung Ø</label><input type="range" id="bohrD" min="0" max="2.5" step="0.1" value="0.9"><input type="text" inputmode="decimal" class="val" id="bohrDV"></div>
         <div class="row"><label class="key" for="padForm">Pad-Form</label><select id="padForm">
           <option value="rund" selected>rund</option>
           <option value="eckig">quadratisch</option>
         </select></div>
-        <div class="row"><label class="key" for="bahnB">Bahnbreite</label><input type="range" id="bahnB" min="0.2" max="4" step="0.1" value="0.8"><span class="val" id="bahnBV"></span></div>
-        <div class="row"><label class="key" for="frei" title="Gilt nur für Masseflächen: alles andere Kupfer wird um diesen Abstand aus ihr ausgespart.">Freistellung</label><input type="range" id="frei" min="0.2" max="2" step="0.05" value="0.5"><span class="val" id="freiV"></span></div>
+        <div class="row"><label class="key" for="bahnB">Bahnbreite</label><input type="range" id="bahnB" min="0.2" max="4" step="0.1" value="0.8"><input type="text" inputmode="decimal" class="val" id="bahnBV"></div>
+        <div class="row"><label class="key" for="frei" title="Gilt nur für Masseflächen: alles andere Kupfer wird um diesen Abstand aus ihr ausgespart.">Freistellung</label><input type="range" id="frei" min="0.2" max="2" step="0.05" value="0.5"><input type="text" inputmode="decimal" class="val" id="freiV"></div>
+      </div>
+
+      <!-- Eine Drehung fuer Bauteil und Beschriftung. Vorher hatte jedes seine
+           eigene, und wer ein gedrehtes Bauteil beschriften wollte, musste sie
+           an zwei Stellen gleich einstellen. -->
+      <div class="group">
+        <h2 class="group__title" title="Gilt für Bauteile und Beschriftungen gleichermaßen. r dreht ebenfalls — ein ausgewähltes Stück genauso wie das nächste zu setzende.">Ausrichtung</h2>
+        <div class="richtungen" id="richtungen">
+          <button type="button" class="richtung on" data-rot="0">0°</button>
+          <button type="button" class="richtung" data-rot="90">90°</button>
+          <button type="button" class="richtung" data-rot="180">180°</button>
+          <button type="button" class="richtung" data-rot="270">270°</button>
+        </div>
       </div>
 
       <div class="group">
         <h2 class="group__title">Bauteil</h2>
         <div class="row"><label class="key" for="bauteil">Typ</label><select id="bauteil"></select></div>
-        <div class="row"><label class="key" for="rot">Drehung</label><select id="rot">
-          <option value="0" selected>0°</option><option value="90">90°</option>
-          <option value="180">180°</option><option value="270">270°</option>
-        </select></div>
         <p class="hint" id="bibStatus" title="Klick setzt das Bauteil, Pin 1 liegt am Klickpunkt. r dreht — auch ein bereits gesetztes, ausgewähltes."></p>
       </div>
 
@@ -272,12 +299,9 @@
         <h2 class="group__title">Beschriftung</h2>
         <div class="row"><label class="key" for="textS">Text</label><input type="text" id="textS" value="GND" maxlength="24"></div>
         <div class="chips" id="chips"></div>
-        <div class="row"><label class="key" for="textH">Höhe</label><input type="range" id="textH" min="1" max="8" step="0.5" value="2.5"><span class="val" id="textHV"></span></div>
-        <div class="row"><label class="key" for="textB">Strichbreite</label><input type="range" id="textB" min="0.2" max="1.5" step="0.05" value="0.5"><span class="val" id="textBV"></span></div>
-        <div class="row"><label class="key" for="textRot">Drehung</label><select id="textRot">
-          <option value="0" selected>0°</option><option value="90">90°</option>
-          <option value="180">180°</option><option value="270">270°</option>
-        </select></div>
+        <div class="chips chips--zahlen" id="chipsZahlen" title="00 bis 44, immer zweistellig — damit die Nummern an den Pins gleich breit stehen."></div>
+        <div class="row"><label class="key" for="textH">Höhe</label><input type="range" id="textH" min="1" max="8" step="0.5" value="2.5"><input type="text" inputmode="decimal" class="val" id="textHV"></div>
+        <div class="row"><label class="key" for="textB">Strichbreite</label><input type="range" id="textB" min="0.2" max="1.5" step="0.05" value="0.5"><input type="text" inputmode="decimal" class="val" id="textBV"></div>
         <div class="checks">
           <label class="check" title="Die Schrift ist Kupfer wie alles andere — die Isolierbahnen umfahren sie von selbst. r dreht, eine ausgewählte Beschriftung genauso wie die nächste zu setzende."><input type="checkbox" id="textRaster"> ans Raster binden</label>
         </div>
@@ -352,10 +376,10 @@
 
       <div class="group">
         <h2 class="group__title">Isolierfräsen</h2>
-        <div class="row"><label class="key" for="fraeser">Fräser-Ø</label><input type="range" id="fraeser" min="0.05" max="2" step="0.05" value="0.2"><span class="val" id="fraeserV"></span></div>
-        <div class="row"><label class="key" for="umlauf">Umläufe</label><input type="range" id="umlauf" min="1" max="6" step="1" value="2"><span class="val" id="umlaufV"></span></div>
-        <div class="row"><label class="key" for="ueber">Bahnabstand</label><input type="range" id="ueber" min="0.05" max="1.5" step="0.05" value="0.15"><span class="val" id="ueberV"></span></div>
-        <div class="row"><label class="key" for="res">Genauigkeit</label><input type="range" id="res" min="6" max="40" step="2" value="16"><span class="val" id="resV"></span></div>
+        <div class="row"><label class="key" for="fraeser">Fräser-Ø</label><input type="range" id="fraeser" min="0.05" max="2" step="0.05" value="0.2"><input type="text" inputmode="decimal" class="val" id="fraeserV"></div>
+        <div class="row"><label class="key" for="umlauf">Umläufe</label><input type="range" id="umlauf" min="1" max="6" step="1" value="2"><input type="text" inputmode="decimal" class="val" id="umlaufV"></div>
+        <div class="row"><label class="key" for="ueber">Bahnabstand</label><input type="range" id="ueber" min="0.05" max="1.5" step="0.05" value="0.15"><input type="text" inputmode="decimal" class="val" id="ueberV"></div>
+        <div class="row"><label class="key" for="res">Genauigkeit</label><input type="range" id="res" min="6" max="40" step="2" value="16"><input type="text" inputmode="decimal" class="val" id="resV"></div>
         <div class="checks">
           <label class="check" title="Die Bahnen sind Mittellinien des Fräsers. Der erste Umlauf läuft im halben Fräser-Ø ums Kupfer, jeder weitere um den Bahnabstand weiter nach außen."><input type="checkbox" id="zeigFraes" checked> Bahnen anzeigen</label>
         </div>
@@ -363,9 +387,9 @@
 
       <div class="group">
         <h2 class="group__title">Kontur und Bohren</h2>
-        <div class="row"><label class="key" for="kFraeser">Kontur-Fräser</label><input type="range" id="kFraeser" min="0.5" max="4" step="0.1" value="2"><span class="val" id="kFraeserV"></span></div>
-        <div class="row"><label class="key" for="stege">Haltestege</label><input type="range" id="stege" min="0" max="12" step="1" value="0"><span class="val" id="stegeV"></span></div>
-        <div class="row"><label class="key" for="stegB">Stegbreite</label><input type="range" id="stegB" min="0.5" max="6" step="0.5" value="2"><span class="val" id="stegBV"></span></div>
+        <div class="row"><label class="key" for="kFraeser">Kontur-Fräser</label><input type="range" id="kFraeser" min="0.5" max="4" step="0.1" value="2"><input type="text" inputmode="decimal" class="val" id="kFraeserV"></div>
+        <div class="row"><label class="key" for="stege">Haltestege</label><input type="range" id="stege" min="0" max="12" step="1" value="0"><input type="text" inputmode="decimal" class="val" id="stegeV"></div>
+        <div class="row"><label class="key" for="stegB">Stegbreite</label><input type="range" id="stegB" min="0.5" max="6" step="0.5" value="2"><input type="text" inputmode="decimal" class="val" id="stegBV"></div>
         <p class="hint" id="stegHint"></p>
       </div>
 
@@ -426,7 +450,7 @@
         <option value="linie" selected>Kreis-Umriss</option>
         <option value="flaeche">gefüllter Punkt</option>
       </select></div>
-      <div class="row"><label class="key" for="strich">Linienstärke</label><input type="range" id="strich" min="0.01" max="0.5" step="0.01" value="0.05"><span class="val" id="strichV"></span></div>
+      <div class="row"><label class="key" for="strich">Linienstärke</label><input type="range" id="strich" min="0.01" max="0.5" step="0.01" value="0.05"><input type="text" inputmode="decimal" class="val" id="strichV"></div>
       <p class="hint" id="expLeer" style="color:var(--orange-deep)"></p>
       <p class="hint" title="Auf der Rohplatine ist alles Kupfer. Trägt man das Feld neben den Bahnen nicht ab, brückt das Lötzinn beim Löten über den schmalen Graben dorthin. Die Ebene reicht 1 mm über die Außenkontur hinaus, sonst bliebe zwischen Platinenrand und Schnittbahn ein Kupferstreifen stehen."><b>Restfläche</b> ist das Kupfer neben den Bahnen —
         komplett abtragen lassen, sonst brückt das Lötzinn.</p>
@@ -1254,8 +1278,7 @@ window.addEventListener('keydown', function (e) {
   }
   if (k === 'r' || k === 'R') {
     if (S.sel && (S.sel.t === 'bauteil' || S.sel.t === 'text')) { merken(); S.sel.rot = (S.sel.rot + 90) % 360; veraendert(); }
-    else if (S.modus === 'text') { S.textRot = (S.textRot + 90) % 360; el('textRot').value = S.textRot; zeichne(); }
-    else { S.rot = (S.rot + 90) % 360; el('rot').value = S.rot; zeichne(); }
+    else setRot(S.rot + 90);
     return;
   }
   if (k === 'l' || k === 'L') { setLage(S.lage === 'unten' ? 'oben' : 'unten'); return; }
@@ -1913,15 +1936,41 @@ function fit() {
   setZoom(Math.min((st.width - 90) / W(), (st.height - 90) / H()));
 }
 
-/* Regler verdrahten */
+/* Regler verdrahten.
+   Das Feld neben dem Regler zeigt den Wert nicht nur an, man kann ihn auch
+   hineinschreiben — mit einem Regler trifft man 0,15 sonst nur mit Glueck.
+   Geschrieben wird deutsch (Komma), gelesen beides. Uebernommen wird bei
+   Enter und beim Verlassen des Feldes, nicht bei jedem Tastendruck: sonst
+   waere "0,15" nach dem Komma schon auf 0 gerundet. */
 function reglerN(id, feld, n, nach) {
   var e = el(id), v = el(id + 'V');
+  function zeig() { if (v) v.value = n === 0 ? S[feld] : de(S[feld], n); }
   function sync() {
     S[feld] = parseFloat(e.value);
-    if (v) v.textContent = n === 0 ? S[feld] : de(S[feld], n);
+    zeig();
     if (nach) nach();
   }
   e.addEventListener('input', sync);
+
+  if (v && v.tagName === 'INPUT') {
+    v.addEventListener('change', uebernehmen);
+    v.addEventListener('keydown', function (ev) { if (ev.key === 'Enter') { ev.preventDefault(); uebernehmen(); v.select(); } });
+    /* Verwirft, was der Regler nicht hergibt, statt es stumm zu schlucken. */
+    v.addEventListener('blur', zeig);
+  }
+  function uebernehmen() {
+    var z = parseFloat(String(v.value).replace(',', '.').trim());
+    if (!isFinite(z)) { zeig(); return; }
+    var min = parseFloat(e.min), max = parseFloat(e.max), st = parseFloat(e.step) || 1;
+    z = Math.min(max, Math.max(min, z));
+    /* Auf ein Vielfaches der Schrittweite runden — der Regler kann nichts
+       anderes darstellen, und die Rechnungen dahinter erwarten dieselben
+       Stufen wie beim Ziehen. */
+    z = min + Math.round((z - min) / st) * st;
+    z = Math.round(z * 1e6) / 1e6;
+    e.value = z;
+    sync();
+  }
   sync();
 }
 
@@ -1966,7 +2015,6 @@ el('isoArt').addEventListener('change', isoHinweis);
 /* Beschriftung */
 reglerN('textH', 'textH', 1, function () { zeichne(); });
 reglerN('textB', 'textB', 2, function () { zeichne(); });
-el('textRot').addEventListener('change', function () { S.textRot = +this.value; zeichne(); });
 el('textRaster').addEventListener('change', function () { S.textRaster = this.checked; zeichne(); });
 el('spOben').addEventListener('change', function () {
   S.spOben = this.checked;
@@ -1989,8 +2037,13 @@ el('textS').addEventListener('input', function () {
 });
 (function () {
   var VORLAGEN = ['+', '-', 'V+', 'V-', 'VCC', 'GND', '5V', '12V', '3V3', 'IN', 'OUT', 'SIG', 'TX', 'RX', 'SDA', 'SCL', 'PWM', 'NC'];
-  var wo = el('chips');
-  VORLAGEN.forEach(function (v) {
+  /* Pin-Nummern. Zweistellig aufgefuellt, weil "1" und "10" nebeneinander an
+     der Stiftleiste sonst verschieden breit stehen — die Schrift ist eine
+     Strichschrift mit fester Weite je Zeichen. */
+  var ZAHLEN = [];
+  for (var i = 0; i <= 44; i++) ZAHLEN.push(i < 10 ? '0' + i : '' + i);
+
+  function kuerzel(v, wo) {
     var b = document.createElement('button');
     b.type = 'button'; b.className = 'chip'; b.textContent = v;
     b.addEventListener('click', function () {
@@ -1999,11 +2052,27 @@ el('textS').addEventListener('input', function () {
       else { setModus('text'); }
     });
     wo.appendChild(b);
-  });
+  }
+  VORLAGEN.forEach(function (v) { kuerzel(v, el('chips')); });
+  ZAHLEN.forEach(function (v) { kuerzel(v, el('chipsZahlen')); });
 })();
 
 el('padForm').addEventListener('change', function () { S.padForm = this.value; });
-el('rot').addEventListener('change', function () { S.rot = +this.value; zeichne(); });
+
+/* ---------- Ausrichtung ----------
+   Ein Wert fuer Bauteil und Beschriftung. S.rot und S.textRot bleiben als
+   getrennte Felder bestehen — sie stecken in jedem gespeicherten Stueck und
+   in allen Zeichenroutinen —, werden aber immer zusammen gesetzt. */
+function setRot(g) {
+  S.rot = S.textRot = ((g % 360) + 360) % 360;
+  [].forEach.call(document.querySelectorAll('.richtung'), function (b) {
+    b.classList.toggle('on', +b.dataset.rot === S.rot);
+  });
+  zeichne();
+}
+[].forEach.call(document.querySelectorAll('.richtung'), function (b) {
+  b.addEventListener('click', function () { setRot(+b.dataset.rot); });
+});
 el('halb').addEventListener('change', function () { S.halb = this.checked; zeichne(); });
 el('diag').addEventListener('change', function () { S.diag = this.checked; });
 el('zeigFraes').addEventListener('change', function () {
@@ -2275,8 +2344,8 @@ function alleVerschieben(dx, dy) {
   for (var i = 0; i < S.items.length; i++) verschiebe(S.items[i], dx, dy);
 }
 function rasterRegler() {
-  el('cols').value = S.cols; el('colsV').textContent = S.cols;
-  el('rows').value = S.rows; el('rowsV').textContent = S.rows;
+  el('cols').value = S.cols; el('colsV').value = S.cols;
+  el('rows').value = S.rows; el('rowsV').value = S.rows;
 }
 
 /* Platine auf das schrumpfen, was tatsächlich drauf ist, plus ein
@@ -2531,7 +2600,7 @@ el('file').addEventListener('change', function () {
       merken();
       S.items = d.items; S.cols = d.cols || S.cols; S.rows = d.rows || S.rows;
       el('cols').value = S.cols; el('rows').value = S.rows;
-      el('colsV').textContent = S.cols; el('rowsV').textContent = S.rows;
+      el('colsV').value = S.cols; el('rowsV').value = S.rows;
       S.sel = null; veraendert(); fit();
     } catch (e) {
       el('stWarn').textContent = 'Datei nicht lesbar: ' + e.message;
@@ -2562,7 +2631,7 @@ bereit = true;
 farbenHolen();
 ebenenSync();
 el('cols').value = S.cols; el('rows').value = S.rows;
-el('colsV').textContent = S.cols; el('rowsV').textContent = S.rows;
+el('colsV').value = S.cols; el('rowsV').value = S.rows;
 setModus('zeiger');
 setLage('unten');
 isoHinweis();
