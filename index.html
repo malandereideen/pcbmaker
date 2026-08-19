@@ -1906,7 +1906,7 @@ var XSVORGABE = { power: 30, speed: 500, repeat: 1 };
 var XSVERFAHREN = {
   /* 2026-08-19, Screenshot: Gravieren · benutzerdefiniert · 45° zunehmend,
      Konturverfolgung an, Schraffur und Verweilzeit aus. */
-  schrift:  { art: 'FILL_VECTOR_ENGRAVING', power: 100, speed: 80, repeat: 3,
+  rest:     { art: 'FILL_VECTOR_ENGRAVING', power: 100, speed: 80, repeat: 3,
               density: 200, frequency: 40, scanAngle: 45, angleType: 2,
               crossAngle: false, outlineTrace: true, bitmapScanMode: 'zMode',
               enableDelayPerLine: false, enableKerf: false, gemessen: true },
@@ -1915,7 +1915,7 @@ var XSVERFAHREN = {
   isoText1: { art: 'FILL_VECTOR_ENGRAVING' },
   isoLeit2: { art: 'FILL_VECTOR_ENGRAVING' },
   isoText2: { art: 'FILL_VECTOR_ENGRAVING' },
-  rest:     { art: 'FILL_VECTOR_ENGRAVING' },
+  schrift:  { art: 'FILL_VECTOR_ENGRAVING' },
   bohr:     { art: 'VECTOR_CUTTING',        power: 100, speed: 3,    repeat: 3 },
   kontur1:  { art: 'FILL_VECTOR_ENGRAVING' },
   kontur2:  { art: 'VECTOR_CUTTING',        power: 100, speed: 3,    repeat: 3 },
