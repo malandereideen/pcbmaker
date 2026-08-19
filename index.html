@@ -2151,7 +2151,11 @@ function xsBauen(lage) {
         scale: { x: 1, y: 1 }, skew: { x: 0, y: 0 },
         pivot: { x: 0, y: 0 }, localSkew: { x: 0, y: 0 },
         offsetX: box.x, offsetY: box.y,
-        lockRatio: true, isClosePath: true, zOrder: i + 1,
+        /* Absteigend: Studio sortiert die Objektliste nach zOrder, höchster
+           oben. Aufsteigend nummeriert stand die Arbeitsreihenfolge dort
+           verkehrt herum. Marios eigene Studio-Dateien machen es genauso —
+           das erste Objekt im Array trägt die höchste Nummer. */
+        lockRatio: true, isClosePath: true, zOrder: ebenen.length - i,
         groupTags: [], groupTag: '',
         layerTag: e.farbe, layerColor: e.farbe,
         visible: true, originColor: e.farbe,
