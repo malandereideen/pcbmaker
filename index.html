@@ -2117,7 +2117,24 @@ function xsEbenen(lage) {
     var box = null;
     elemente.forEach(function (el) { box = boxDazu(box, elementBox(el, spiegel)); });
     if (!box) return;
-    teile.push({ e: e, elemente: elemente, box: box });
+    /* Die Strichstärke steht als Attribut an jedem Element — farbig()
+       schreibt sie dort hinein. Ohne sie stand im XS pauschal 1 mm, und
+       0,5 mm breite Buchstabenstriche auf 2,5 mm Höhe liefen damit zu
+       Klumpen zusammen. */
+    var strich = 0;
+    elemente.forEach(function (el) {
+      var b = parseFloat(el.getAttribute('stroke-width'));
+      if (isFinite(b) && b > strich) strich = b;
+    });
+    /* Gefüllt oder gestrichelt steht ebenfalls am Element. Restfläche und
+       Isolierbahnen als Fläche kommen mit fill="<farbe>" stroke="none",
+       Kontur und Schrift andersherum. Pauschal ungefüllt zu melden war
+       für die Flächen falsch. */
+    var gefuellt = [].some.call(elemente, function (el) {
+      var f = el.getAttribute('fill');
+      return f && f !== 'none';
+    });
+    teile.push({ e: e, elemente: elemente, box: box, strich: strich, gefuellt: gefuellt });
   });
   if (!teile.length) return [];
 
@@ -2125,6 +2142,7 @@ function xsEbenen(lage) {
     var d = t.elemente.map(function (el) { return alsPfad(el, spiegel, dx, dy); });
     return {
       id: t.e.id, name: t.e.name, farbe: S.farben[t.e.id], d: d.join(' '),
+      strich: t.strich, gefuellt: t.gefuellt,
       box: { x: t.box.x0 + dx, y: t.box.y0 + dy,
              w: t.box.x1 - t.box.x0, h: t.box.y1 - t.box.y0 }
     };
@@ -2219,12 +2237,15 @@ function xsBauen(lage) {
         resourceOrigin: '',
         customData: { tabBreaks: {}, startPoint: {} },
         rootComponentId: '', minCanvasVersion: '0.0.0', alpha: 1,
-        fill: { paintType: 'color', visible: false, color: 0, alpha: 1 },
-        stroke: { paintType: 'color', visible: true, color: 0, alpha: 1,
-                  width: 1, cap: 'butt', join: 'miter', miterLimit: 4, alignment: 0.5 },
+        fill: { paintType: 'color', visible: !!e.gefuellt, color: 0, alpha: 1 },
+        /* Rund abgeschlossen wie im SVG — die Einlinien-Schrift wird dort
+           mit stroke-linecap="round" gezeichnet. */
+        stroke: { paintType: 'color', visible: !e.gefuellt, color: 0, alpha: 1,
+                  width: e.strich || 1, cap: 'round', join: 'round',
+                  miterLimit: 4, alignment: 0.5 },
         effects: [],
         width: box.w, height: box.h,
-        isFill: false, lineColor: 16421416, fillColor: '#f9932b',
+        isFill: !!e.gefuellt, lineColor: 16421416, fillColor: '#f9932b',
         points: [], fillRule: 'evenodd',
         graphicX: box.x, graphicY: box.y,
         isCompoundPath: (e.d.match(/M/g) || []).length > 1,
