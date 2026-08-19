@@ -1915,12 +1915,16 @@ var XSVERFAHREN = {
   isoText1: { art: 'FILL_VECTOR_ENGRAVING' },
   isoLeit2: { art: 'FILL_VECTOR_ENGRAVING' },
   isoText2: { art: 'FILL_VECTOR_ENGRAVING' },
-  /* 2026-08-19, Screenshot: Gravieren · benutzerdefiniert. Schnell und
-     zurückhaltend — die Schrift wird auf der Oberseite nur markiert, nicht
-     freigelegt wie die Restfläche unten. */
-  schrift:  { art: 'FILL_VECTOR_ENGRAVING', power: 80, speed: 2000, repeat: 3,
-              density: 300, frequency: 40, bitmapScanMode: 'zMode',
-              gemessen: true },
+  /* Liniengravur, nicht Flächengravur: die pcbmaker-Schrift ist eine
+     Einlinien-Schrift ohne Fläche. Auf Flächengravur füllt Studio den Pfad
+     und macht aus jedem Buchstaben einen Klumpen — daran hat weder ein
+     offener Pfad noch die richtige Strichstärke etwas geändert.
+
+     Leistung, Geschwindigkeit und Durchgänge sind Marios Werte vom
+     2026-08-19, abgelesen aber am Reiter *Gravieren*. Sie stehen hier auf
+     Verdacht, bis er sie am Reiter *Liniengravur* bestätigt. */
+  schrift:  { art: 'VECTOR_ENGRAVING', power: 80, speed: 2000, repeat: 3,
+              frequency: 40, unsicher: true },
   /* 2026-08-19, Screenshot: Schneiden · benutzerdefiniert. 35 Durchgänge —
      durch 1,6 mm FR4 kommt der UV-Laser nur schichtweise. Fokusabstieg,
      Schnittfugenkorrektur und Tab-Erstellung aus. */
@@ -3079,17 +3083,19 @@ function xsWerteZeile(lage) {
     var w = xsWerte(id);
     /* Ungeprüfte Zeilen kennzeichnen — sonst sieht eine geratene Vorgabe
        genauso verbindlich aus wie ein abgelesener Wert. */
-    var marke = v.gemessen ? '' : ' <span class="xsroh" title="Noch die Materialvorgabe, nicht eingestellt">?</span>';
+    var marke = v.gemessen ? ''
+      : v.unsicher ? ' <span class="xsroh" title="Werte von einem anderen Reiter übernommen — noch nicht bestätigt">?</span>'
+      : ' <span class="xsroh" title="Noch die Materialvorgabe, nicht eingestellt">?</span>';
     return '<tr' + (v.gemessen ? '' : ' class="roh"') + '>' + nr + '<td>' + e.name + marke + '</td><td>' + (XSNAMEN[v.art] || v.art) + '</td>' +
            '<td>' + w.power + ' %</td><td>' + w.speed + ' mm/s</td><td>' + w.repeat + '×</td></tr>';
   });
   var offen = xsReihenfolge(lage).filter(function (id) {
     return XSVERFAHREN[id] && !XSVERFAHREN[id].gemessen && (XSSTUMM[lage] || []).indexOf(id) < 0;
   }).length;
+  var xsWort = offen > 1 ? 'Ebenen mit ? sind noch nicht bestätigt' : 'Ebene mit ? ist noch nicht bestätigt';
   return '<table class="xswerte"><tbody>' + zeilen.join('') + '</tbody></table>' +
          '<p class="hint">Gerät: ' + XSGERAET.name + '. ' +
-         (offen ? '<b>' + offen + ' Ebene' + (offen > 1 ? 'n' : '') + ' mit ? ' +
-                  (offen > 1 ? 'tragen' : 'trägt') + ' noch die Materialvorgabe</b> — in Studio prüfen, bevor es losgeht.'
+         (offen ? '<b>' + offen + ' ' + xsWort + '</b> — in Studio prüfen, bevor es losgeht.'
                 : 'Alle Werte sind eingestellt.') + '</p>';
 }
 el('expStd').addEventListener('click', function () { expSetzen(expStandardsatz(expLage)); expSichern(); });
