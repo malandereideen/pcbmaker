@@ -2277,7 +2277,15 @@ function xsBauen(lage) {
       var v = XSVERFAHREN[e.id] || XSVERFAHREN.rest;
       var did = uuid(), pid = 'profile:' + e.id, h = hashes[i], box = e.box;
 
-      layerData[e.farbe] = { name: e.farbe.toUpperCase(), order: i + 1, visible: true };
+      /* Absteigend wie zOrder. Die Farbliste in Studio steht nach `order`
+         sortiert, höchster oben — und genau diese Liste arbeitet die
+         Maschine von oben nach unten ab. Aufsteigend nummeriert stand sie
+         spiegelverkehrt zur Objektliste, und man musste sie vor jedem Lauf
+         von Hand umsortieren.
+         Der Name ist der der Ebene, nicht der Hex-Wert: in der Farbliste
+         steht sonst nur #96D71D, und welche Ebene das ist, weiss man dann
+         nicht mehr. */
+      layerData[e.farbe] = { name: e.name, order: ebenen.length - i, visible: true };
       bucket[h] = e.d;
       index[h] = { hash: h, size: e.d.length };
 
