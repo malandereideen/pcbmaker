@@ -141,6 +141,38 @@
   }
   .dlg::backdrop { background: rgba(0,0,0,.45); }
   .dlg--schmal { width: min(420px, calc(100vw - 32px)); }
+  .dlg--breit { width: min(1060px, calc(100vw - 32px)); }
+
+  /* Konfigurationstabelle. Eng gesetzt — zwölf Ebenen mal acht Felder
+     passen anders nicht ohne Scrollen auf den Schirm. */
+  .ktab-roll { overflow-x: auto; }
+  .ktab { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .ktab th { text-align: left; font-weight: 500; color: var(--text-muted); font-size: 11px;
+             padding: 0 5px 4px 0; white-space: nowrap; }
+  .ktab td { padding: 2px 5px 2px 0; border-top: 1px solid var(--border); vertical-align: middle; }
+  .ktab tr.aus td { opacity: .45; }
+  .ktab .knr { color: var(--text-faint); font-family: var(--font-mono); font-size: 11px; text-align: right; width: 16px; }
+  .ktab input[type=color] { width: 34px; height: 22px; padding: 1px; border: 1px solid var(--border);
+                            border-radius: 5px; background: var(--surface); cursor: pointer; }
+  .ktab input[type=text] { width: 100%; min-width: 130px; }
+  /* Breit genug für vierstellige Werte samt Spinner — 2000 mm/s wurde
+     sonst als "200(" abgeschnitten. */
+  .ktab input[type=number] { width: 82px; text-align: right; }
+  .ktab select { min-width: 108px; }
+  .ktab .kextra { color: var(--text-muted); }
+  .ktab .kextra label { display: inline-flex; align-items: center; gap: 4px; margin-right: 10px; font-size: 11.5px; }
+  .ktab .kextra input[type=number] { width: 70px; }
+  .ktab .kextra input[type=checkbox] { width: 13px; height: 13px; margin: 0; accent-color: var(--blue); }
+
+  .kablauf { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px; align-items: start; }
+  @media (max-width: 720px) { .kablauf { grid-template-columns: 1fr; } }
+  .kseite { margin: 0 0 6px; font-size: 12.5px; font-weight: 500; color: var(--text); }
+  .kzeile { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; font-size: 12px; }
+  .kzeile .kpunkt { width: 11px; height: 11px; border-radius: 3px; flex: none; border: 1px solid var(--border); }
+  .kzeile .kname { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .kzeile .btn { padding: 2px 7px; font-size: 12px; line-height: 1.2; }
+  .kzeile label { display: inline-flex; align-items: center; gap: 4px; color: var(--text-muted); font-size: 11.5px; white-space: nowrap; }
+  .kzeile label input { width: 13px; height: 13px; margin: 0; accent-color: var(--blue); }
   /* Was gleich losfaehrt, in einer Zeile je Ebene. */
   .xswerte { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
   .xswerte td { padding: 3px 6px 3px 0; border-top: 1px solid var(--border); color: var(--text-muted); }
@@ -380,6 +412,9 @@
         <div class="btns eins">
           <button id="bauteilAuf" class="btn">Eigenes Bauteil …</button>
         </div>
+        <div class="btns eins">
+          <button id="konfigAuf" class="btn" title="Ebenen, Farben, Namen und die Laserwerte für den xTool-Export">Konfiguration …</button>
+        </div>
         <input type="file" id="file" accept=".json,application/json" hidden>
       </div>
 
@@ -437,6 +472,35 @@
      Spalte stehen: Unter- und Oberseite brauchen verschiedene Ebenen, und in
      einem festen Kasten muesste man vor jedem der beiden Exporte umhaken und
      danach zurueck. Der Dialog merkt sich beide Saetze getrennt. -->
+<!-- Ebenen und Laserwerte zum Selberstellen. Vorher stand beides fest im
+     Quelltext, jede Änderung ging über Claude. -->
+<dialog id="konfigDlg" class="dlg dlg--breit">
+  <h2 class="dlg__titel">Konfiguration</h2>
+
+  <h3 class="group__title">Ebenen und Laserwerte</h3>
+  <p class="hint" style="margin:0 0 10px">Farbe und Name gelten überall. Die Laserwerte gehen in
+    den xTool-Export — das SVG kennt sie nicht.</p>
+  <div class="ktab-roll"><table class="ktab" id="konfigTab"><tbody></tbody></table></div>
+
+  <h3 class="group__title" style="margin-top:18px">Ablauf je Seite</h3>
+  <p class="hint" style="margin:0 0 10px">Reihenfolge von oben nach unten ist die Reihenfolge, in der
+    die Maschine arbeitet. <b>Nur ausrichten</b> heißt: liegt auf der Fläche, wird aber nicht bearbeitet.</p>
+  <div class="kablauf">
+    <div><h4 class="kseite">Unterseite</h4><div id="konfigUnten"></div></div>
+    <div><h4 class="kseite">Oberseite</h4><div id="konfigOben"></div></div>
+  </div>
+
+  <div class="dlg__fuss">
+    <button id="konfigStd" class="btn" type="button" title="Alles zurück auf den Auslieferungszustand">Zurücksetzen</button>
+    <button id="konfigAus" class="btn" type="button">Sichern …</button>
+    <button id="konfigEin" class="btn" type="button">Einlesen …</button>
+    <input type="file" id="konfigDatei" accept=".json,application/json" hidden>
+    <span class="dlg__luecke"></span>
+    <button id="konfigZu" class="btn" type="button">Abbrechen</button>
+    <button id="konfigOk" class="btn btn--primary" type="button">Übernehmen</button>
+  </div>
+</dialog>
+
 <!-- Eigene Bauteile werden selten angelegt und brauchen dann sechs Felder.
      Dauerhaft in der Leiste kosten sie Platz, den die Regler taeglich brauchen
      — deshalb hinter einem Knopf. -->
@@ -2541,6 +2605,295 @@ el('textS').addEventListener('input', function () {
 
 el('padForm').addEventListener('change', function () { S.padForm = this.value; });
 
+/* ============================================================
+   Konfiguration
+
+   Ebenennamen, Farben, Laserwerte und der Ablauf je Seite standen bis zum
+   2026-08-19 fest im Quelltext. Jede Änderung ging damit über jemanden, der
+   die Datei aufmacht. Jetzt liegen sie im Browser-Speicher und lassen sich
+   hier einstellen — samt Sichern und Einlesen, damit sie nicht am Gerät
+   kleben und beim Leeren des Browsers weg sind.
+   ============================================================ */
+var KONFIGKEY = 'pcbmaker-konfig', KONFIGVERSION = 1;
+
+/* Der Auslieferungszustand, damit Zurücksetzen etwas hat, worauf es
+   zurücksetzt. Erst beim Start festgehalten, nicht hier: EBENEN und XSEBENEN
+   stehen weiter unten in der Datei und sind an dieser Stelle noch leer. */
+var KONFIGSTD = null;
+function konfigStdMerken() {
+  if (KONFIGSTD) return;
+  KONFIGSTD = {
+    namen:     EBENEN.map(function (e) { return e.name; }),
+    farben:    JSON.parse(JSON.stringify(FARBSTD)),
+    verfahren: JSON.parse(JSON.stringify(XSVERFAHREN)),
+    ablauf:    JSON.parse(JSON.stringify(XSEBENEN)),
+    stumm:     JSON.parse(JSON.stringify(XSSTUMM))
+  };
+}
+
+function konfigLesen() {
+  try {
+    var d = JSON.parse(localStorage.getItem(KONFIGKEY) || 'null');
+    if (d && d.v === KONFIGVERSION) return d;
+  } catch (e) { }
+  return null;
+}
+function konfigSchreiben() {
+  if (!bereit) return;
+  var d = { v: KONFIGVERSION, namen: {}, farben: {}, verfahren: {}, ablauf: {}, stumm: {} };
+  EBENEN.forEach(function (e) { d.namen[e.id] = e.name; d.farben[e.id] = S.farben[e.id]; });
+  d.verfahren = JSON.parse(JSON.stringify(XSVERFAHREN));
+  d.ablauf = JSON.parse(JSON.stringify(XSEBENEN));
+  d.stumm = JSON.parse(JSON.stringify(XSSTUMM));
+  try { localStorage.setItem(KONFIGKEY, JSON.stringify(d)); } catch (e) { }
+}
+/* Gespeichertes über die Vorgaben legen. Unbekannte Ebenen-Ids werden
+   übergangen — sonst zieht eine alte Sicherung Namen mit, zu denen es keine
+   Ebene mehr gibt. */
+function konfigAnwenden(d) {
+  if (!d) return;
+  EBENEN.forEach(function (e) {
+    if (d.namen && d.namen[e.id]) e.name = d.namen[e.id];
+    if (d.farben && d.farben[e.id]) S.farben[e.id] = d.farben[e.id];
+  });
+  if (d.verfahren) Object.keys(d.verfahren).forEach(function (id) {
+    if (XSVERFAHREN[id]) XSVERFAHREN[id] = d.verfahren[id];
+  });
+  ['unten', 'oben'].forEach(function (l) {
+    if (d.ablauf && d.ablauf[l]) XSEBENEN[l] = d.ablauf[l].filter(gibtEbene);
+    if (d.stumm && d.stumm[l]) XSSTUMM[l] = d.stumm[l].filter(gibtEbene);
+  });
+  ebenenAuffrischen();
+}
+function gibtEbene(id) { return EBENEN.some(function (e) { return e.id === id; }); }
+function ebene(id) { return EBENEN.filter(function (e) { return e.id === id; })[0]; }
+
+/* Namen und Farben stehen im Export-Dialog in einer Liste, die beim Start
+   einmal gebaut wird. Nach einer Änderung muss sie nachgezogen werden. */
+function ebenenAuffrischen() {
+  [].forEach.call(document.querySelectorAll('.ebene'), function (z, i) {
+    var e = EBENEN[i];
+    if (!e) return;
+    var n = z.querySelector('.name'), f = z.querySelector('input[type=color]');
+    if (n) n.textContent = e.name;
+    if (f) f.value = S.farben[e.id];
+  });
+}
+
+var KONFIGARTEN = [
+  ['VECTOR_ENGRAVING', 'Linie gravieren'],
+  ['FILL_VECTOR_ENGRAVING', 'Fläche gravieren'],
+  ['VECTOR_CUTTING', 'schneiden']
+];
+
+/* ---------- Dialog aufbauen ---------- */
+function konfigBauen() {
+  var tb = el('konfigTab').querySelector('tbody');
+  tb.innerHTML = '<tr><th></th><th>Farbe</th><th>Name</th><th>Verfahren</th>' +
+    '<th>Leistung&nbsp;%</th><th>mm/s</th><th>Durchg.</th><th>kHz</th></tr>';
+
+  EBENEN.forEach(function (e, i) {
+    var v = XSVERFAHREN[e.id] || { art: 'FILL_VECTOR_ENGRAVING' };
+    var w = xsWerte(e.id);
+    var tr = document.createElement('tr');
+    tr.dataset.id = e.id;
+    tr.innerHTML =
+      '<td class="knr">' + (i + 1) + '</td>' +
+      '<td><input type="color" data-f="farbe" value="' + S.farben[e.id] + '"></td>' +
+      '<td><input type="text" data-f="name" maxlength="40" value="' + e.name.replace(/"/g, '&quot;') + '"></td>' +
+      '<td><select data-f="art">' + KONFIGARTEN.map(function (a) {
+        return '<option value="' + a[0] + '"' + (a[0] === v.art ? ' selected' : '') + '>' + a[1] + '</option>';
+      }).join('') + '</select></td>' +
+      '<td><input type="number" data-f="power" min="0" max="100" step="1" value="' + w.power + '"></td>' +
+      '<td><input type="number" data-f="speed" min="1" max="20000" step="1" value="' + w.speed + '"></td>' +
+      '<td><input type="number" data-f="repeat" min="1" max="200" step="1" value="' + w.repeat + '"></td>' +
+      '<td><input type="number" data-f="frequency" min="1" max="200" step="1" value="' + w.frequency + '"></td>';
+    tb.appendChild(tr);
+
+    /* Zweite Zeile mit dem, was nur ein Verfahren betrifft. Sie steht immer
+       da, zeigt aber nur die Felder, die zur gewählten Art gehören. */
+    var tx = document.createElement('tr');
+    tx.dataset.extra = e.id;
+    tx.innerHTML = '<td></td><td colspan="7" class="kextra">' +
+      '<span data-nur="gravur">' +
+        '<label>Linien/cm <input type="number" data-f="density" min="10" max="2000" step="10" value="' + w.density + '"></label>' +
+        '<label>Winkel <input type="number" data-f="scanAngle" min="0" max="180" step="1" value="' + w.scanAngle + '"></label>' +
+        '<label><input type="checkbox" data-f="angleType"' + (w.angleType === 2 ? ' checked' : '') + '> zunehmend</label>' +
+        '<label><input type="checkbox" data-f="crossAngle"' + (w.crossAngle ? ' checked' : '') + '> Schraffur</label>' +
+        '<label><input type="checkbox" data-f="outlineTrace"' + (w.outlineTrace ? ' checked' : '') + '> Konturverfolgung</label>' +
+      '</span>' +
+      '<span data-nur="schnitt">' +
+        '<label><input type="checkbox" data-f="cuttingDrop"' + (w.cuttingDrop ? ' checked' : '') + '> Fokusabstieg</label>' +
+        '<label><input type="checkbox" data-f="enableBreakPoint"' + (w.enableBreakPoint ? ' checked' : '') + '> Tab-Erstellung</label>' +
+      '</span>' +
+      '<label><input type="checkbox" data-f="enableKerf"' + (w.enableKerf ? ' checked' : '') + '> Schnittfugenkorrektur</label>' +
+      '</td>';
+    tb.appendChild(tx);
+
+    var sel = tr.querySelector('[data-f=art]');
+    function extraZeigen() {
+      var art = sel.value;
+      tx.querySelector('[data-nur=gravur]').style.display = art === 'FILL_VECTOR_ENGRAVING' ? '' : 'none';
+      tx.querySelector('[data-nur=schnitt]').style.display = art === 'VECTOR_CUTTING' ? '' : 'none';
+    }
+    sel.addEventListener('change', extraZeigen);
+    extraZeigen();
+  });
+
+  konfigAblaufBauen('unten');
+  konfigAblaufBauen('oben');
+}
+
+/* Der Ablauf einer Seite: die gewählten Ebenen in Arbeitsreihenfolge, dazu
+   Pfeile zum Verschieben und ein Kästchen für "nur ausrichten". */
+function konfigAblaufBauen(lage) {
+  var wo = el(lage === 'unten' ? 'konfigUnten' : 'konfigOben');
+  var liste = (XSEBENEN[lage] || []).filter(gibtEbene);
+  wo.innerHTML = '';
+
+  liste.forEach(function (id, i) {
+    var e = ebene(id);
+    var z = document.createElement('div');
+    z.className = 'kzeile';
+    z.innerHTML =
+      '<span class="kpunkt" style="background:' + S.farben[id] + '"></span>' +
+      '<span class="kname">' + (i + 1) + '. ' + e.name + '</span>' +
+      '<label><input type="checkbox" data-stumm' + ((XSSTUMM[lage] || []).indexOf(id) >= 0 ? ' checked' : '') + '> nur ausrichten</label>' +
+      '<button type="button" class="btn" data-hoch' + (i === 0 ? ' disabled' : '') + '>↑</button>' +
+      '<button type="button" class="btn" data-runter' + (i === liste.length - 1 ? ' disabled' : '') + '>↓</button>' +
+      '<button type="button" class="btn" data-weg title="Aus dem Ablauf nehmen">×</button>';
+
+    z.querySelector('[data-stumm]').addEventListener('change', function () {
+      var s = XSSTUMM[lage] || (XSSTUMM[lage] = []);
+      var p = s.indexOf(id);
+      if (this.checked && p < 0) s.push(id);
+      if (!this.checked && p >= 0) s.splice(p, 1);
+    });
+    z.querySelector('[data-hoch]').addEventListener('click', function () { konfigSchieben(lage, i, -1); });
+    z.querySelector('[data-runter]').addEventListener('click', function () { konfigSchieben(lage, i, 1); });
+    z.querySelector('[data-weg]').addEventListener('click', function () {
+      XSEBENEN[lage].splice(i, 1);
+      var s = XSSTUMM[lage] || [], p = s.indexOf(id);
+      if (p >= 0) s.splice(p, 1);
+      konfigAblaufBauen(lage);
+    });
+    wo.appendChild(z);
+  });
+
+  var fehlen = EBENEN.filter(function (e) { return liste.indexOf(e.id) < 0; });
+  if (fehlen.length) {
+    var z = document.createElement('div');
+    z.className = 'kzeile';
+    z.innerHTML = '<select style="flex:1"><option value="">+ Ebene hinzufügen …</option>' +
+      fehlen.map(function (e) { return '<option value="' + e.id + '">' + e.name + '</option>'; }).join('') + '</select>';
+    z.querySelector('select').addEventListener('change', function () {
+      if (!this.value) return;
+      XSEBENEN[lage] = liste.concat([this.value]);
+      konfigAblaufBauen(lage);
+    });
+    wo.appendChild(z);
+  }
+}
+function konfigSchieben(lage, i, d) {
+  var l = XSEBENEN[lage], j = i + d;
+  if (j < 0 || j >= l.length) return;
+  var t = l[i]; l[i] = l[j]; l[j] = t;
+  konfigAblaufBauen(lage);
+}
+
+/* ---------- Dialog auslesen ---------- */
+function konfigUebernehmen() {
+  [].forEach.call(el('konfigTab').querySelectorAll('tr[data-id]'), function (tr) {
+    var id = tr.dataset.id, e = ebene(id);
+    var tx = el('konfigTab').querySelector('tr[data-extra="' + id + '"]');
+    function feld(f) { return tr.querySelector('[data-f=' + f + ']') || tx.querySelector('[data-f=' + f + ']'); }
+    function zahl(f) { var n = parseFloat(feld(f).value); return isFinite(n) ? n : 0; }
+    function ja(f) { return feld(f).checked; }
+
+    var name = feld('name').value.trim();
+    if (name) e.name = name;
+    S.farben[id] = feld('farbe').value;
+
+    var art = feld('art').value;
+    var v = { art: art, power: zahl('power'), speed: zahl('speed'), repeat: zahl('repeat'),
+              frequency: zahl('frequency'), enableKerf: ja('enableKerf'),
+              /* Von Hand eingestellt heisst geprüft — das orange ? im
+                 Export-Dialog verschwindet damit. */
+              gemessen: true };
+    if (art === 'FILL_VECTOR_ENGRAVING') {
+      v.density = zahl('density');
+      v.scanAngle = zahl('scanAngle');
+      v.angleType = ja('angleType') ? 2 : 1;
+      v.crossAngle = ja('crossAngle');
+      v.outlineTrace = ja('outlineTrace');
+    }
+    if (art === 'VECTOR_CUTTING') {
+      v.cuttingDrop = ja('cuttingDrop');
+      v.enableBreakPoint = ja('enableBreakPoint');
+    }
+    XSVERFAHREN[id] = v;
+  });
+
+  ebenenAuffrischen();
+  ebenenSync();
+  konfigSchreiben();
+  farbenSichern();
+  if (el('expDlg').open && expArt === 'xs') el('expWerte').innerHTML = xsWerteZeile(expLage);
+  zeichne();
+}
+
+el('konfigAuf').addEventListener('click', function () {
+  /* Auf einer Kopie arbeiten: wer abbricht, soll nichts verändert haben.
+     Ablauf und Stummschaltung ändern sich schon beim Klicken auf die
+     Pfeile — ohne Kopie wäre Abbrechen dort wirkungslos. */
+  konfigSicherung = { ablauf: JSON.parse(JSON.stringify(XSEBENEN)),
+                      stumm: JSON.parse(JSON.stringify(XSSTUMM)) };
+  konfigBauen();
+  el('konfigDlg').showModal();
+});
+var konfigSicherung = null;
+el('konfigZu').addEventListener('click', function () {
+  if (konfigSicherung) { XSEBENEN = konfigSicherung.ablauf; XSSTUMM = konfigSicherung.stumm; }
+  el('konfigDlg').close();
+});
+el('konfigOk').addEventListener('click', function () {
+  konfigUebernehmen();
+  konfigSicherung = null;
+  el('konfigDlg').close();
+});
+el('konfigStd').addEventListener('click', function () {
+  EBENEN.forEach(function (e, i) { e.name = KONFIGSTD.namen[i]; S.farben[e.id] = KONFIGSTD.farben[e.id]; });
+  XSVERFAHREN = JSON.parse(JSON.stringify(KONFIGSTD.verfahren));
+  XSEBENEN = JSON.parse(JSON.stringify(KONFIGSTD.ablauf));
+  XSSTUMM = JSON.parse(JSON.stringify(KONFIGSTD.stumm));
+  konfigBauen();
+});
+el('konfigAus').addEventListener('click', function () {
+  var d = { v: KONFIGVERSION, namen: {}, farben: {}, verfahren: XSVERFAHREN,
+            ablauf: XSEBENEN, stumm: XSSTUMM };
+  EBENEN.forEach(function (e) { d.namen[e.id] = e.name; d.farben[e.id] = S.farben[e.id]; });
+  lade('pcbmaker-konfiguration.json', JSON.stringify(d, null, 1), 'application/json');
+});
+el('konfigEin').addEventListener('click', function () { el('konfigDatei').click(); });
+el('konfigDatei').addEventListener('change', function () {
+  var f = this.files[0];
+  if (!f) return;
+  var r = new FileReader();
+  r.onload = function () {
+    try {
+      var d = JSON.parse(r.result);
+      if (!d || d.v !== KONFIGVERSION) throw new Error('andere Fassung');
+      konfigAnwenden(d);
+      konfigBauen();
+      el('stWarn').textContent = 'Konfiguration eingelesen.';
+    } catch (e) {
+      el('stWarn').textContent = 'Konfiguration nicht eingelesen: ' + e.message;
+    }
+  };
+  r.readAsText(f);
+  this.value = '';
+});
+
 /* Der Bauteil-Dialog haelt die Auswahl fest: waehrend er offen ist, kann man
    nicht auf der Platine klicken, und das ist gut so — sonst waere die
    Auswahl, die gespeichert werden soll, mit dem ersten Klick weg. */
@@ -3195,6 +3548,10 @@ el('stage').addEventListener('wheel', function (e) {
 holen();
 bereit = true;
 farbenHolen();
+/* Erst den Auslieferungszustand festhalten, dann die eigene Konfiguration
+   darüberlegen — sonst wäre "Zurücksetzen" ein Zurück auf die eigenen Werte. */
+konfigStdMerken();
+konfigAnwenden(konfigLesen());
 ebenenSync();
 el('cols').value = S.cols; el('rows').value = S.rows;
 el('colsV').value = S.cols; el('rowsV').value = S.rows;

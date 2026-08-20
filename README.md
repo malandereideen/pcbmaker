@@ -44,6 +44,11 @@ etwas macht: Export, Fräsbahnen, Pad und Bahn, Isolierfräsen, Kontur.
 *Eigenes Bauteil* liegt hinter einem Knopf unter Speichern/Laden/Leeren — sechs Felder, die
 man selten braucht, kosten in der Leiste jeden Tag Platz.
 
+*Konfiguration* liegt daneben. Dort stehen alle Ebenen mit Farbe, Name und den Laserwerten für
+den xTool-Export, darunter der Ablauf je Seite: welche Ebene wann drankommt, und welche nur
+zum Ausrichten mitfährt. Alles liegt im Browser-Speicher und lässt sich als `.json` sichern und
+einlesen — sonst hängt es an einem Rechner und ist beim Leeren des Browsers weg.
+
 Erklärungen stehen nicht mehr als Absätze zwischen den Reglern, sondern hängen als Tooltip an
 dem Element, das sie erklären — erkennbar am gepunkteten Unterstrich.
 
